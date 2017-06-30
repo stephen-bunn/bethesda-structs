@@ -1,7 +1,7 @@
-bethesda_structs
-================
+Modules
+=======
 
 .. toctree::
-   :maxdepth: 4
+    :maxdepth: 3
 
-   bethesda_structs
+    bethesda_structs

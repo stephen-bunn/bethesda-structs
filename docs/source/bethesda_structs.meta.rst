@@ -1,24 +1,22 @@
-bethesda\_structs\.meta package
-===============================
+bethesda\_structs\.meta
+=======================
 
 .. automodule:: bethesda_structs.meta
     :members:
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
 
-bethesda\_structs\.meta\.checksummed module
--------------------------------------------
+bethesda\_structs\.meta\.checksummed
+------------------------------------
 
 .. automodule:: bethesda_structs.meta.checksummed
     :members:
     :undoc-members:
     :show-inheritance:
 
-bethesda\_structs\.meta\.prefixed module
-----------------------------------------
+bethesda\_structs\.meta\.prefixed
+---------------------------------
 
 .. automodule:: bethesda_structs.meta.prefixed
     :members:

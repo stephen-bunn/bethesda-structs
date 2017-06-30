@@ -1,5 +1,5 @@
-bethesda\_structs package
-=========================
+bethesda\_structs
+=================
 
 .. automodule:: bethesda_structs
     :members:

@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT <https://opensource.org/licenses/MIT>
+# MIT License <https://opensource.org/licenses/MIT>
 
 import os
 import enum
@@ -201,9 +201,10 @@ class TES4Record(meta.Prefixed):
     def data(self) -> bytes:
         """ The data of the TES4 record.
 
-        .. note:: When ``flags.DATA_COMPRESSED`` is true, the record data is \
-            compressed and can be decompressed with :mod:`zlib` using \
-            :const:`zlib.MAX_WBITS` as the extraction method (`zlib`).\
+        .. note:: When :const:`flags.DATA_COMPRESSED` is true, \
+            the record data is compressed and can be decompressed \
+            with :mod:`zlib` using :const:`zlib.MAX_WBITS` as the \
+            extraction method (`zlib`).\
             **This is done automatically.**
 
         :getter: Returns the data of the TES4 record

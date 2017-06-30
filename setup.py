@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT <https://opensource.org/licenses/MIT>
+# MIT License <https://opensource.org/licenses/MIT>
 
 import os
 import setuptools
@@ -36,7 +36,8 @@ setuptools.setup(
     extras_require={
         'dev': [
             'sphinx',
-            'sphinx-autodoc-typehints'
+            'sphinx-autodoc-typehints',
+            'sphinx-readable-theme',
         ]
     }
 )

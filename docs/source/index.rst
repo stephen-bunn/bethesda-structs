@@ -1,17 +1,20 @@
+Bethesda Structs
+================
 
-Welcome to Bethesda Structs's documentation!
-============================================
+A wrapper for some of `Bethesda's <https://bethesda.net/>`_ more popular archive and plugin file formats.
 
 .. toctree::
     :maxdepth: 2
     :caption: User Documentation
 
+    getting_started
+
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Reference
 
+    changelog
     modules
-
 
 
 Indices and tables

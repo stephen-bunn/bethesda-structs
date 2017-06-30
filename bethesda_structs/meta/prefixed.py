@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 #
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT <https://opensource.org/licenses/MIT>
+# MIT License <https://opensource.org/licenses/MIT>
 
 import abc
 import struct

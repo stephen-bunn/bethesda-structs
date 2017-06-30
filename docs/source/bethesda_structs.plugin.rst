@@ -1,16 +1,14 @@
-bethesda\_structs\.plugin package
-=================================
+bethesda\_structs\.plugin
+=========================
 
 .. automodule:: bethesda_structs.plugin
     :members:
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
 
-bethesda\_structs\.plugin\.tes4 module
---------------------------------------
+bethesda\_structs\.plugin\.tes4
+--------------------------------
 
 .. automodule:: bethesda_structs.plugin.tes4
     :members:
