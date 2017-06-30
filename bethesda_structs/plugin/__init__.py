@@ -20,8 +20,11 @@ def get_plugin(filepath: str) -> AbstractPlugin:
     :returns: An initialized plugin, hopefully
     """
 
+    # iterate over all the imported plugins
     for (class_name, class_ref,) in \
             inspect.getmembers(sys.modules[__name__], inspect.isclass):
+        # return the first plugin that can handle the file
+        # and isn't an abstract class
         if class_ref not in (AbstractPlugin,) and \
                 class_ref.can_handle(filepath):
             return class_ref(filepath)

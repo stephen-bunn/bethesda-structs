@@ -20,8 +20,11 @@ def get_archive(filepath: str) -> AbstractArchive:
     :returns: An initialized archive, hopefully
     """
 
+    # iterate over all the imported archives
     for (class_name, class_ref,) in \
             inspect.getmembers(sys.modules[__name__], inspect.isclass):
+        # return the first archive that can handle the file
+        # and isn't an abstract class
         if class_ref not in (AbstractArchive,) and \
                 class_ref.can_handle(filepath):
             return class_ref(filepath)

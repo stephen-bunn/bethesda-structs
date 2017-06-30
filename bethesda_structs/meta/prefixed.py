@@ -50,8 +50,11 @@ class Prefixed(object, metaclass=abc.ABCMeta):
         :type buffer: bytes
         """
 
+        # save the buffer, aesthetic addition
         self._buffer = buffer
 
+        # unpack the required prefix structure from the given buffer
+        # into the required prefix names before continuing
         for (name, value) in zip(
             self._prefix_names,
             struct.unpack(

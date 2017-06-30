@@ -35,11 +35,16 @@ class CheckSummed(object, metaclass=abc.ABCMeta):
         :returns: The checksum for the file at the class's filepath
         """
 
+        # get the algorithm requested from hashlib
         algorithm = getattr(hashlib, algorithm)()
         with open(self.filepath, 'rb') as fp:
+            # iterate over the file and build the hash given a standard
+            # chunk size (2^10 bytes)
             while True:
                 chunk = fp.read(self._checksum_chunksize)
                 if not chunk:
                     break
                 algorithm.update(chunk)
+
+        # give back the pretty hex digest
         return algorithm.hexdigest()

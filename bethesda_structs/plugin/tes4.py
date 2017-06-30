@@ -192,6 +192,8 @@ class TES4Record(meta.Prefixed):
 
         if not hasattr(self, '_editor_id'):
             self._editor_id = None
+            # iterate over the extracted fields and see if one with type
+            # EDID exists...
             for field in self.fields:
                 if field.type == b'EDID':
                     self._editor_id = field.data
@@ -211,9 +213,12 @@ class TES4Record(meta.Prefixed):
         :setter: Does not allow setting
         """
 
+        # sometimes record data is compressed using zlib 6 something
+        # this is indicated by the DATA_COMPRESSED flag
         if self.flags.DATA_COMPRESSED:
             if not hasattr(self, '_uncompressed_data'):
                 try:
+                    # try to decompress the data using zlib
                     self._uncompressed_data = zlib.decompress(
                         self._buffer[
                             (self._prefix_size + 0x4):
@@ -516,7 +521,10 @@ class TES4Plugin(AbstractPlugin):
                 header = TES4Record(fp.read(
                     struct.calcsize(TES4Record._prefix_struct)
                 ))
+                # should be able to handle the record if it's tagged as a TES4
+                # and is version 43, hopefully...
                 return (header.type == b'TES4') and (header.version == 43)
-            except IndexError as exc:
+            except struct.error as exc:
+                # catch if it can't even unpack the header
                 pass
         return False
