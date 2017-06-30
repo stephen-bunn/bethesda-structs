@@ -1,3 +1,6 @@
+.. _modules-page:
+
+=======
 Modules
 =======
 

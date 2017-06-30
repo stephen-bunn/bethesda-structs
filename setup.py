@@ -7,6 +7,8 @@
 import os
 import setuptools
 
+import bethesda_structs
+
 
 REQUIREMENTS = []
 with open(os.path.join(
@@ -17,14 +19,12 @@ with open(os.path.join(
 
 
 setuptools.setup(
-    name='bethesda-structs',
-    version='0.0.1',
-    description=(
-        'A wrapper for some of Bethesda\'s popular plugin/archive file formats'
-    ),
+    name=bethesda_structs.__name__,
+    version=bethesda_structs.__version__,
+    description=bethesda_structs.__description__,
     url='http://github.com/stephen-bunn/bethesda-structs',
-    author='Stephen Bunn',
-    author_email='stephen@bunn.io',
+    author=bethesda_structs.__author__,
+    author_email=bethesda_structs.__contact__,
     license='MIT',
     packages=[
         'bethesda_structs',

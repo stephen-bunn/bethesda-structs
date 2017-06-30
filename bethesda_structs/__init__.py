@@ -8,6 +8,14 @@ from typing import (Union,)
 
 from . import (plugin, archive,)
 
+__name__ = 'bethesda_structs'
+__description__ = (
+    'A wrapper for some of Bethesda\'s popular plugin/archive file formats'
+)
+__author__ = 'Stephen Bunn'
+__contact__ = 'stephen@bunn.io'
+__version__ = '0.0.0'
+
 
 def get_struct(filepath: str) -> \
         Union[plugin.AbstractPlugin, archive.AbstractArchive]:
