@@ -292,12 +292,18 @@ class BSAArchive(AbstractArchive):
         :returns: Does not return
         """
 
+        # read the contents of the buffer into working memory
+        # (kinda messy and stupid, just like me :D)
         self.filepath = filepath
         with open(self.filepath, 'rb') as fp:
             self._buffer = fp.read()
 
-        self.header = BSAHeader(self._buffer)
+        # immediately build header since it's useful for pre-analysis before
+        # extraction or processing of the data within the archive
+        self._header = BSAHeader(self._buffer)
 
+        # extract folders structs to a "private" variable because they
+        # are not very useful to the user
         self._folders = []
         buffer_offset = len(self.header)
         for _ in range(self.header.folder_count):
@@ -359,22 +365,6 @@ class BSAArchive(AbstractArchive):
 
         return self._header
 
-    @header.setter
-    def header(self, header: BSAHeader) -> None:
-        """ Sets the header of the BSA archive.
-
-        :param header: The new header of the BSA archive
-        :type header: BSAHeader
-        :returns: Does not return
-        """
-
-        if not isinstance(header, BSAHeader):
-            raise ValueError((
-                "{self.__class__.__name__} header must be an instance of "
-                "BSAHeader"
-            ).format(**locals()))
-        self._header = header
-
     @property
     def files(self) -> List[BSAFile]:
         """ The files within the BSA archive.
@@ -384,40 +374,64 @@ class BSAArchive(AbstractArchive):
         """
 
         if not hasattr(self, '_files'):
+            # oh jeez, here we go
             self._files = []
+
+            # get the buffer offset for the begining of the file data,
+            # this data is after both the archive prefix and all the folder
+            # structures which were unpacked on initialization
             buffer_offset = (
                 sum(len(folder) for folder in self._folders) +
                 self.header._prefix_size
             )
             for folder in self._folders:
-                filepath_length = ord(self._buffer[
+
+                # the length of the dirpath is stored in a single byte
+                # preceeding the dirpath
+                dirpath_length = ord(self._buffer[
                     buffer_offset:(buffer_offset + 1)
                 ])
+                # account for the byte that was just read
                 buffer_offset += 1
-                filepath = str(self._buffer[
-                    buffer_offset:(buffer_offset + filepath_length)
+
+                # get that damn dirpath
+                dirpath = str(self._buffer[
+                    buffer_offset:(buffer_offset + dirpath_length)
                 ], 'utf-8')[:-1]
-                buffer_offset += filepath_length
+                # account for that damn dirpath
+                buffer_offset += dirpath_length
 
                 for _ in range(folder.file_count):
+                    # each of the files within a folder take up a constant
+                    # size in bytes (just their prefixes)
                     file_offset = struct.calcsize(BSAFile._prefix_struct)
+                    # unpack and append the file given the **correct** buffer
                     file_ = BSAFile(
                         self._buffer[
                             buffer_offset:(buffer_offset + file_offset)
                         ],
-                        filepath
+                        dirpath
                     )
                     self._files.append(file_)
+                    # account for the just unpacked file
                     buffer_offset += file_offset
 
+            # now to get the bloody filenames
+            # the filenames are in the same ordering as the file objects
             (file_idx, filename,) = (0, b'',)
+            # there are no length indicators for filenames
+            # so we just have to go until we hit a null terminator
             while file_idx < len(self._files):
+                # get a character if a filename
                 filename_char = self._buffer[buffer_offset:(buffer_offset + 1)]
                 buffer_offset += 1
+                # if its not the end of a filename (null terminator), continue
                 if filename_char != b'\x00':
                     filename += filename_char
                     continue
 
+                # add the built filename to the corresponding file object
+                # (since they are ordered the same, just use index)
                 self._files[file_idx]._filename = str(filename, 'utf-8')
                 filename = b''
                 file_idx += 1
@@ -442,8 +456,10 @@ class BSAArchive(AbstractArchive):
                 header = BSAHeader(fp.read(
                     struct.calcsize(BSAHeader._prefix_struct)
                 ))
+                # should be able to handle the record if its tagged as a BSA
                 return (header.bsa == b'BSA\x00')
-            except IndexError as exc:
+            except struct.error as exc:
+                # catch if it can't even unpack the header
                 pass
         return False
 
@@ -461,18 +477,28 @@ class BSAArchive(AbstractArchive):
         :returns: Does not return
         """
 
+        # ensure the parent directory exists before trying to write to it
         if not os.path.isdir(to_dir):
             raise NotADirectoryError((
                 "no such directory '{to_dir}' exists"
             ).format(**locals()))
+
         total_count = len(self.files)
         for (file_idx, file_) in enumerate(self.files):
+            # get the full path the file is going to be saved to
             to_path = os.path.join(to_dir, file_.filepath)
             file_dirpath = os.path.dirname(to_path)
+
+            # if the full path's directory doesn't exist, create it
             if not os.path.isdir(file_dirpath):
                 os.makedirs(file_dirpath)
+
+            # if progress hook is enabled, report the progress
             if hook:
                 hook((file_idx + 1), total_count, to_path)
+
+            # write the archived file to the full path given the file
+            # object's offset and size
             with open(to_path, 'wb') as fp:
                 fp.write(self._buffer[
                     file_.offset:(file_.offset + file_.size)
