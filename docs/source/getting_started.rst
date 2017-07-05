@@ -11,7 +11,15 @@ Installation and Setup
 
 Installing the package should be super duper simple as we utilize Python's setuptools.
 
-    TODO SECTION
+Bethesda Structs is not yet on PyPI as it is still undergoing initial development.
+However, you can install Bethesda Structs by cloning the source and installing the package through the included setup script!
+
+.. code-block:: bash
+
+    $ git clone https://github.com/stephen-bunn/bethesda-structs.git
+    $ cd ./bethesda-structs
+    $ python setup.py install
+
 
 Example Usage
 =============
@@ -80,7 +88,7 @@ You can hook into the extraction progress callback by doing something similar to
     sys.stdout.write('\n')
 
 Your progress hook should take the ``current`` file number being extracted, the ``total`` number of files to be extracted, and the ``filepath`` where the file is being extracted to.
-`Your progress hook could also be cooler than this nasty little hook.`
+*Your progress hook could also be cooler than this nasty little hook.*
 
 
 List Masters of a TES Plugin
