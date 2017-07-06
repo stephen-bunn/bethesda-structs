@@ -16,3 +16,11 @@ bethesda\_structs\.archive\.bsa
     :show-inheritance:
 
 
+bethesda\_structs\.archive\.ba2
+-------------------------------
+
+.. automodule:: bethesda_structs.archive.ba2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

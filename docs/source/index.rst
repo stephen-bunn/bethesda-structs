@@ -15,7 +15,7 @@ To get started using this package, please see the :ref:`getting-started-page` pa
 
 ---
 
-.. image:: https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat-square
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
    :target: http://opensource.org/licenses/MIT
 
 .. image:: https://img.shields.io/github/release/stephen-bunn/bethesda-structs.svg?style=flat-square

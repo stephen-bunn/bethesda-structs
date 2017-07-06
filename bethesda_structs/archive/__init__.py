@@ -9,6 +9,7 @@ import inspect
 
 from ._common import AbstractArchive
 from .bsa import BSAArchive
+from .ba2 import BA2Archive
 
 
 def get_archive(filepath: str) -> AbstractArchive:

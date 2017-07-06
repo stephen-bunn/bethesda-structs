@@ -193,6 +193,8 @@ class BSAHeader(meta.Prefixed):
     def bsa(self) -> bytes:
         """ The BSA magic of the header.
 
+        .. note:: Should always be ``BSA`` in bytes terminated by a null byte.
+
         :getter: Returns the BSA magic of the header
         :setter: Does not allow setting
         """

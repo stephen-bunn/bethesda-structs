@@ -24,7 +24,7 @@ class CheckSummed(object, metaclass=abc.ABCMeta):
 
         raise NotImplementedError()
 
-    def checksum(self, algorithm: str='md5') -> str:
+    def checksum(self, algorithm: str='blake2b') -> str:
         """ Calculates a checksum for the file at the class's filepath.
 
         .. note:: Valid algorithm strings are the names of the \
