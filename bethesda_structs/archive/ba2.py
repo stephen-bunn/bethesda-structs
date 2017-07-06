@@ -432,6 +432,7 @@ class BA2TextureFile(meta.Prefixed):
         :returns: The length of the BA2 compressed texture file in bytes
         """
 
+        # need to account for all the chunks that make up the texture
         return (
             self._prefix_size + (
                 len(self.chunks) *
@@ -575,13 +576,18 @@ class BA2TextureFile(meta.Prefixed):
         if not hasattr(self, '_chunks'):
             self._chunks = []
 
+            # chunk prefix should just be calculated once
             chunk_prefix_size = struct.calcsize(BA2TextureChunk._prefix_struct)
             buffer_offset = self._prefix_size
             for chunk_idx in range(self.chunk_count):
+                # initialize a new chunk given the current buffer
                 chunk_ = BA2TextureChunk(self._buffer[
                     buffer_offset:(buffer_offset + chunk_prefix_size)
                 ])
+                # add the initialized texture chunk to the file's chunks
                 self._chunks.append(chunk_)
+                # chunk size is only as large as the prefix
+                # offset indicates where content is actually stored
                 buffer_offset += chunk_prefix_size
 
         return self._chunks
@@ -829,6 +835,7 @@ class BA2Archive(AbstractArchive):
         with open(self.filepath, 'rb') as fp:
             self._buffer = fp.read()
 
+        # get BA2 header immediately
         self._header = BA2Header(self._buffer)
 
     def __repr__(self) -> str:
@@ -896,31 +903,51 @@ class BA2Archive(AbstractArchive):
         if not hasattr(self, '_files'):
             self._files = []
 
+            # get the necessary file object based on archive type
+            # defaults to basic BA2File, if DX10 BA2TextureFile is used
             file_object = BA2File
             if self.header.type in (b'DX10',):
                 file_object = BA2TextureFile
 
+            # handle both buffer and name offsets at the same time
             buffer_offset = self.header._prefix_size
             name_offset = self.header.names_offset
 
+            # iterate over the number of files as defined in the header
             for file_idx in range(self.header.file_count):
+                # the length of the filepath is stored in a single byte
+                # preceeding the filepath
                 filepath_length = ord(self._buffer[
                     name_offset:(name_offset + 1)
                 ])
+                # account for the filepath length indicator and an
+                # accompanying null byte
                 name_offset += 2
 
+                # get the filepath for the file object from the table at
+                # the byte offset name_offset
                 filepath = str(self._buffer[
                     name_offset:(name_offset + filepath_length)
                 ], 'utf-8')
 
+                # initialize the file object with both the buffer and the
+                # filepath of the file
                 file_ = file_object(self._buffer[buffer_offset:], filepath)
+                # append the initialized file object to the archive's files
                 self._files.append(file_)
 
+                # increment buffer offset by specific count depending on
+                # the archive type.
+                #
+                # GNRL archives should be incremented by the size of their
+                # file prefix, otherwise the length of the file object
+                # should be used
                 buffer_offset += (
                     file_._prefix_size
                     if self.header.type in (b'GNRL',) else
                     len(file_)
                 )
+                # account for the read filepath in name_offset
                 name_offset += filepath_length
 
         return self._files
@@ -943,11 +970,14 @@ class BA2Archive(AbstractArchive):
                 header = BA2Header(fp.read(
                     struct.calcsize(BA2Header._prefix_struct)
                 ))
+                # should be able to handle the archive its tagged as a BTDX
+                # and is in the supported types GNRL and DX10
                 return (
                     (header.ba2 == b'BTDX') and
                     (header.type in (b'GNRL', b'DX10',))
                 )
             except struct.error as exc:
+                # catch if it can't even unpack the header
                 pass
         return False
 
@@ -967,15 +997,20 @@ class BA2Archive(AbstractArchive):
 
         total_count = len(self.files)
         for (file_idx, file_) in enumerate(self.files):
+            # get the full path the file is going to be saved to
             to_path = os.path.join(to_dir, file_.filepath)
             file_dirpath = os.path.dirname(to_path)
 
+            # if the full path's directory doesn't exist, create it
             if not os.path.isdir(file_dirpath):
                 os.makedirs(file_dirpath)
 
+            # if progress hook is enabled, report the progress
             if hook:
                 hook((file_idx + 1), total_count, to_path)
 
+            # write the archived file to the full path given the file
+            # object's offset and size
             with open(to_path, 'wb') as fp:
                 fp.write(self._buffer[
                     file_.offset:(file_.offset + file_.full_size)
@@ -1000,16 +1035,22 @@ class BA2Archive(AbstractArchive):
 
         total_count = len(self.files)
         for (file_idx, file_) in enumerate(self.files):
+            # get the full path the file is going to be saved to
             to_path = os.path.join(to_dir, file_.filepath)
             file_dirpath = os.path.dirname(to_path)
 
+            # if the full path's directory doesn't exist, create it
             if not os.path.isdir(file_dirpath):
                 os.makedirs(file_dirpath)
 
+            # if progress hook is enabled, report the progress
             if hook:
                 hook((file_idx + 1), total_count, to_path)
 
+            # DX10 requires that a DDSHeader is built
             dds_header = DDSHeader()
+            # check out this giant mess...
+            # intialize DDSHeader with valid flags and sizes
             dds_header.dwSize = ctypes.sizeof(DDSHeader)
             dds_header.dwFlags = (
                 DDSFlags.DDS_HEADER_FLAGS_TEXTURE |
@@ -1019,45 +1060,55 @@ class BA2Archive(AbstractArchive):
             dds_header.dwHeight = file_.height
             dds_header.dwWidth = file_.width
             dds_header.dwMipMapCount = file_.mipmap_count
+            # XXX: unknown attribute usage (dwSurfaceFlags)
+            # Not documented or anything, but used in BA2Lib... so why not?
             dds_header.dwSurfaceFlags = (
                 DDSFlags.DDS_SURFACE_FLAGS_TEXTURE |
                 DDSFlags.DDS_SURFACE_FLAGS_MIPMAP
             )
+            # initalize the pixel format size before messing with it
             dds_header.ddspf.dwSize = ctypes.sizeof(DDSPixelFormat)
 
             try:
+                # discover the dxgi format from the given file format
                 dxgi_format = DXGIFormats(file_.format)
 
+                # header configuration for bc1_unorm formats
                 if dxgi_format == DXGIFormats.DXGI_FORMAT_BC1_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_FOURCC
                     dds_header.ddspf.dwFourCC = fourcc(*'DXT1')
                     dds_header.dwPitchOrLinearSize = \
                         (file_.width * file_.height) // 2
 
+                # header configuration for bc2_unorm formats
                 elif dxgi_format == DXGIFormats.DXGI_FORMAT_BC2_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_FOURCC
                     dds_header.ddspf.dwFourCC = fourcc(*'DXT3')
                     dds_header.dwPitchOrLinearSize = \
                         (file_.width * file_.height)
 
+                # header configuration for bc3_unorm formats
                 elif dxgi_format == DXGIFormats.DXGI_FORMAT_BC3_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_FOURCC
                     dds_header.ddspf.dwFourCC = fourcc(*'DXT5')
                     dds_header.dwPitchOrLinearSize = \
                         (file_.width * file_.height)
 
+                # header configuration for bc5_unorm formats
                 elif dxgi_format == DXGIFormats.DXGI_FORMAT_BC5_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_FOURCC
                     dds_header.ddspf.dwFourCC = fourcc(*'ATI2')
                     dds_header.dwPitchOrLinearSize = \
                         (file_.width * file_.height)
 
+                # header configuration for bc7_unorm formats
                 elif dxgi_format == DXGIFormats.DXGI_FORMAT_BC7_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_FOURCC
                     dds_header.ddspf.dwFourCC = fourcc(*'BC7\x00')
                     dds_header.dwPitchOrLinearSize = \
                         (file_.width * file_.height)
 
+                # header configuration for b8g8r8a8_unorm formats
                 elif dxgi_format == DXGIFormats.DXGI_FORMAT_B8G8R8A8_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_RGBA
                     dds_header.ddspf.dwRGBBitCount = 32
@@ -1068,30 +1119,39 @@ class BA2Archive(AbstractArchive):
                     dds_header.dwPitchOrLinearSize = \
                         ((file_.width * file_.height) * 4)
 
+                # header configuration for r8_unorm formats
                 elif dxgi_format == DXGIFormats.DXGI_FORMAT_R8_UNORM:
                     dds_header.ddspf.dwFlags = DDSFlags.DDS_RGB
                     dds_header.ddspf.dwRGBBitCount = 8
                     dds_header.ddspf.dwRBitMask = 0x000000ff
                     dds_header.dwPitchOrLinearSize = \
                         (file_.width * file_.height)
+
+                # unsupported formats caught and thrown at your face
                 else:
                     raise NotImplementedError((
                         "unsupported dxgi format {dxgi_format}"
                     ).format(**locals()))
 
+            # invalid format numbers detected should just be ignored...
             except ValueError as exc:
                 pass
 
             with open(to_path, 'wb') as fp:
+                # write out the DDS_MAGIC and the built header
                 fp.write(struct.pack('<L', DDSFlags.DDS_MAGIC.value))
                 fp.write(dds_header)
 
+                # iterate over chunks for a given texture file
                 for chunk_ in file_.chunks:
                     if chunk_.packed_size > 0:
+                        # if the chunk is compressed, decompress up to the
+                        # packed_size using zlib
                         fp.write(zlib.decompress(self._buffer[
                             chunk_.offset:(chunk_.offset + chunk_.packed_size)
                         ]))
                     else:
+                        # just write the chunk out normally (no compression)
                         fp.write(self._buffer[
                             chunk_.offset:(chunk_.offset + chunk_.full_size)
                         ])
@@ -1110,11 +1170,13 @@ class BA2Archive(AbstractArchive):
         :returns: Does not return
         """
 
+        # ensure the parent directory exists before trying to write to it
         if not os.path.isdir(to_dir):
             raise NotADirectoryError((
                 "no such directory '{to_dir}' exists"
             ).format(**locals()))
 
+        # handle two different extraction types for different archive types
         {
             b'GNRL': self._extract_gnrl,
             b'DX10': self._extract_dx10

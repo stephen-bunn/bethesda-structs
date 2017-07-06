@@ -458,7 +458,7 @@ class BSAArchive(AbstractArchive):
                 header = BSAHeader(fp.read(
                     struct.calcsize(BSAHeader._prefix_struct)
                 ))
-                # should be able to handle the record if its tagged as a BSA
+                # should be able to handle the archive if its tagged as a BSA
                 return (header.bsa == b'BSA\x00')
             except struct.error as exc:
                 # catch if it can't even unpack the header
