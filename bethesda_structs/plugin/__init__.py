@@ -9,6 +9,7 @@ import inspect
 
 from ._common import AbstractPlugin
 from .tes4 import TES4Plugin
+from .tes5 import TES5Plugin
 
 
 def get_plugin(filepath: str) -> AbstractPlugin:

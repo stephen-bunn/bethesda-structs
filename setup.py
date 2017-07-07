@@ -22,7 +22,7 @@ setuptools.setup(
     name=bethesda_structs.__name__,
     version=bethesda_structs.__version__,
     description=bethesda_structs.__description__,
-    url='http://github.com/stephen-bunn/bethesda-structs',
+    url='https://github.com/stephen-bunn/bethesda-structs',
     author=bethesda_structs.__author__,
     author_email=bethesda_structs.__contact__,
     license='MIT',

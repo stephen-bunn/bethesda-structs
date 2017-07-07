@@ -16,3 +16,11 @@ bethesda\_structs\.plugin\.tes4
     :show-inheritance:
 
 
+bethesda\_structs\.plugin\.tes5
+--------------------------------
+
+.. automodule:: bethesda_structs.plugin.tes5
+    :members:
+    :undoc-members:
+    :show-inheritance:
+

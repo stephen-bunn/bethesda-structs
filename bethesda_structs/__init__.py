@@ -8,7 +8,7 @@ from typing import (Union,)
 
 from . import (plugin, archive,)
 
-__name__ = 'bethesda_structs'
+__name__ = 'bethesda-structs'
 __description__ = (
     'A wrapper for some of Bethesda\'s popular plugin/archive file formats'
 )

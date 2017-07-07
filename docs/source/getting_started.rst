@@ -29,8 +29,8 @@ Because this package is a wrapper around some of Bethesda's popular file formats
 Below are a few quick examples of how you might use this package, **but** remember to keep the :ref:`modules-page` index handy!
 
 
-Extracting a BSA archive
-------------------------
+Extracting an archive
+---------------------
 
 Lets say that you want to extract the contents of a BSA archive to a directory.
 This can be done quickly using a snippet like the following:
@@ -67,7 +67,7 @@ with the simplification
 This automatically handles the instance where ``BSA_ARCHIVE_PATH`` isn't actually pointing to a BSA archive.
 Instead, it will set the local ``archive`` variable to whatever archive it thinks can handle the file.
 
-`If no archive wrapper thinks it can handle the file`, it will just set ``archive`` to ``None``.
+*If no archive wrapper thinks it can handle the file, it will just set* ``archive`` *to* ``None``.
 
 ---
 
@@ -88,10 +88,42 @@ You can hook into the extraction progress callback by doing something similar to
     sys.stdout.write('\n')
 
 Your progress hook should take the ``current`` file number being extracted, the ``total`` number of files to be extracted, and the ``filepath`` where the file is being extracted to.
-*Your progress hook could also be cooler than this nasty little hook.*
+`Your progress hook could also be cooler than this nasty little hook.`
+
+---
+
+And guess what, **BA2 archives** are also supported!
+Simply give the path to a BA2 archive and decompress and extract the archived contents out to a given directory!
+
+.. code-block:: python
+
+    BA2_ARCHIVE_PATH = 'C:/Users/me/Desktop/Archive.ba2'
+
+    archive = bethesda_structs.archive.get_archive(BA2_ARCHIVE_PATH)
+
+    if not os.path.isdir(EXTRACT_TO_DIR):
+        os.makedirs(EXTRACT_TO_DIR)
+
+    archive.extract(EXTRACT_TO_DIR)
 
 
 List Masters of a TES Plugin
 ----------------------------
 
-    TODO SECTION
+One of the most common tasks in plugin analysis is determining the masters of a plugin.
+The names of a plugin's masters are stored within the ``MAST`` fields in the plugin's header record.
+You can get a list of these names like this:
+
+.. code-block:: python
+
+    import os
+    import bethesda_structs
+
+    TES_PLUGIN_PATH = 'C:/Users/me/Desktop/Archive.esp'
+
+    plugin = bethesda_structs.plugin.get_plugin(TES_PLUGIN_PATH)
+    print([
+        field.data
+        for field in plugin.header.fields
+        if feild.type == b'MAST'
+    ])
