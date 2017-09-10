@@ -19,7 +19,8 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../bethesda_structs/'))
+sys.path.insert(0, os.path.abspath('../../'))
+
 
 import bethesda_structs
 import sphinx_readable_theme
