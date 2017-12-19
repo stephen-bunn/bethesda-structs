@@ -51,8 +51,10 @@ Usage
 |
 
 
+Extracting a BSA archive
+''''''''''''''''''''''''
+
 .. code-block:: python
-   :caption: Extracting a BSA archive
 
    import os
    import bethesda_structs
@@ -68,8 +70,10 @@ Usage
    archive.extract(EXTRACT_TO_DIR)
 
 
+Getting masters of a TES4 plugin
+''''''''''''''''''''''''''''''''
+
 .. code-block:: python
-   :caption: Getting masters of a TES4 plugin
 
    import os
    import bethesda_structs
