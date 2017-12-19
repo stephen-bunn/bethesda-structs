@@ -48,4 +48,37 @@ Usage
 
 | Inspect and extract Bethesda's TES4, TES5, BSA, and BA2 filetypes...
 | Read about more complex usage in the `documentation <https://bethesda-structs.readthedocs.io/en/latest/>`_.
+|
 
+
+.. code-block:: python
+   :caption: Extracting a BSA archive
+
+   import os
+   import bethesda_structs
+
+   BSA_ARCHIVE_PATH = 'C:/Users/me/Desktop/Archive.bsa'
+   EXTRACT_TO_DIR   = 'C:/Users/me/Desktop/ArchiveContents/'
+
+   archive = bethesda_structs.archive.BSAArchive(BSA_ARCHIVE_PATH)
+
+   if not os.path.isdir(EXTRACT_TO_DIR):
+       os.makedirs(EXTRACT_TO_DIR)
+
+   archive.extract(EXTRACT_TO_DIR)
+
+
+.. code-block:: python
+   :caption: Getting masters of a TES4 plugin
+
+   import os
+   import bethesda_structs
+
+   TES_PLUGIN_PATH = 'C:/Users/me/Desktop/Archive.esp'
+
+   plugin = bethesda_structs.plugin.get_plugin(TES_PLUGIN_PATH)
+   print([
+       field.data
+       for field in plugin.header.fields
+       if feild.type == b'MAST'
+   ])
