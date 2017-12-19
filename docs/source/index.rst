@@ -43,10 +43,6 @@ To get started using this package, please see the :ref:`getting-started` page!
    :target: https://travis-ci.org/stephen-bunn/bethesda-structs
    :alt: Build Status
 
-.. image:: https://codecov.io/gh/stephen-bunn/bethesda-structs/branch/master/graph/badge.svg
-   :target: https://codecov.io/gh/stephen-bunn/bethesda-structs
-   :alt: Code Coverage
-
 .. image:: https://requires.io/github/stephen-bunn/bethesda-structs/requirements.svg?branch=master
    :target: https://requires.io/github/stephen-bunn/bethesda-structs/requirements/?branch=master
    :alt: Requirements Status

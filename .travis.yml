@@ -9,9 +9,7 @@ install:
   - pipenv install --dev --skip-lock
   - pipenv run pip install codecov
 script:
-  - pytest --cov
-after_success:
-  - codecov
+  - pytest
 notifications:
   email:
     on_success: never
