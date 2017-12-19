@@ -1,0 +1,21 @@
+[[source]]
+
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+
+[packages]
+
+
+
+[dev-packages]
+
+ptpython = "*"
+"flake8" = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
+sphinx-readable-theme = "*"
+pytest = "*"
+pytest-cov = "*"
+"pytest-flake8" = "*"

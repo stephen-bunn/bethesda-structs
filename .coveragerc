@@ -1,0 +1,11 @@
+[run]
+branch=True
+include=
+    bethesda_structs/*
+
+[report]
+show_missing=True
+omit=
+    bethesda_structs/__init__.py
+    bethesda_structs/__version__.py
+    */_common.py

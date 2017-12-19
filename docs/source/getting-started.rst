@@ -1,4 +1,4 @@
-.. _getting-started-page:
+.. _getting-started:
 
 ===============
 Getting Started
@@ -26,7 +26,7 @@ Example Usage
 
 Because this package is a wrapper around some of Bethesda's popular file formats, it is hopefully extendable to different purposes you might have.
 
-Below are a few quick examples of how you might use this package, **but** remember to keep the :ref:`modules-page` index handy!
+Below are a few quick examples of how you might use this package, **but** remember to keep the :ref:`autodocs <bethesda-structs>` handy!
 
 
 Extracting an archive
@@ -84,7 +84,7 @@ You can hook into the extraction progress callback by doing something similar to
         ).format(**locals()))
         sys.stdout.flush()
 
-    archive.extract(EXTRACT_TO_DIR, hook=_progress_hook)
+    archive.extract(EXTRACT_TO_DIR, progress_hook=_progress_hook)
     sys.stdout.write('\n')
 
 Your progress hook should take the ``current`` file number being extracted, the ``total`` number of files to be extracted, and the ``filepath`` where the file is being extracted to.

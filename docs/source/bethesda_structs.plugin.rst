@@ -7,8 +7,8 @@ bethesda\_structs\.plugin
     :show-inheritance:
 
 
-bethesda\_structs\.plugin\.tes4
---------------------------------
+tes4
+----
 
 .. automodule:: bethesda_structs.plugin.tes4
     :members:
@@ -16,8 +16,8 @@ bethesda\_structs\.plugin\.tes4
     :show-inheritance:
 
 
-bethesda\_structs\.plugin\.tes5
---------------------------------
+tes5
+----
 
 .. automodule:: bethesda_structs.plugin.tes5
     :members:

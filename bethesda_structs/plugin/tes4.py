@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import os
 import enum
@@ -10,8 +7,8 @@ import zlib
 import struct
 from typing import (List,)
 
-from .. import meta
-from ._common import AbstractPlugin
+from .. import (meta,)
+from ._common import (AbstractPlugin,)
 
 
 class TES4Field(meta.Prefixed):

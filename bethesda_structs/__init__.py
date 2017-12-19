@@ -1,20 +1,9 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 from typing import (Union,)
 
 from . import (plugin, archive,)
-
-__name__ = 'bethesda-structs'
-__description__ = (
-    'A wrapper for some of Bethesda\'s popular plugin/archive file formats'
-)
-__author__ = 'Stephen Bunn'
-__contact__ = 'stephen@bunn.io'
-__version__ = '0.0.0'
 
 
 def get_struct(filepath: str) -> \

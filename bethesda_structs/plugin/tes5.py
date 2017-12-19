@@ -1,15 +1,12 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import os
 import enum
 import struct
 from typing import (List,)
 
-from . import tes4
+from . import (tes4,)
 
 
 class TES5Field(tes4.TES4Field):

@@ -1,15 +1,12 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import os
 import struct
 from typing import (List, Callable,)
 
-from .. import meta
-from ._common import AbstractArchive
+from .. import (meta,)
+from ._common import (AbstractArchive,)
 
 
 class BSAFile(meta.Prefixed):
@@ -468,14 +465,14 @@ class BSAArchive(AbstractArchive):
     def extract(
         self,
         to_dir: str,
-        hook: Callable[[int, int, str], None]=None
+        progress_hook: Callable[[int, int, str], None]=None
     ) -> None:
         """ Extracts the contents of the archive to a given directory.
 
         :param to_dir: The directory to extract files to
         :type to_dir: str
-        :param hook: A progress hook for the extraction process
-        :type hook: typing.Callable[[int, int, str], None]
+        :param progress_hook: A progress hook for the extraction process
+        :type progress_hook: typing.Callable[[int, int, str], None]
         :returns: Does not return
         """
 
@@ -496,8 +493,8 @@ class BSAArchive(AbstractArchive):
                 os.makedirs(file_dirpath)
 
             # if progress hook is enabled, report the progress
-            if hook:
-                hook((file_idx + 1), total_count, to_path)
+            if progress_hook:
+                progress_hook((file_idx + 1), total_count, to_path)
 
             # write the archived file to the full path given the file
             # object's offset and size

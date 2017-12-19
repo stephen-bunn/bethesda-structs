@@ -1,19 +1,35 @@
-# http://editorconfig.org
+# EditorConfig http://editorconfig.org
 
 root = true
 
+# global config
 [*]
+charset = utf-8
 indent_style = space
-indent_size = 4
+end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
-end_of_line = lf
-charset = utf-8
 
-# Docstrings and comments use max_line_length = 79
+# python config
 [*.py]
-max_line_length = 79
+indent_size = 4
 
-# The JSON files contain newlines inconsistently
-[*.json]
+# sphinx config
+[*.rst]
+indent_size = 3
+
+# external config
+[*.{json,yaml,yml,toml,html,js}]
 indent_size = 2
+
+# batch config
+[*.{bat}]
+end_of_line = crlf
+
+# license config
+[LICENSE]
+insert_final_newline = false
+
+# make config
+[Makefile]
+indent_style = tab

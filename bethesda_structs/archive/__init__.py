@@ -1,15 +1,12 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import sys
 import inspect
 
-from ._common import AbstractArchive
-from .bsa import BSAArchive
-from .ba2 import BA2Archive
+from ._common import (AbstractArchive,)
+from .bsa import (BSAArchive,)
+from .ba2 import (BA2Archive,)
 
 
 def get_archive(filepath: str) -> AbstractArchive:

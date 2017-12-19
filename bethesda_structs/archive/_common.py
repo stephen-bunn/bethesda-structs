@@ -1,13 +1,10 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import abc
 from typing import (Callable,)
 
-from .. import meta
+from .. import (meta,)
 
 
 class AbstractArchive(meta.CheckSummed, metaclass=abc.ABCMeta):
@@ -40,14 +37,14 @@ class AbstractArchive(meta.CheckSummed, metaclass=abc.ABCMeta):
     def extract(
         self,
         to_dir: str,
-        hook: Callable[[int, int, str], None]=None
+        progress_hook: Callable[[int, int, str], None]=None
     ) -> None:
         """ Extracts the contents of the archive to a given directory.
 
         :param to_dir: The directory to extract files to
         :type to_dir: str
-        :param hook: A progress hook for the extraction process
-        :type hook: typing.Callable[[int, int, str], None]
+        :param progress_hook: A progress hook for the extraction process
+        :type progress_hook: typing.Callable[[int, int, str], None]
         :returns: Does not return
         """
 

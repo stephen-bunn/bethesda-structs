@@ -1,15 +1,12 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import sys
 import inspect
 
-from ._common import AbstractPlugin
-from .tes4 import TES4Plugin
-from .tes5 import TES5Plugin
+from ._common import (AbstractPlugin,)
+from .tes4 import (TES4Plugin,)
+from .tes5 import (TES5Plugin,)
 
 
 def get_plugin(filepath: str) -> AbstractPlugin:

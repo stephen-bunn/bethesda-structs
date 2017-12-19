@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import os
 import enum
@@ -11,8 +8,8 @@ import ctypes
 import struct
 from typing import (List, Callable, Union,)
 
-from .. import meta
-from ._common import AbstractArchive
+from .. import (meta,)
+from ._common import (AbstractArchive,)
 
 
 def fourcc(char0: str, char1: str, char2: str, char3: str) -> int:
@@ -984,14 +981,14 @@ class BA2Archive(AbstractArchive):
     def _extract_gnrl(
         self,
         to_dir: str,
-        hook: Callable[[int, int, str], None]=None
+        progress_hook: Callable[[int, int, str], None]=None
     ) -> None:
         """ Helper extraction for extracting GNRL archvies.
 
         :param to_dir: The directory to extract files to
         :type to_dir: str
-        :param hook: A progress hook for the extraction process
-        :type hook: typing.Callable[[int, int, str], None]
+        :param progress_hook: A progress hook for the extraction process
+        :type progress_hook: typing.Callable[[int, int, str], None]
         :returns: Does not return
         """
 
@@ -1006,8 +1003,8 @@ class BA2Archive(AbstractArchive):
                 os.makedirs(file_dirpath)
 
             # if progress hook is enabled, report the progress
-            if hook:
-                hook((file_idx + 1), total_count, to_path)
+            if progress_hook:
+                progress_hook((file_idx + 1), total_count, to_path)
 
             # write the archived file to the full path given the file
             # object's offset and size
@@ -1019,7 +1016,7 @@ class BA2Archive(AbstractArchive):
     def _extract_dx10(
         self,
         to_dir: str,
-        hook: Callable[[int, int, str], None]=None
+        progress_hook: Callable[[int, int, str], None]=None
     ) -> None:
         """ Helper extraction for extracting DX10 archvies.
 
@@ -1028,8 +1025,8 @@ class BA2Archive(AbstractArchive):
 
         :param to_dir: The directory to extract files to
         :type to_dir: str
-        :param hook: A progress hook for the extraction process
-        :type hook: typing.Callable[[int, int, str], None]
+        :param progress_hook: A progress hook for the extraction process
+        :type progress_hook: typing.Callable[[int, int, str], None]
         :returns: Does not return
         """
 
@@ -1044,8 +1041,8 @@ class BA2Archive(AbstractArchive):
                 os.makedirs(file_dirpath)
 
             # if progress hook is enabled, report the progress
-            if hook:
-                hook((file_idx + 1), total_count, to_path)
+            if progress_hook:
+                progress_hook((file_idx + 1), total_count, to_path)
 
             # DX10 requires that a DDSHeader is built
             dds_header = DDSHeader()
@@ -1159,14 +1156,14 @@ class BA2Archive(AbstractArchive):
     def extract(
         self,
         to_dir: str,
-        hook: Callable[[int, int, str], None]=None
+        progress_hook: Callable[[int, int, str], None]=None
     ) -> None:
         """ Extracts the contents of the archive to a given directory.
 
         :param to_dir: The directory to extract files to
         :type to_dir: str
-        :param hook: A progress hook for the extraction process
-        :type hook: typing.Callable[[int, int, str], None]
+        :param progress_hook: A progress hook for the extraction process
+        :type progress_hook: typing.Callable[[int, int, str], None]
         :returns: Does not return
         """
 
@@ -1180,4 +1177,4 @@ class BA2Archive(AbstractArchive):
         {
             b'GNRL': self._extract_gnrl,
             b'DX10': self._extract_dx10
-        }[self.header.type](to_dir, hook=hook)
+        }[self.header.type](to_dir, progress_hook=progress_hook)

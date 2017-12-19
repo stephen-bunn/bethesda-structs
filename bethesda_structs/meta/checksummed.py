@@ -1,8 +1,5 @@
-#!/usr/bin/env python
-# -*- encoding: utf-8 -*-
-#
 # Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# MIT License <https://opensource.org/licenses/MIT>
+# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import abc
 import hashlib
@@ -24,7 +21,7 @@ class CheckSummed(object, metaclass=abc.ABCMeta):
 
         raise NotImplementedError()
 
-    def checksum(self, algorithm: str='blake2b') -> str:
+    def checksum(self, algorithm: str='md5') -> str:
         """ Calculates a checksum for the file at the class's filepath.
 
         .. note:: Valid algorithm strings are the names of the \

@@ -1,17 +1,15 @@
-bethesda\_structs
-=================
+.. _bethesda-structs:
+
+Bethesda Structs Package
+========================
 
 .. automodule:: bethesda_structs
     :members:
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
-
 .. toctree::
 
-    bethesda_structs.archive
-    bethesda_structs.meta
-    bethesda_structs.plugin
-
+   archive<bethesda_structs.archive>
+   plugin<bethesda_structs.plugin>
+   meta<bethesda_structs.meta>
