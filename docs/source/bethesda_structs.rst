@@ -9,6 +9,7 @@ Bethesda Structs Package
     :show-inheritance:
 
 .. toctree::
+   :caption: Subpackages
 
    archive<bethesda_structs.archive>
    plugin<bethesda_structs.plugin>
