@@ -4,6 +4,7 @@
 import os
 import enum
 import struct
+import warnings
 from typing import (List,)
 
 from . import (tes4,)
@@ -85,6 +86,20 @@ class TES5Group(tes4.TES4Group):
 class TES5Plugin(tes4.TES4Plugin):
     """ Wrapper for a TES5 plugin.
     """
+
+    def __init__(self, filepath: str):
+        """ Initializes the TES5 plugin wrapper.
+
+        :param filepath: The filepath for a given TES5 plugin
+        :type filepath: str
+        :returns: Does not return
+        """
+
+        warnings.warn((
+            "TES5Plugin is currently experimental and will not work in "
+            ".esps where CELL groups are used"
+        ), UserWarning)
+        super().__init__(filepath)
 
     @property
     def groups(self) -> List[TES5Group]:
