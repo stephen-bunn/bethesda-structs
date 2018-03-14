@@ -10,7 +10,9 @@ import bethesda_structs.__version__ as PACKAGE
 
 CURDIR = os.path.abspath(os.path.dirname(__file__))
 
-INSTALL_REQUIRES = []
+INSTALL_REQUIRES = [
+    'construct'
+]
 SETUP_REQUIRES = []
 EXTRAS_REQUIRE = {
     'dev': [
@@ -22,6 +24,7 @@ EXTRAS_REQUIRE = {
         'pytest',
         'pytest-cov',
         'pytest-flake8',
+        'pytest-sugar',
     ]
 }
 
@@ -80,6 +83,7 @@ setuptools.setup(
         'structures',
         'archive',
         'python36',
+        'construct',
     ],
     python_requires='>=3.6',
     classifiers=[

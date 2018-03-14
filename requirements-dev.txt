@@ -1,8 +1,0 @@
-ptpython
-flake8
-sphinx
-sphinx-autodoc-typehints
-sphinx-readable-theme
-pytest
-pytest-cov
-pytest-flake8
