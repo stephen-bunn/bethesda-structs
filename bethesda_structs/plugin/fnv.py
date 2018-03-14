@@ -6,15 +6,20 @@
 from construct import *
 
 
-""" Fallout New Vegas subrecord structure.
-Author: Stephen Bunn
-Credit: TES5Edit Team <https://tes5edit.github.io/fopdoc/FalloutNV>
-"""
 FNVSubrecord = Struct(
     "type" / String(4, 'utf8'),
     "dataSize" / Int16ul,
     "data" / Bytes(lambda this: this.dataSize),
 )
+""" Fallout New Vegas subrecord structure.
+
+:var type: The type of the subrecord
+:vartype type: str
+:var dataSize: The size of the subrecord data
+:vartype dataSize: int
+:var data: The data of the subrecord
+:vartype data: bytes
+"""
 
 
 def _iter_subrecords(record_data: bytes):
@@ -31,10 +36,6 @@ def _iter_subrecords(record_data: bytes):
         yield subrecord
 
 
-""" Fallout New Vegas record structure.
-Author: Stephen Bunn
-Credit: TES5Edit Team <https://tes5edit.github.io/fopdoc/FalloutNV>
-"""
 FNVRecord = Struct(
     "type" / String(4, 'utf8'),
     "dataSize" / Int32ul,
@@ -88,6 +89,27 @@ FNVRecord = Struct(
         for entry in _iter_subrecords(ctx.data)
     ])
 )
+""" Fallout New Vegas record structure.
+
+:var type: The type of the record
+:vartype type: str
+:var dataSize: The size of the record's subrecord data
+:vartype dataSize: int
+:var flags: A container of evaluated record flags
+:vartype flags: Container
+:var id: The form id of the record
+:vartype id: bytes
+:var revision: Revision data of the record
+:vartype revision: int
+:var version: Version data of the record
+:vartype version: int
+:var unknown: *An unknown field*
+:vartype unknown: int
+:var data: The subrecord data of the record
+:vartype data: bytes
+:var subrecords: Computed subrecords from the record subrecord data
+:vartype subrecords: list[:const:`FNVSubrecord`]
+"""
 
 
 def _iter_records(group_data: bytes):
@@ -104,10 +126,6 @@ def _iter_records(group_data: bytes):
         yield record
 
 
-""" Fallout New Vegas group structure.
-Author: Stephen Bunn
-Credit: TES5Edit Team <https://tes5edit.github.io/fopdoc/FalloutNV>
-"""
 FNVGroup = Struct(
     "type" / Const(b'GRUP'),
     "groupSize" / Int32ul,
@@ -121,13 +139,35 @@ FNVGroup = Struct(
         for entry in _iter_records(ctx.data)
     ]),
 )
+""" Fallout New Vegas group structure.
 
-
-""" Fallout New Vegas plugin structure.
-Author: Stephen Bunn
-Credit: TES5Edit Team <https://tes5edit.github.io/fopdoc/FalloutNV>
+:var type: Always ``GRUP``
+:vartype type: bytes
+:var groupSize: The size of the group data + 24 bytes
+:vartype groupSize: int
+:var label: The label of the group
+:vartype label: int
+:var groupType: The type of the group
+:vartype groupType: int
+:var stamp: The timestamp of the group
+:vartype stamp: int
+:var unknown: *An unknown field*
+:vartype unknown: bytes
+:var data: The record data of the group
+:vartype data: bytes
+:var records: Computed records from the record data of the group
+:vartype records: list[:const:`FNVRecord`]
 """
+
+
 FNVPlugin = Struct(
     "header" / FNVRecord,
     "groups" / FNVGroup[:]
 )
+""" Fallout New Vegas plugin structure.
+
+:var header: The header record of the plugin
+:vartype header: :const:`FNVRecord`
+:var groups: A list of the plugin's groups
+:vartype groups: list[:const:`FNVGroup`]
+"""

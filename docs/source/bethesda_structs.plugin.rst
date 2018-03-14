@@ -2,25 +2,15 @@ bethesda\_structs\.plugin
 =========================
 
 .. automodule:: bethesda_structs.plugin
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 
-tes4
-----
+fnv
+---
 
-.. automodule:: bethesda_structs.plugin.tes4
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-tes5
-----
-
-.. automodule:: bethesda_structs.plugin.tes5
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
+.. automodule:: bethesda_structs.plugin.fnv
+   :members:
+   :undoc-members:
+   :show-inheritance:
