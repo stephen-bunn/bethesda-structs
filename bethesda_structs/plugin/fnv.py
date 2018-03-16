@@ -11,6 +11,19 @@ from construct import *
 from ._common import (BasePlugin,)
 
 
+class FNV_FormID(Adapter):
+
+    def __init__(self, backrefs, *args, **kwargs):
+        super().__init__(Int32ul, *args, **kwargs)
+        self.backrefs = backrefs
+
+    def _decode(self, obj, context, path):
+        return obj
+
+    def _encode(self, obj, context, path):
+        return obj
+
+
 FNV_ServiceFlags = FlagsEnum(
     Int32ul,
     weapons=0x00000001,
@@ -367,7 +380,7 @@ FNV_MAP = {
                 "alternate_texture" / Struct(
                     "name_length" / Int32ul,
                     "3d_name" / String(lambda this: this.name_length, 'utf8'),
-                    "new_texture" / Int32ul,
+                    "new_texture" / FNV_FormID(['TXST']),
                     "3d_index" / Int32sl
                 )
             )
@@ -446,34 +459,34 @@ FNV_MAP = {
         'SNAM': {
             'description': 'NPC Faction',
             'structure': Struct(
-                "faction" / Int32ul,
+                "faction" / FNV_FormID(['FACT']),
                 "rank" / Int8ul,
                 "unused" / Bytes(3)
             )
         },
         'INAM': {
             'description': 'Death Item',
-            'structure': Int32ul
+            'structure': FNV_FormID(['LVL1'])
         },
         'VTCK': {
             'description': 'NPC Voice',
-            'structure': Int32ul
+            'structure': FNV_FormID(['VTCP'])
         },
         'TPLT': {
             'description': 'NPC Template',
-            'structure': Int32ul
+            'structure': FNV_FormID(['NPC_', 'LVLN'])
         },
         'RNAM': {
             'description': 'NPC Race',
-            'structure': Int32ul
+            'structure': FNV_FormID(['RACE'])
         },
         'SPLO': {
             'description': 'Actor Effect',
-            'structure': Int32ul
+            'structure': FNV_FormID(['SPEL'])
         },
         'EITM': {
             'description': 'Unarmed Attack Effect',
-            'structure': Int32ul
+            'structure': FNV_FormID(['ENCH', 'SPEL'])
         },
         'EAMT': {
             'description': 'Unarmed Attack Animation',
@@ -504,27 +517,31 @@ FNV_MAP = {
                     destroy=0x4
                 ),
                 "self_damage_per_second" / Int32sl,
-                "explosion" / Int32ul,
-                "debris" / Int32ul,
+                "explosion" / FNV_FormID(['EXPL']),
+                "debris" / FNV_FormID(['DEBR']),
                 "debris_count" / Int32sl
             )
         },
         'SCRI': {
             'description': 'NPC Script',
-            'structure': Int32ul
+            'structure': FNV_FormID(['SCPT'])
         },
         'CNTO': {
             'description': 'Item Data',
             'structure': Struct(
-                "item" / Int32ul,
+                "item" / FNV_FormID([
+                    'AMRO', 'AMMO', 'MISC', 'WEAP', 'BOOK', 'LVL1', 'KEYM',
+                    'ALCH', 'NOTE', 'IMOD', 'CMNY', 'CCRD', 'LIGH', 'CHIP',
+                    'MSTT', 'STAT'
+                ]),
                 "count" / Int32sl
             )
         },
         'COED': {
             'description': 'Extra Item Data',
             'structure': Struct(
-                "owner" / Int32ul,
-                "global_variable" / Int32ul,
+                "owner" / FNV_FormID(['NPC_', 'FACT']),
+                "global_variable" / FNV_FormID(['GLOB']),
                 "item_condition" / Float32l
             )
         },
@@ -534,11 +551,11 @@ FNV_MAP = {
         },
         'PKID': {
             'description': 'NPC Package',
-            'structure': Int32ul
+            'structure': FNV_FormID(['PACK'])
         },
         'CNAM': {
             'description': 'NPC Class',
-            'structure': Int32ul
+            'structure': FNV_FormID(['CLAS'])
         },
         'DATA': {
             'description': 'NPC Data',
@@ -589,19 +606,19 @@ FNV_MAP = {
         },
         'PNAM': {
             'description': 'NPC Head Part',
-            'structure': Int32ul
+            'structure': FNV_FormID(['HDPT'])
         },
         'HNAM': {
             'description': 'NPC Hair',
-            'structure': Int32ul
+            'structure': FNV_FormID(['HAIR'])
         },
         'LNAM': {
             'description': 'NPC Hair Length',
-            'structure': Int32ul
+            'structure': Float32l
         },
         'ENAM': {
             'description': 'NPC Eyes',
-            'structure': Int32ul
+            'structure': FNV_FormID(['EYES'])
         },
         'HCLR': {
             'description': 'NPC Hair Color',
@@ -609,7 +626,7 @@ FNV_MAP = {
         },
         'ZNAM': {
             'description': 'NPC Combat Style',
-            'structure': Int32ul
+            'structure': FNV_FormID(['CSTY'])
         },
         'NAM4': {
             'description': 'Impact Material Type',
