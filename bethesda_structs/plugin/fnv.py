@@ -335,10 +335,53 @@ FNV_MAP = {
     'NAVI': {},
     'NAVM': {},
     'NOTE': {},
-    'NPC_': { # TODO: Model Data, Destruction Data, Item collections...
-        'EDID': {'description': 'Editor ID', 'structure': CString('utf8')},
-        'OBND': {'description': 'Object Bounds', 'structure': FNV_OBNDStruct},
-        'FULL': {'description': 'NPC Name', 'structure': CString('utf8')},
+    'NPC_': {
+        'EDID': {
+            'description': 'Editor ID',
+            'structure': CString('utf8')
+        },
+        'OBND': {
+            'description': 'Object Bounds',
+            'structure': FNV_OBNDStruct
+        },
+        'FULL': {
+            'description': 'NPC Name',
+            'structure': CString('utf8')
+        },
+        'MODL': {
+            'description': 'Model Filename',
+            'structure': CString('utf8')
+        },
+        'MODB': {
+            'description': 'Model Texture Unknown',
+            'structure': Bytes(4)
+        },
+        'MODT': {
+            'description': 'Model Texture File Hashes',
+            'structure': Byte[:]
+        },
+        'MODS': {
+            'description': 'Alternate Textures',
+            'structure': Struct(
+                "count" / Int32ul,
+                "alternate_texture" / Struct(
+                    "name_length" / Int32ul,
+                    "3d_name" / String(lambda this: this.name_length, 'utf8'),
+                    "new_texture" / Int32ul,
+                    "3d_index" / Int32sl
+                )
+            )
+        },
+        'MODD': {
+            'description': 'FaceGen Model Flags',
+            'structure': FlagsEnum(
+                Int8ul,
+                head=0x01,
+                torso=0x02,
+                right_hand=0x04,
+                left_hand=0x08
+            )
+        },
         'ACBS': {
             'description': 'NPC Configuration',
             'structure': Struct(
@@ -400,19 +443,103 @@ FNV_MAP = {
                 ),
             )
         },
-        'INAM': {'description': 'Death Item', 'structure': Int32ul},
-        'VTCK': {'description': 'NPC Voice', 'structure': Int32ul},
-        'TPLT': {'description': 'NPC Template', 'structure': Int32ul},
-        'RNAM': {'description': 'NPC Race', 'structure': Int32ul},
-        'EITM': {'description': 'Unarmed Attack Effect', 'structure': Int32ul},
+        'SNAM': {
+            'description': 'NPC Faction',
+            'structure': Struct(
+                "faction" / Int32ul,
+                "rank" / Int8ul,
+                "unused" / Bytes(3)
+            )
+        },
+        'INAM': {
+            'description': 'Death Item',
+            'structure': Int32ul
+        },
+        'VTCK': {
+            'description': 'NPC Voice',
+            'structure': Int32ul
+        },
+        'TPLT': {
+            'description': 'NPC Template',
+            'structure': Int32ul
+        },
+        'RNAM': {
+            'description': 'NPC Race',
+            'structure': Int32ul
+        },
+        'SPLO': {
+            'description': 'Actor Effect',
+            'structure': Int32ul
+        },
+        'EITM': {
+            'description': 'Unarmed Attack Effect',
+            'structure': Int32ul
+        },
         'EAMT': {
             'description': 'Unarmed Attack Animation',
             'structure': FNV_AttackAnimationsEnum
         },
-        'SCRI': {'description': 'NPC Script', 'structure': Int32ul},
-        'AIDT': {'description': 'NPC AI Data', 'structure': FNV_AIDTStruct},
-        'PKID': {'description': 'NPC Package', 'structure': Int32ul},
-        'CNAM': {'description': 'NPC Class', 'structure': Int32ul},
+        'DEST': {
+            'description': 'Destruction Data',
+            'structure': Struct(
+                "health" / Int32sl,
+                "count" / Int8ul,
+                "flags" / FlagsEnum(
+                    Int8ul,
+                    vats_targetable=0x01
+                ),
+                "unknown" / Bytes(2)
+            )
+        },
+        'DSTD': {
+            'description': 'Destruction Stage Data',
+            'structure': Struct(
+                "health_percentage" / Int8ul,
+                "index" / Int8ul,
+                "damage_stage" / Int8ul,
+                "flags" / FlagsEnum(
+                    Int8ul,
+                    cap_damage=0x1,
+                    disable=0x2,
+                    destroy=0x4
+                ),
+                "self_damage_per_second" / Int32sl,
+                "explosion" / Int32ul,
+                "debris" / Int32ul,
+                "debris_count" / Int32sl
+            )
+        },
+        'SCRI': {
+            'description': 'NPC Script',
+            'structure': Int32ul
+        },
+        'CNTO': {
+            'description': 'Item Data',
+            'structure': Struct(
+                "item" / Int32ul,
+                "count" / Int32sl
+            )
+        },
+        'COED': {
+            'description': 'Extra Item Data',
+            'structure': Struct(
+                "owner" / Int32ul,
+                "global_variable" / Int32ul,
+                "item_condition" / Float32l
+            )
+        },
+        'AIDT': {
+            'description': 'NPC AI Data',
+            'structure': FNV_AIDTStruct
+        },
+        'PKID': {
+            'description': 'NPC Package',
+            'structure': Int32ul
+        },
+        'CNAM': {
+            'description': 'NPC Class',
+            'structure': Int32ul
+        },
         'DATA': {
             'description': 'NPC Data',
             'structure': Struct(
@@ -460,12 +587,30 @@ FNV_MAP = {
                 "unarmed_offset" / Int8ul,
             )
         },
-        'PNAM': {'description': 'NPC Head Part', 'structure': Int32ul},
-        'HNAM': {'description': 'NPC Hair', 'structure': Int32ul},
-        'LNAM': {'description': 'NPC Hair Length', 'structure': Int32ul},
-        'ENAM': {'description': 'NPC Eyes', 'structure': Int32ul},
-        'HCLR': {'description': 'NPC Hair Color', 'structure': FNV_RGBAStruct},
-        'ZNAM': {'description': 'NPC Combat Style', 'structure': Int32ul},
+        'PNAM': {
+            'description': 'NPC Head Part',
+            'structure': Int32ul
+        },
+        'HNAM': {
+            'description': 'NPC Hair',
+            'structure': Int32ul
+        },
+        'LNAM': {
+            'description': 'NPC Hair Length',
+            'structure': Int32ul
+        },
+        'ENAM': {
+            'description': 'NPC Eyes',
+            'structure': Int32ul
+        },
+        'HCLR': {
+            'description': 'NPC Hair Color',
+            'structure': FNV_RGBAStruct
+        },
+        'ZNAM': {
+            'description': 'NPC Combat Style',
+            'structure': Int32ul
+        },
         'NAM4': {
             'description': 'Impact Material Type',
             'structure': FNV_ImpactMaterialEnum
