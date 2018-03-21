@@ -269,8 +269,163 @@ FNV_AIDTStruct = Struct(
 )
 
 
+FNV_DestructionCollection = {
+    'DEST': Struct(
+        "health" / Int32sl,
+        "count" / Int8ul,
+        "flags" / FlagsEnum(
+            Int8ul,
+            vats_targetable=0x01
+        ),
+        "unknown_0" / Bytes(2)
+    ) * 'Header',
+    'DSTD': Struct(
+        "health_percentage" / Int8ul,
+        "index" / Int8ul,
+        "damage_stage" / Int8ul,
+        "flags" / FlagsEnum(
+            Int8ul,
+            cap_damage=0x01,
+            disable=0x02,
+            destroy=0x04
+        ),
+        "self_damage_per_second" / Int32sl,
+        "explosion" / FNV_FormID(['EXPL']),
+        "debris" / FNV_FormID(['DEBR']),
+        "debris_count" / Int32sl
+    ) * 'Stage Data',
+    'DMDT': Byte[:] * 'Stage Model Texture File Hashes',
+    'DSTF': Bytes(0) * 'Stage End Marker'
+}
+
+FNV_ScriptCollection = {
+    'SCHR': Struct(
+        "unused" / Byte[4],
+        "ref_count" / Int32ul,
+        "compiled_size" / Int32ul,
+        "variable_count" / Int32ul,
+        "type" / FlagsEnum(
+            Int16ul,
+            object=0x000,
+            quest=0x001,
+            effect=0x100
+        ),
+        "flags" / FlagsEnum(
+            Int16ul,
+            enabled=0x0001
+        )
+    ) * 'Basic Script Data',
+    'SCDA': Int8ul[:] * 'Commpiled Script Source',
+    'SCTX': GreedyString('utf8') * 'Script Source',
+    'SLSD': Struct(
+        "index" / Int32ul,
+        "unknown_0" / Bytes(12),
+        "flags" / FlagsEnum(
+            Int8ul,
+            is_long_or_short=0x01
+        ),
+        "unknown_1" / Bytes(7)
+    ) * 'Local Variable Data',
+    'SCVR': CString('utf8') * 'Local Variable Name',
+    'SCRO': FNV_FormID([
+        'ACTI', 'DOOR', 'STAT', 'FURN', 'CREA', 'SPEL', 'NPC_', 'CONT', 'ARMO',
+        'AMMO', 'MISC', 'WEAP', 'IMAD', 'BOOK', 'KEYM', 'ALCH', 'LIGH', 'QUST',
+        'PLYR', 'PACK', 'LVLI', 'ECZN', 'EXPL', 'FLST', 'IDLM', 'PMIS', 'FACT',
+        'ACHR', 'REFR', 'ACRE', 'GLOB', 'DIAL', 'CELL', 'SOUN', 'MGEF', 'WTHR',
+        'CLAS', 'EFSH', 'RACE', 'LVLC', 'CSTY', 'WRLD', 'SCPT', 'IMGS', 'MESG',
+        'MSTT', 'MUSC', 'NOTE', 'PERK', 'PGRE', 'PROJ', 'LVLN', 'WATR', 'ENCH',
+        'TREE', 'REPU', 'REGN', 'CSNO', 'CHAL', 'IMOD', 'RCCT', 'CMNY', 'CDCK',
+        'CHIP', 'CCRD', 'TERM', 'HAIR', 'EYES', 'ADDN', 'NULL'
+    ]) * 'Reference'
+}
+
+FNV_ModelCollection = {
+    'MODL': CString('utf8') * 'Model Filename',
+    'MODB': Bytes(4) * 'Unknown',
+    'MODT': Byte[:] * 'Texture File Hashes',
+    'MODS': Struct(
+        "count" / Int32ul * 'Alternate Textures Count',
+        "alternate_texture" / Struct(
+            "name_length" / Int32ul * 'Alternate Texture Data',
+            "3d_name" / PaddedString(
+                lambda this: this.name_length,
+                'utf8'
+            ) * 'Alternate Texture Data',
+            "new_texture" / FNV_FormID(['TXST']) * 'Alternate Texture Data',
+            "3d_index" / Int32sl * 'Alternate Texture Data'
+        )
+    ) * 'Alternate Textures',
+    'MODD': FlagsEnum(
+        Int8ul,
+        head=0x01,
+        torso=0x02,
+        right_hand=0x04,
+        left_hand=0x08
+    ) * 'Facegen Model Flags'
+}
+
+
 FNV_MAP = {
-    'ACHR': {},
+    'ACHR': dict({
+        'EDID': CString('utf8') * 'Editor ID',
+        'NAME': FNV_FormID(['NPC_']) * 'Base',
+        'XEZN': FNV_FormID(['ECZN']) * 'Encounter Zone',
+        'XRGD': Byte[:] * 'Ragdoll Data',
+        'XRGB': Byte[:] * 'Ragdol Biped Data',
+        'XPRD': Float32l * 'Patrol Data',
+        'XPPA': Bytes(0) * 'Patrol Script Marker',
+        'INAM': FNV_FormID(['IDLE']) * 'Idle',
+        'TNAM': FNV_FormID(['DIAL']) * 'Topic',
+        'XLCM': Int32sl * 'Level Modifier',
+        'XMRC': FNV_FormID(['REFR']) * 'Merchant Container',
+        'XCNT': Int32sl * 'Count',
+        'XRDS': Float32l * 'Radius',
+        'XHLP': Float32l * 'Health',
+        'XLKR': FNV_FormID([
+            'REFR', 'ACRE', 'ACHR', 'PGRE', 'PMIS'
+        ]) * 'Linked Reference',
+        'XDCR': Struct(
+            "reference" / FNV_FormID(['REFR']),
+            "unknown" / Byte[:]
+        ) * 'Decal',
+        'XCLP': Struct(
+            "link_start_color" / FNV_RGBAStruct,
+            "link_end_color" / FNV_RGBAStruct
+        ) * 'Linked Reference Color',
+        'XAPD': FlagsEnum(
+            Int8ul,
+            parent_activate_only=0x01
+        ) * 'Flags',
+        'XAPR': Struct(
+            "reference" / FNV_FormID(['REFR', 'ACRE', 'ACHR', 'PGRE', 'PMIS']),
+            "delay" / Float32l
+        ) * 'Active Parent Reference',
+        'XATO': CString('utf8') * 'Activation Prompt',
+        'XESP': Struct(
+            "reference" / FNV_FormID([
+                'PLYR', 'REFR', 'ACRE', 'ACHR', 'PGRE', 'PMIS'
+            ]),
+            "flags" / FlagsEnum(
+                Int8ul,
+                set_enable_state_to_opposite_of_parent=0x01,
+                pop_in=0x02
+            ),
+            "unknown" / Byte[3]
+        ) * 'Enable Parent',
+        'XEMI': FNV_FormID(['LIGH', 'REGN']) * 'Emittance',
+        'XMBR': FNV_FormID(['REFR']) * 'MultiBound Reference',
+        'XIBS': Bytes(0) * 'Ignored by Sandbox',
+        'XSCL': Float32l * 'Scale',
+        'DATA': Struct(
+            "x_position" / Float32l,
+            "y_position" / Float32l,
+            "z_position" / Float32l,
+            "x_rotation" / Float32l,
+            "y_rotation" / Float32l,
+            "z_rotation" / Float32l
+        ) * 'Postion / Rotation'
+
+    }, **FNV_ScriptCollection),
     'ACRE': {},
     'ACTI': {},
     'ADDN': {},
@@ -310,7 +465,41 @@ FNV_MAP = {
     'ENCH': {},
     'EXPL': {},
     'EYES': {},
-    'FACT': {},
+    'FACT': {
+        'EDID': CString('utf8') * 'Editor ID',
+        'FULL': CString('utf8') * 'Name',
+        'XNAM': Struct(
+            "faction" / FNV_FormID(['FACT', 'RACE']),
+            "modifier" / Int32sl,
+            "group_combat_reaction" / Enum(
+                Int32ul,
+                neutral=0,
+                enemy=1,
+                ally=2,
+                friend=3
+            )
+        ) * 'Relation',
+        'DATA': Struct(
+            "flags_1" / FlagsEnum(
+                Int8ul,
+                hidden_from_pc=0x01,
+                evil=0x02,
+                special_combat=0x04
+            ),
+            "flags_2" / FlagsEnum(
+                Int8ul,
+                track_crime=0x01,
+                allow_sell=0x02
+            ),
+            "unused" / Byte[2]
+        ) * 'Data',
+        'CNAM': Float32l * 'Unused',
+        'RNAM': Int32sl * 'Rank Number',
+        'MNAM': CString('utf8') * 'Male',
+        'FNAM': CString('utf8') * 'Female',
+        'INAM': CString('utf8') * 'Insignia (unused)',
+        'WMI1': FNV_FormID(['REPU']) * 'Reputation'
+    },
     'FLST': {},
     'FURN': {},
     'GLOB': {},
@@ -328,7 +517,21 @@ FNV_MAP = {
     'INGR': {},
     'IPCT': {},
     'IPDS': {},
-    'KEYM': {},
+    'KEYM': dict({
+        'EDID': CString('utf8') * 'Editor ID',
+        'OBND': FNV_OBNDStruct * 'Object Bounds',
+        'FULL': CString('utf8') * 'Name',
+        'ICON': CString('utf8') * 'Large Icon Filename',
+        'MICO': CString('utf8') * 'Small Icon Filename',
+        'SCRI': FNV_FormID(['SCPT']) * 'Script',
+        'YNAM': FNV_FormID(['SOUN']) * 'Sound - Pick Up',
+        'ZNAM': FNV_FormID(['SOUN']) * 'Sound - Drop',
+        'DATA': Struct(
+            "value" / Int32sl,
+            "weight" / Float32l
+        ),
+        'RNAM': FNV_FormID(['SOUN']) * 'Sound - Random/Looping'
+    }, **FNV_ModelCollection, **FNV_DestructionCollection),
     'LAND': {},
     'LGMT': {},
     'LIGH': {},
@@ -345,317 +548,355 @@ FNV_MAP = {
     'MSET': {},
     'MSTT': {},
     'MUSC': {},
-    'NAVI': {},
+    'NAVI': {
+        'EDID': CString('utf8') * 'Editor ID',
+        'NVER': Int32ul * 'Version',
+        'NVMI': Struct(
+            "unknown_0" / Bytes(4),
+            "navigation_mesh" / FNV_FormID(['NAVM']),
+            "location" / FNV_FormID(['CELL', 'WRLD']),
+            "grid_x" / Int16sl,
+            "grid_y" / Int16sl,
+            "unknown_1" / Int8ul[:]
+        ) * 'Navigation Map Info',
+        'NVCI': Struct(
+            "unknown_0" / FNV_FormID(['NAVM']),
+            "unknown_1" / FNV_FormID(['NAVM']),
+            "unknown_2" / FNV_FormID(['NAVM']),
+            "door" / FNV_FormID(['REFR']),
+        ) * 'Unknown'
+    },
     'NAVM': {},
-    'NOTE': {},
+    'NOTE': dict({
+        'EDID': CString('utf8') * 'Editor ID',
+        'OBND': FNV_OBNDStruct * 'Object Bounds',
+        'FULL': CString('utf8') * 'Name',
+        'ICON': CString('utf8') * 'Large Icon Filename',
+        'MICO': CString('utf8') * 'Small Icon Filename',
+        'YNAM': FNV_FormID(['SOUN']) * 'Sound - Pick Up',
+        'ZNAM': FNV_FormID(['SOUN']) * 'Sound - Drop',
+        'DATA': Enum(
+            Int8ul,
+            sound=0,
+            text=1,
+            image=2,
+            voice=3
+        ) * 'Type',
+        'XNAM': CString('utf8') * 'Texture',
+        'TNAM': CString('utf8') * 'Text / Topic',
+        'SNAM': FNV_FormID(['SOUN', 'NPC_', 'CREA']) * 'Sound / Actor'
+    }, **FNV_ModelCollection),
     'NPC_': {
-        'EDID': {
-            'description': 'Editor ID',
-            'structure': CString('utf8')
-        },
-        'OBND': {
-            'description': 'Object Bounds',
-            'structure': FNV_OBNDStruct
-        },
-        'FULL': {
-            'description': 'NPC Name',
-            'structure': CString('utf8')
-        },
-        'MODL': {
-            'description': 'Model Filename',
-            'structure': CString('utf8')
-        },
-        'MODB': {
-            'description': 'Model Texture Unknown',
-            'structure': Bytes(4)
-        },
-        'MODT': {
-            'description': 'Model Texture File Hashes',
-            'structure': Byte[:]
-        },
-        'MODS': {
-            'description': 'Alternate Textures',
-            'structure': Struct(
-                "count" / Int32ul,
-                "alternate_texture" / Struct(
-                    "name_length" / Int32ul,
-                    "3d_name" / String(lambda this: this.name_length, 'utf8'),
-                    "new_texture" / FNV_FormID(['TXST']),
-                    "3d_index" / Int32sl
-                )
-            )
-        },
-        'MODD': {
-            'description': 'FaceGen Model Flags',
-            'structure': FlagsEnum(
-                Int8ul,
-                head=0x01,
-                torso=0x02,
-                right_hand=0x04,
-                left_hand=0x08
-            )
-        },
-        'ACBS': {
-            'description': 'NPC Configuration',
-            'structure': Struct(
-                "flags" / FlagsEnum(
-                    Int32ul,
-                    biped=0x00000001,
-                    essential=0x00000002,
-                    is_chargen_face_preset=0x00000004,
-                    respawn=0x00000008,
-                    auto_calc_stats=0x00000010,
-                    _unknown_0=0x00000020,
-                    _unknown_1=0x00000040,
-                    level_mult=0x00000080,
-                    use_template=0x00000100,
-                    low_level_processing=0x00000200,
-                    _unknown_2=0x00000400,
-                    no_blood_spray=0x00000800,
-                    no_blood_decal=0x00001000,
-                    _unknown_3=0x00002000,
-                    _unknown_4=0x00004000,
-                    _unknown_5=0x00008000,
-                    _unknown_6=0x00010000,
-                    _unknown_7=0x00020000,
-                    _unknown_8=0x00040000,
-                    _unknown_9=0x00080000,
-                    no_vats_melee=0x00100000,
-                    _unknown_10=0x00200000,
-                    can_be_all_races=0x00400000,
-                    auto_calc_services=0x00800000,
-                    _unknown_11=0x01000000,
-                    _unknown_12=0x02000000,
-                    no_knockdowns=0x03000000,
-                    not_pushable=0x08000000,
-                    _unknown_13=0x10000000,
-                    _unknown_14=0x20000000,
-                    not_rotating_to_headtrack=0x40000000,
-                    _unknown_15=0x80000000
-                ),
-                "fatigue" / Int16ul,
-                "barter_gold" / Int16ul,
-                "level" / Int16sl,
-                "calc_min" / Int16ul,
-                "calc_max" / Int16ul,
-                "speed_multiplier" / Int16ul,
-                "karma" / Float32l,
-                "disposition_base" / Int16sl,
-                "template_flags" / FlagsEnum(
-                    Int16ul,
-                    use_traits=0x0001,
-                    use_stats=0x0002,
-                    use_factions=0x0004,
-                    use_actor_effect_list=0x0008,
-                    use_ai_data=0x0010,
-                    use_ai_packages=0x0020,
-                    use_model=0x0040,
-                    use_base_data=0x0080,
-                    use_inventory=0x0100,
-                    use_script=0x0200,
-                ),
-            )
-        },
-        'SNAM': {
-            'description': 'NPC Faction',
-            'structure': Struct(
-                "faction" / FNV_FormID(['FACT']),
-                "rank" / Int8ul,
-                "unused" / Bytes(3)
-            )
-        },
-        'INAM': {
-            'description': 'Death Item',
-            'structure': FNV_FormID(['LVL1'])
-        },
-        'VTCK': {
-            'description': 'NPC Voice',
-            'structure': FNV_FormID(['VTCP'])
-        },
-        'TPLT': {
-            'description': 'NPC Template',
-            'structure': FNV_FormID(['NPC_', 'LVLN'])
-        },
-        'RNAM': {
-            'description': 'NPC Race',
-            'structure': FNV_FormID(['RACE'])
-        },
-        'SPLO': {
-            'description': 'Actor Effect',
-            'structure': FNV_FormID(['SPEL'])
-        },
-        'EITM': {
-            'description': 'Unarmed Attack Effect',
-            'structure': FNV_FormID(['ENCH', 'SPEL'])
-        },
-        'EAMT': {
-            'description': 'Unarmed Attack Animation',
-            'structure': FNV_AttackAnimationsEnum
-        },
-        'DEST': {
-            'description': 'Destruction Data',
-            'structure': Struct(
-                "health" / Int32sl,
-                "count" / Int8ul,
-                "flags" / FlagsEnum(
-                    Int8ul,
-                    vats_targetable=0x01
-                ),
-                "unknown" / Bytes(2)
-            )
-        },
-        'DSTD': {
-            'description': 'Destruction Stage Data',
-            'structure': Struct(
-                "health_percentage" / Int8ul,
-                "index" / Int8ul,
-                "damage_stage" / Int8ul,
-                "flags" / FlagsEnum(
-                    Int8ul,
-                    cap_damage=0x1,
-                    disable=0x2,
-                    destroy=0x4
-                ),
-                "self_damage_per_second" / Int32sl,
-                "explosion" / FNV_FormID(['EXPL']),
-                "debris" / FNV_FormID(['DEBR']),
-                "debris_count" / Int32sl
-            )
-        },
-        'SCRI': {
-            'description': 'NPC Script',
-            'structure': FNV_FormID(['SCPT'])
-        },
-        'CNTO': {
-            'description': 'Item Data',
-            'structure': Struct(
-                "item" / FNV_FormID([
-                    'AMRO', 'AMMO', 'MISC', 'WEAP', 'BOOK', 'LVL1', 'KEYM',
-                    'ALCH', 'NOTE', 'IMOD', 'CMNY', 'CCRD', 'LIGH', 'CHIP',
-                    'MSTT', 'STAT'
-                ]),
-                "count" / Int32sl
-            )
-        },
-        'COED': {
-            'description': 'Extra Item Data',
-            'structure': Struct(
-                "owner" / FNV_FormID(['NPC_', 'FACT']),
-                "global_variable" / FNV_FormID(['GLOB']),
-                "item_condition" / Float32l
-            )
-        },
-        'AIDT': {
-            'description': 'NPC AI Data',
-            'structure': FNV_AIDTStruct
-        },
-        'PKID': {
-            'description': 'NPC Package',
-            'structure': FNV_FormID(['PACK'])
-        },
-        'CNAM': {
-            'description': 'NPC Class',
-            'structure': FNV_FormID(['CLAS'])
-        },
-        'DATA': {
-            'description': 'NPC Data',
-            'structure': Struct(
-                "base_health" / Int32sl,
-                "strength" / Int8ul,
-                "perception"  / Int8ul,
-                "endurance" / Int8ul,
-                "charisma" / Int8ul,
-                "intelligence" / Int8ul,
-                "agility" / Int8ul,
-                "luck" / Int8ul,
-                "unused" / Optional(Int8ul[:])
-            )
-        },
-        'DNAM': {
-            'description': 'NPC Skills',
-            'structure': Struct(
-                "barter_value" / Int8ul,
-                "big_guns_value" / Int8ul,
-                "energy_weapons_value" / Int8ul,
-                "explosives_value" / Int8ul,
-                "lockpick_value" / Int8ul,
-                "medicine_value" / Int8ul,
-                "melee_weapons_value" / Int8ul,
-                "repair_value" / Int8ul,
-                "science_value" / Int8ul,
-                "guns_value" / Int8ul,
-                "sneak_value" / Int8ul,
-                "speech_value" / Int8ul,
-                "survival_value" / Int8ul,
-                "unarmed_value" / Int8ul,
-                "barter_offset" / Int8ul,
-                "big_guns_offset" / Int8ul,
-                "energy_weapons_offset" / Int8ul,
-                "explosives_offset" / Int8ul,
-                "lockpick_offset" / Int8ul,
-                "medicine_offset" / Int8ul,
-                "melee_weapons_offset" / Int8ul,
-                "repair_offset" / Int8ul,
-                "science_offset" / Int8ul,
-                "guns_offset" / Int8ul,
-                "sneak_offset" / Int8ul,
-                "speech_offset" / Int8ul,
-                "survival_offset" / Int8ul,
-                "unarmed_offset" / Int8ul,
-            )
-        },
-        'PNAM': {
-            'description': 'NPC Head Part',
-            'structure': FNV_FormID(['HDPT'])
-        },
-        'HNAM': {
-            'description': 'NPC Hair',
-            'structure': FNV_FormID(['HAIR'])
-        },
-        'LNAM': {
-            'description': 'NPC Hair Length',
-            'structure': Float32l
-        },
-        'ENAM': {
-            'description': 'NPC Eyes',
-            'structure': FNV_FormID(['EYES'])
-        },
-        'HCLR': {
-            'description': 'NPC Hair Color',
-            'structure': FNV_RGBAStruct
-        },
-        'ZNAM': {
-            'description': 'NPC Combat Style',
-            'structure': FNV_FormID(['CSTY'])
-        },
-        'NAM4': {
-            'description': 'Impact Material Type',
-            'structure': FNV_ImpactMaterialEnum
-        },
-        'FGGS': {
-            'description': 'NPC Facegen Geometry - Symmetric',
-            'structure': Int8ul[:]
-        },
-        'FGGA': {
-            'description': 'NPC Facegen Geometry - Asymmetric',
-            'structure': Int8ul[:]
-        },
-        'FGTS': {
-            'description': 'NPC Facegen Texture - Symmetric',
-            'structure': Int8ul[:]
-        },
-        'NAM5': {
-            'description': 'Unknown',
-            'structure': Int16ul
-        },
-        'NAM6': {
-            'description': 'NPC Height',
-            'structure': Float32l
-        },
-        'NAM7': {
-            'description': 'NPC Weight',
-            'structure': Float32l
-        },
+        # 'EDID': {
+        #     'description': 'Editor ID',
+        #     'structure': CString('utf8')
+        # },
+        # 'OBND': {
+        #     'description': 'Object Bounds',
+        #     'structure': FNV_OBNDStruct
+        # },
+        # 'FULL': {
+        #     'description': 'NPC Name',
+        #     'structure': CString('utf8')
+        # },
+        # 'MODL': {
+        #     'description': 'Model Filename',
+        #     'structure': CString('utf8')
+        # },
+        # 'MODB': {
+        #     'description': 'Model Texture Unknown',
+        #     'structure': Bytes(4)
+        # },
+        # 'MODT': {
+        #     'description': 'Model Texture File Hashes',
+        #     'structure': Byte[:]
+        # },
+        # 'MODS': {
+        #     'description': 'Alternate Textures',
+        #     'structure': Struct(
+        #         "count" / Int32ul,
+        #         "alternate_texture" / Struct(
+        #             "name_length" / Int32ul,
+        #             "3d_name" / PaddedString(
+        #                 lambda this: this.name_length,
+        #                 'utf8'
+        #             ),
+        #             "new_texture" / FNV_FormID(['TXST']),
+        #             "3d_index" / Int32sl
+        #         )
+        #     )
+        # },
+        # 'MODD': {
+        #     'description': 'FaceGen Model Flags',
+        #     'structure': FlagsEnum(
+        #         Int8ul,
+        #         head=0x01,
+        #         torso=0x02,
+        #         right_hand=0x04,
+        #         left_hand=0x08
+        #     )
+        # },
+        # 'ACBS': {
+        #     'description': 'NPC Configuration',
+        #     'structure': Struct(
+        #         "flags" / FlagsEnum(
+        #             Int32ul,
+        #             biped=0x00000001,
+        #             essential=0x00000002,
+        #             is_chargen_face_preset=0x00000004,
+        #             respawn=0x00000008,
+        #             auto_calc_stats=0x00000010,
+        #             _unknown_0=0x00000020,
+        #             _unknown_1=0x00000040,
+        #             level_mult=0x00000080,
+        #             use_template=0x00000100,
+        #             low_level_processing=0x00000200,
+        #             _unknown_2=0x00000400,
+        #             no_blood_spray=0x00000800,
+        #             no_blood_decal=0x00001000,
+        #             _unknown_3=0x00002000,
+        #             _unknown_4=0x00004000,
+        #             _unknown_5=0x00008000,
+        #             _unknown_6=0x00010000,
+        #             _unknown_7=0x00020000,
+        #             _unknown_8=0x00040000,
+        #             _unknown_9=0x00080000,
+        #             no_vats_melee=0x00100000,
+        #             _unknown_10=0x00200000,
+        #             can_be_all_races=0x00400000,
+        #             auto_calc_services=0x00800000,
+        #             _unknown_11=0x01000000,
+        #             _unknown_12=0x02000000,
+        #             no_knockdowns=0x03000000,
+        #             not_pushable=0x08000000,
+        #             _unknown_13=0x10000000,
+        #             _unknown_14=0x20000000,
+        #             not_rotating_to_headtrack=0x40000000,
+        #             _unknown_15=0x80000000
+        #         ),
+        #         "fatigue" / Int16ul,
+        #         "barter_gold" / Int16ul,
+        #         "level" / Int16sl,
+        #         "calc_min" / Int16ul,
+        #         "calc_max" / Int16ul,
+        #         "speed_multiplier" / Int16ul,
+        #         "karma" / Float32l,
+        #         "disposition_base" / Int16sl,
+        #         "template_flags" / FlagsEnum(
+        #             Int16ul,
+        #             use_traits=0x0001,
+        #             use_stats=0x0002,
+        #             use_factions=0x0004,
+        #             use_actor_effect_list=0x0008,
+        #             use_ai_data=0x0010,
+        #             use_ai_packages=0x0020,
+        #             use_model=0x0040,
+        #             use_base_data=0x0080,
+        #             use_inventory=0x0100,
+        #             use_script=0x0200,
+        #         ),
+        #     )
+        # },
+        # 'SNAM': {
+        #     'description': 'NPC Faction',
+        #     'structure': Struct(
+        #         "faction" / FNV_FormID(['FACT']),
+        #         "rank" / Int8ul,
+        #         "unused" / Bytes(3)
+        #     )
+        # },
+        # 'INAM': {
+        #     'description': 'Death Item',
+        #     'structure': FNV_FormID(['LVL1'])
+        # },
+        # 'VTCK': {
+        #     'description': 'NPC Voice',
+        #     'structure': FNV_FormID(['VTCP'])
+        # },
+        # 'TPLT': {
+        #     'description': 'NPC Template',
+        #     'structure': FNV_FormID(['NPC_', 'LVLN'])
+        # },
+        # 'RNAM': {
+        #     'description': 'NPC Race',
+        #     'structure': FNV_FormID(['RACE'])
+        # },
+        # 'SPLO': {
+        #     'description': 'Actor Effect',
+        #     'structure': FNV_FormID(['SPEL'])
+        # },
+        # 'EITM': {
+        #     'description': 'Unarmed Attack Effect',
+        #     'structure': FNV_FormID(['ENCH', 'SPEL'])
+        # },
+        # 'EAMT': {
+        #     'description': 'Unarmed Attack Animation',
+        #     'structure': FNV_AttackAnimationsEnum
+        # },
+        # 'DEST': {
+        #     'description': 'Destruction Data',
+        #     'structure': Struct(
+        #         "health" / Int32sl,
+        #         "count" / Int8ul,
+        #         "flags" / FlagsEnum(
+        #             Int8ul,
+        #             vats_targetable=0x01
+        #         ),
+        #         "unknown" / Bytes(2)
+        #     )
+        # },
+        # 'DSTD': {
+        #     'description': 'Destruction Stage Data',
+        #     'structure': Struct(
+        #         "health_percentage" / Int8ul,
+        #         "index" / Int8ul,
+        #         "damage_stage" / Int8ul,
+        #         "flags" / FlagsEnum(
+        #             Int8ul,
+        #             cap_damage=0x1,
+        #             disable=0x2,
+        #             destroy=0x4
+        #         ),
+        #         "self_damage_per_second" / Int32sl,
+        #         "explosion" / FNV_FormID(['EXPL']),
+        #         "debris" / FNV_FormID(['DEBR']),
+        #         "debris_count" / Int32sl
+        #     )
+        # },
+        # 'SCRI': {
+        #     'description': 'NPC Script',
+        #     'structure': FNV_FormID(['SCPT'])
+        # },
+        # 'CNTO': {
+        #     'description': 'Item Data',
+        #     'structure': Struct(
+        #         "item" / FNV_FormID([
+        #             'AMRO', 'AMMO', 'MISC', 'WEAP', 'BOOK', 'LVL1', 'KEYM',
+        #             'ALCH', 'NOTE', 'IMOD', 'CMNY', 'CCRD', 'LIGH', 'CHIP',
+        #             'MSTT', 'STAT'
+        #         ]),
+        #         "count" / Int32sl
+        #     )
+        # },
+        # 'COED': {
+        #     'description': 'Extra Item Data',
+        #     'structure': Struct(
+        #         "owner" / FNV_FormID(['NPC_', 'FACT']),
+        #         "global_variable" / FNV_FormID(['GLOB']),
+        #         "item_condition" / Float32l
+        #     )
+        # },
+        # 'AIDT': {
+        #     'description': 'NPC AI Data',
+        #     'structure': FNV_AIDTStruct
+        # },
+        # 'PKID': {
+        #     'description': 'NPC Package',
+        #     'structure': FNV_FormID(['PACK'])
+        # },
+        # 'CNAM': {
+        #     'description': 'NPC Class',
+        #     'structure': FNV_FormID(['CLAS'])
+        # },
+        # 'DATA': {
+        #     'description': 'NPC Data',
+        #     'structure': Struct(
+        #         "base_health" / Int32sl,
+        #         "strength" / Int8ul,
+        #         "perception"  / Int8ul,
+        #         "endurance" / Int8ul,
+        #         "charisma" / Int8ul,
+        #         "intelligence" / Int8ul,
+        #         "agility" / Int8ul,
+        #         "luck" / Int8ul,
+        #         "unused" / Optional(Int8ul[:])
+        #     )
+        # },
+        # 'DNAM': {
+        #     'description': 'NPC Skills',
+        #     'structure': Struct(
+        #         "barter_value" / Int8ul,
+        #         "big_guns_value" / Int8ul,
+        #         "energy_weapons_value" / Int8ul,
+        #         "explosives_value" / Int8ul,
+        #         "lockpick_value" / Int8ul,
+        #         "medicine_value" / Int8ul,
+        #         "melee_weapons_value" / Int8ul,
+        #         "repair_value" / Int8ul,
+        #         "science_value" / Int8ul,
+        #         "guns_value" / Int8ul,
+        #         "sneak_value" / Int8ul,
+        #         "speech_value" / Int8ul,
+        #         "survival_value" / Int8ul,
+        #         "unarmed_value" / Int8ul,
+        #         "barter_offset" / Int8ul,
+        #         "big_guns_offset" / Int8ul,
+        #         "energy_weapons_offset" / Int8ul,
+        #         "explosives_offset" / Int8ul,
+        #         "lockpick_offset" / Int8ul,
+        #         "medicine_offset" / Int8ul,
+        #         "melee_weapons_offset" / Int8ul,
+        #         "repair_offset" / Int8ul,
+        #         "science_offset" / Int8ul,
+        #         "guns_offset" / Int8ul,
+        #         "sneak_offset" / Int8ul,
+        #         "speech_offset" / Int8ul,
+        #         "survival_offset" / Int8ul,
+        #         "unarmed_offset" / Int8ul,
+        #     )
+        # },
+        # 'PNAM': {
+        #     'description': 'NPC Head Part',
+        #     'structure': FNV_FormID(['HDPT'])
+        # },
+        # 'HNAM': {
+        #     'description': 'NPC Hair',
+        #     'structure': FNV_FormID(['HAIR'])
+        # },
+        # 'LNAM': {
+        #     'description': 'NPC Hair Length',
+        #     'structure': Float32l
+        # },
+        # 'ENAM': {
+        #     'description': 'NPC Eyes',
+        #     'structure': FNV_FormID(['EYES'])
+        # },
+        # 'HCLR': {
+        #     'description': 'NPC Hair Color',
+        #     'structure': FNV_RGBAStruct
+        # },
+        # 'ZNAM': {
+        #     'description': 'NPC Combat Style',
+        #     'structure': FNV_FormID(['CSTY'])
+        # },
+        # 'NAM4': {
+        #     'description': 'Impact Material Type',
+        #     'structure': FNV_ImpactMaterialEnum
+        # },
+        # 'FGGS': {
+        #     'description': 'NPC Facegen Geometry - Symmetric',
+        #     'structure': Int8ul[:]
+        # },
+        # 'FGGA': {
+        #     'description': 'NPC Facegen Geometry - Asymmetric',
+        #     'structure': Int8ul[:]
+        # },
+        # 'FGTS': {
+        #     'description': 'NPC Facegen Texture - Symmetric',
+        #     'structure': Int8ul[:]
+        # },
+        # 'NAM5': {
+        #     'description': 'Unknown',
+        #     'structure': Int16ul
+        # },
+        # 'NAM6': {
+        #     'description': 'NPC Height',
+        #     'structure': Float32l
+        # },
+        # 'NAM7': {
+        #     'description': 'NPC Weight',
+        #     'structure': Float32l
+        # },
     },
     'PACK': {},
     'PERK': {},
@@ -673,7 +914,9 @@ FNV_MAP = {
     'REPU': {},
     'RGDL': {},
     'SCOL': {},
-    'SCPT': {},
+    'SCPT': dict({
+        'EDID': CString('utf8') * 'Editor ID',
+    }, **FNV_ScriptCollection),
     'SLPD': {},
     'SOUN': {},
     'SPEL': {},
@@ -692,7 +935,7 @@ FNV_MAP = {
 
 
 FNV_Subrecord = Struct(
-    "type" / String(4, 'utf8'),
+    "type" / PaddedString(4, 'utf8'),
     "data_size" / Int16ul,
     "data" / Bytes(lambda this: this.data_size),
 )
@@ -702,21 +945,20 @@ def _parse_subrecords(record_data: bytes, record_type: str) -> List[Container]:
     while record_data and len(record_data) > 0:
         subrecord = FNV_Subrecord.parse(record_data)
         record_data = record_data[(subrecord.data_size + 6):]
+
         if record_type in FNV_MAP:
             if subrecord.type in FNV_MAP[record_type]:
-                subrecord.description = (
-                    FNV_MAP[record_type][subrecord.type]
-                    .get('description', None)
+                subrecord_struct = FNV_MAP[record_type][subrecord.type]
+                (subrecord.parsed, subrecord.description,) = (
+                    subrecord_struct.parse(subrecord.data),
+                    getattr(subrecord_struct, 'docs', None),
                 )
-                subrecord.parsed = \
-                    FNV_MAP[record_type][subrecord.type]['structure'].parse(
-                        subrecord.data
-                    )
+
         yield subrecord
 
 
 FNV_Record = Struct(
-    "type" / String(4, 'utf8'),
+    "type" / PaddedString(4, 'utf8'),
     "data_size" / Int32ul,
     "flags" / FlagsEnum(  # FIXME: find better names for these flags
         Int32ul,

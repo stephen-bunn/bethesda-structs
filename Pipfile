@@ -1,28 +1,21 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
 construct = "*"
 
-
 [dev-packages]
-
 ptpython = "*"
 "flake8" = "*"
-sphinx = "*"
+Sphinx = "*"
 sphinx-autodoc-typehints = "*"
 pytest = "*"
 pytest-cov = "*"
 "pytest-flake8" = "*"
 pytest-sugar = "*"
-flask-sphinx-themes = "*"
-
+Flask-Sphinx-Themes = "*"
 
 [requires]
-
 python_version = "3.6"
