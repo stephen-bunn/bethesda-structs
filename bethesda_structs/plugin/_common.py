@@ -4,9 +4,10 @@
 import os
 import io
 import abc
-from typing import (TypeVar, Generic, List,)
+from typing import (TypeVar, Generic, List, Generator,)
 
 from construct import (Struct, Container,)
+from multidict import (CIMultiDict,)
 
 
 T_BasePlugin = TypeVar('BasePlugin')
@@ -14,7 +15,10 @@ T_BasePlugin = TypeVar('BasePlugin')
 
 class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
 
-    def __init__(self, content: bytes):
+    record_registry = CIMultiDict()
+    form_registry = CIMultiDict()
+
+    def __init__(self, content: bytes, masters: List[T_BasePlugin]=None):
         self.content = content
 
     @property
@@ -55,8 +59,18 @@ class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
     def can_handle(self, filepath: str) -> bool:
         raise NotImplementedError()
 
-    def find(self, record_type: str) -> List[Container]:
+    def iter_records(
+        self, record_type: str=None, include_header: bool=False
+    ) -> Generator[Container, None, None]:
+        if include_header:
+            if isinstance(record_type, str) and record_type.lower() != 'hedr':
+                pass
+            else:
+                yield self.header
+
         for group in self.groups:
             for record in group.records:
-                if record.type == record_type:
-                    yield record
+                if isinstance(record_type, str) and \
+                        record.type.lower() != record_type.lower():
+                    continue
+                yield record
