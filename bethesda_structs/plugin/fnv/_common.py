@@ -3,14 +3,16 @@
 
 # flake8: noqa F405
 
-from typing import (List,)
+from typing import List
 
 from construct import *
-from multidict import (CIMultiDict,)
+from multidict import CIMultiDict
+
+from .._common import FormID
 
 
 class FNV_FormID(Adapter):
-    """ The Form ID for Fallout: New Vegas.
+    """ A Form ID for Fallout: New Vegas.
     """
 
     def __init__(self, forms: List[str], *args: list, **kwargs: dict):
@@ -18,10 +20,10 @@ class FNV_FormID(Adapter):
         self.forms = forms
 
     def _decode(self, obj, context, path):
-        return obj
+        return FormID(obj, self.forms)
 
     def _encode(self, obj, context, path):
-        return obj
+        return Int32ul.build(obj.form_id)
 
 
 FNV_ServiceFlags = FlagsEnum(
@@ -41,7 +43,7 @@ FNV_ServiceFlags = FlagsEnum(
     _unknown_3=0x00001000,
     potions=0x00002000,
     training=0x00004000,
-    _unknown=0x00008000,
+    _unknown_4=0x00008000,
     recharge=0x00010000,
     repair=0x00020000,
 )
@@ -251,7 +253,7 @@ FNV_DestructionCollection = CIMultiDict({
             Int8ul,
             vats_targetable=0x01
         ),
-        "unknown_0" / Bytes(2)
+        "_unknown_0" / Bytes(2)
     ) * 'Header',
     'DSTD': Struct(
         "health_percentage" / Int8ul,
@@ -373,4 +375,46 @@ FNV_ItemCollection = CIMultiDict({
         "global_variable" / FNV_FormID(['GLOB']), # FIXME: various types,
         "item_condition" / Float32l
     ) * 'Extra Data'
+})
+
+
+FNV_ScriptCollection = CIMultiDict({
+    'SCHR': Struct(
+        "unused" / Byte[4],
+        "ref_count" / Int32ul,
+        "compiled_size" / Int32ul,
+        "variable_count" / Int32ul,
+        "type" / FlagsEnum(
+            Int16ul,
+            object=0x000,
+            quest=0x001,
+            effect=0x100
+        ),
+        "flags" / FlagsEnum(
+            Int16ul,
+            enabled=0x0001
+        )
+    ) * 'Basic Script Data',
+    'SCDA': GreedyBytes * 'Commpiled Script Source',
+    'SCTX': GreedyString('utf8') * 'Script Source',
+    'SLSD': Struct(
+        "index" / Int32ul,
+        "_unknown_0" / Bytes(12),
+        "flags" / FlagsEnum(
+            Int8ul,
+            is_long_or_short=0x01
+        ),
+        "_unknown_1" / Bytes(7)
+    ) * 'Local Variable Data',
+    'SCVR': CString('utf8') * 'Local Variable Name',
+    'SCRO': FNV_FormID([
+        'ACTI', 'DOOR', 'STAT', 'FURN', 'CREA', 'SPEL', 'NPC_', 'CONT', 'ARMO',
+        'AMMO', 'MISC', 'WEAP', 'IMAD', 'BOOK', 'KEYM', 'ALCH', 'LIGH', 'QUST',
+        'PLYR', 'PACK', 'LVLI', 'ECZN', 'EXPL', 'FLST', 'IDLM', 'PMIS', 'FACT',
+        'ACHR', 'REFR', 'ACRE', 'GLOB', 'DIAL', 'CELL', 'SOUN', 'MGEF', 'WTHR',
+        'CLAS', 'EFSH', 'RACE', 'LVLC', 'CSTY', 'WRLD', 'SCPT', 'IMGS', 'MESG',
+        'MSTT', 'MUSC', 'NOTE', 'PERK', 'PGRE', 'PROJ', 'LVLN', 'WATR', 'ENCH',
+        'TREE', 'REPU', 'REGN', 'CSNO', 'CHAL', 'IMOD', 'RCCT', 'CMNY', 'CDCK',
+        'CHIP', 'CCRD', 'TERM', 'HAIR', 'EYES', 'ADDN', 'NULL'
+    ]) * 'Reference'
 })

@@ -6,17 +6,18 @@ name = "pypi"
 [packages]
 construct = "*"
 multidict = "*"
+attrs = "*"
 
 [dev-packages]
 ptpython = "*"
 "flake8" = "*"
-sphinx = "*"
+Sphinx = "*"
 sphinx-autodoc-typehints = "*"
 pytest = "*"
 pytest-cov = "*"
 "pytest-flake8" = "*"
 pytest-sugar = "*"
-flask-sphinx-themes = "*"
+Flask-Sphinx-Themes = "*"
 
 [requires]
 python_version = "3.6"

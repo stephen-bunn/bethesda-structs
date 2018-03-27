@@ -6,6 +6,7 @@ import io
 import abc
 from typing import (TypeVar, Generic, List, Generator,)
 
+import attr
 from construct import (Struct, Container,)
 from multidict import (CIMultiDict,)
 
@@ -13,10 +14,15 @@ from multidict import (CIMultiDict,)
 T_BasePlugin = TypeVar('BasePlugin')
 
 
+@attr.s
+class FormID(object):
+    form_id = attr.ib()
+    forms = attr.ib(default=attr.Factory(list))
+
+
 class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
 
     record_registry = CIMultiDict()
-    form_registry = CIMultiDict()
 
     def __init__(self, content: bytes, masters: List[T_BasePlugin]=None):
         self.content = content
@@ -62,8 +68,9 @@ class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
     def iter_records(
         self, record_type: str=None, include_header: bool=False
     ) -> Generator[Container, None, None]:
+        record_type = record_type.lower()
         if include_header:
-            if isinstance(record_type, str) and record_type.lower() != 'hedr':
+            if isinstance(record_type, str) and record_type != 'hedr':
                 pass
             else:
                 yield self.header
@@ -71,6 +78,6 @@ class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
         for group in self.groups:
             for record in group.records:
                 if isinstance(record_type, str) and \
-                        record.type.lower() != record_type.lower():
+                        record.type.lower() != record_type:
                     continue
                 yield record

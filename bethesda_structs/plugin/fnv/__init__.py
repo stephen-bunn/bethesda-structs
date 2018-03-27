@@ -8,9 +8,9 @@ from typing import (List, Generator,)
 
 from construct import *
 
-from .records import (FNV_SubrecordMap,)
-from .records._common import (FNV_FormID,)
-from .._common import (BasePlugin,)
+from .._common import (BasePlugin, FormID,)
+from ._common import FNV_FormID
+from .records import RecordMap
 
 
 class FNV_Plugin(BasePlugin):
@@ -22,9 +22,9 @@ class FNV_Plugin(BasePlugin):
         "data_size" / Int16ul,
         "data" / Bytes(lambda this: this.data_size),
         "parsed" / Computed(lambda this: FNV_Plugin._parse_fields(
-            this.data,
+            this._.parent,
             this.type,
-            this._.parent
+            this.data
         ))
     ) * 'The subrecord structure for Fallout: New Vegas'
 
@@ -84,7 +84,7 @@ class FNV_Plugin(BasePlugin):
     group_struct = Struct(
         "type" / Const(b'GRUP'),
         "group_size" / Int32ul,
-        "_label" / Bytes(4), # NOTE: deferred  until group_type is determined
+        "_label" / Bytes(4), # NOTE: deferred until group_type is determined
         "group_type" / Enum(
             Int32sl,
             top_level=0,
@@ -166,30 +166,41 @@ class FNV_Plugin(BasePlugin):
             return header.type == 'TES4' and header.version == 15
 
     @classmethod
+    def get_struct(cls, record_type: str, subrecord_type: str) -> Struct:
+        """ Gets the appropriate structure for parsing a subrecord.
+
+        Args:
+            record_type (str): The type of the parent record
+            subrecord_type (str): The type of the subrecord
+
+        Returns:
+            Struct: The appropriate subrecord structure
+        """
+
+        if record_type in RecordMap:
+            return RecordMap[record_type].get(subrecord_type, GreedyBytes)
+
+    @classmethod
     def _parse_fields(
-        cls, subrecord_data: bytes, subrecord_type: str, record_type: str
+        cls, record_type: str, subrecord_type: str, subrecord_data: bytes,
     ) -> Generator[Container, None, None]:
         """ Parses fields from subrecord data.
 
         Args:
-            subrecord_data (bytes): The data of the subrecord
-            subrecord_type (str): The type of the subrecord
             record_type (str): The type of the record
+            subrecord_type (str): The type of the subrecord
+            subrecord_data (bytes): The data of the subrecord
 
         Returns:
             Generator[Container]: A list of Fields
         """
 
-        if record_type in FNV_SubrecordMap:
-            field_structure = FNV_SubrecordMap[record_type].get(
-                subrecord_type,
-                GreedyBytes
-            )
+        field_structure = cls.get_struct(record_type, subrecord_type)
+        if field_structure:
             field = Container(
                 value=field_structure.parse(subrecord_data),
                 description=field_structure.docs
             )
-
             return field
 
     @classmethod
