@@ -177,8 +177,16 @@ class FNV_Plugin(BasePlugin):
             Struct: The appropriate subrecord structure
         """
 
+        subrecord_struct = (GreedyBytes * 'Unhandled')
+
         if record_type in RecordMap:
-            return RecordMap[record_type].get(subrecord_type, GreedyBytes)
+            record_entry = RecordMap.get(record_type, None)
+            if record_entry:
+                subrecord_entry = record_entry.get(subrecord_type, None)
+                if subrecord_entry:
+                    subrecord_struct = subrecord_entry
+
+        return subrecord_struct
 
     @classmethod
     def _parse_fields(

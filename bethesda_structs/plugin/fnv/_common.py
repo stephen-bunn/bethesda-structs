@@ -26,7 +26,7 @@ class FNV_FormID(Adapter):
         return Int32ul.build(obj.form_id)
 
 
-FNV_ServiceFlags = FlagsEnum(
+ServiceFlags = FlagsEnum(
     Int32ul,
     weapons=0x00000001,
     armor=0x00000002,
@@ -49,7 +49,7 @@ FNV_ServiceFlags = FlagsEnum(
 )
 
 
-FNV_EquipmentTypeEnum = Enum(
+EquipmentTypeEnum = Enum(
     Int32sl,
     none=-1,
     big_guns=0,
@@ -69,7 +69,7 @@ FNV_EquipmentTypeEnum = Enum(
 )
 
 
-FNV_ImpactMaterialEnum = Enum(
+ImpactMaterialEnum = Enum(
     Int32ul,
     stone=0,
     dirt=1,
@@ -86,7 +86,7 @@ FNV_ImpactMaterialEnum = Enum(
 )
 
 
-FNV_SkillEnum = Enum(
+SkillEnum = Enum(
     Int8sl,
     none=-1,
     barter=0,
@@ -106,7 +106,7 @@ FNV_SkillEnum = Enum(
 )
 
 
-FNV_AttackAnimationsEnum = Enum(
+AttackAnimationsEnum = Enum(
     Int16ul,
     attack_left=26,
     attack_left_up=27,
@@ -227,7 +227,7 @@ FNV_AttackAnimationsEnum = Enum(
 )
 
 
-FNV_RGBAStruct = Struct(
+RGBAStruct = Struct(
     "red" / Int8ul,
     "green" / Int8ul,
     "blue" / Int8ul,
@@ -235,7 +235,7 @@ FNV_RGBAStruct = Struct(
 )
 
 
-FNV_ObjectBoundsStruct = Struct(
+ObjectBoundsStruct = Struct(
     "X1" / Int16sl,
     "Y1" / Int16sl,
     "Z1" / Int16sl,
@@ -245,7 +245,7 @@ FNV_ObjectBoundsStruct = Struct(
 )
 
 
-FNV_DestructionCollection = CIMultiDict({
+DestructionCollection = CIMultiDict({
     'DEST': Struct(
         "health" / Int32sl,
         "count" / Int8ul,
@@ -275,7 +275,7 @@ FNV_DestructionCollection = CIMultiDict({
 })
 
 
-FNV_ModelCollection = CIMultiDict({
+ModelCollection = CIMultiDict({
     'MODL': CString('utf8') * 'Model Filename',
     'MODB': Bytes(4) * 'Unknown',
     'MODT': GreedyBytes * 'Texture File Hashes',
@@ -301,7 +301,7 @@ FNV_ModelCollection = CIMultiDict({
 })
 
 
-FNV_Model2Collection = CIMultiDict({
+Model2Collection = CIMultiDict({
     'MOD2': CString('utf8') * 'Model Filename',
     'MO2T': GreedyBytes * 'Texture File Hashes',
     'MO2S': Struct(
@@ -319,7 +319,7 @@ FNV_Model2Collection = CIMultiDict({
 })
 
 
-FNV_Model3Collection = CIMultiDict({
+Model3Collection = CIMultiDict({
     'MOD3': CString('utf8') * 'Model Filename',
     'MO3T': GreedyBytes * 'Texture File Hashes',
     'MO3S': Struct(
@@ -344,7 +344,7 @@ FNV_Model3Collection = CIMultiDict({
 })
 
 
-FNV_Model4Collection = CIMultiDict({
+Model4Collection = CIMultiDict({
     'MOD4': CString('utf8') * 'Model Filename',
     'MO4T': GreedyBytes * 'Texture File Hashes',
     'MO4S': Struct(
@@ -362,7 +362,7 @@ FNV_Model4Collection = CIMultiDict({
 })
 
 
-FNV_ItemCollection = CIMultiDict({
+ItemCollection = CIMultiDict({
     'CNTO': Struct(
         "item" / FNV_FormID([
             'AMRO', 'AMMO', 'MISC', 'WEAP', 'BOOK', 'LVLI', 'KEYM', 'ALCH',
@@ -378,7 +378,7 @@ FNV_ItemCollection = CIMultiDict({
 })
 
 
-FNV_ScriptCollection = CIMultiDict({
+ScriptCollection = CIMultiDict({
     'SCHR': Struct(
         "unused" / Byte[4],
         "ref_count" / Int32ul,

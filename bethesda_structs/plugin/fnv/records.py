@@ -11,7 +11,7 @@ from ._common import *
 
 ACTI_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
     ('SNAM', FNV_FormID(['SOUN']) * 'Sound - Looping'),
@@ -21,14 +21,14 @@ ACTI_Subrecords = CIMultiDict([
     ('WNAM', FNV_FormID(['WATR']) * 'Water Type'),
     ('XATO', CString('utf8') * 'Activation Prompt'),
 ],
-    **FNV_ModelCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **DestructionCollection
 )
 
 
 AMMO_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('ICON', CString('utf8') * 'Large Icon Filename'),
     ('MICO', CString('utf8') * 'Small Icon Filename'),
@@ -57,14 +57,14 @@ AMMO_Subrecords = CIMultiDict([
     ('QNAM', CString('utf8') * 'Abbreviation'),
     ('RCIL', FNV_FormID(['AMEF']) * 'Ammo Effect'),
 ],
-    **FNV_ModelCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **DestructionCollection
 )
 
 
 ARMO_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
     ('EITM', FNV_FormID(['ENCH', 'SPEL']) * 'Object Effect'),
@@ -112,7 +112,7 @@ ARMO_Subrecords = CIMultiDict([
     ('BMCT', CString('utf8') * 'Ragdoll Constraint Template'),
     ('REPL', FNV_FormID(['FLST']) * 'Repair List'),
     ('BIPL', FNV_FormID(['FLST']) * 'Biped Model List'),
-    ('ETYP', FNV_EquipmentTypeEnum * 'Equipment Type'),
+    ('ETYP', EquipmentTypeEnum * 'Equipment Type'),
     ('YNAM', FNV_FormID(['SOUN']) * 'Sound - Pick Up'),
     ('ZNAM', FNV_FormID(['SOUN']) * 'Sound - Drop'),
     ('DATA', Struct(
@@ -150,16 +150,16 @@ ARMO_Subrecords = CIMultiDict([
     ) * 'Animation Sound'),
     ('TNAM', FNV_FormID(['ARMO']) * 'Animation Sound Template')
 ],
-    **FNV_ModelCollection,
-    **FNV_Model2Collection,
-    **FNV_Model3Collection,
-    **FNV_Model4Collection
+    **ModelCollection,
+    **Model2Collection,
+    **Model3Collection,
+    **Model4Collection
 )
 
 
 CONT_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
     ('DATA', Struct(
@@ -174,15 +174,15 @@ CONT_Subrecords = CIMultiDict([
     ('QNAM', FNV_FormID(['SOUN']) * 'Sound - Close'),
     ('RNAM', FNV_FormID(['SOUN']) * 'Sound - Random / Looping'),
 ],
-    **FNV_ModelCollection,
-    **FNV_ItemCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **ItemCollection,
+    **DestructionCollection
 )
 
 
 DOOR_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
     ('SNAM', FNV_FormID(['SOUN']) * 'Sound - Open'),
@@ -197,8 +197,8 @@ DOOR_Subrecords = CIMultiDict([
         sliding_door=0x10
     ) * 'Flags'),
 ],
-    **FNV_ModelCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **DestructionCollection
 )
 
 
@@ -241,7 +241,7 @@ FACT_Subrecords = CIMultiDict([
 
 KEYM_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('ICON', CString('utf8') * 'Large Icon Filename'),
     ('MICO', CString('utf8') * 'Small Icon Filename'),
@@ -254,8 +254,8 @@ KEYM_Subrecords = CIMultiDict([
     ) * 'Data'),
     ('RNAM', FNV_FormID(['SOUN']) * 'Sound - Random/Looping')
 ],
-    **FNV_ModelCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **DestructionCollection
 )
 
 
@@ -284,7 +284,7 @@ NAVI_Subrecords = CIMultiDict([
 
 NOTE_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('ICON', CString('utf8') * 'Large Icon Filename'),
     ('MICO', CString('utf8') * 'Small Icon Filename'),
@@ -301,13 +301,13 @@ NOTE_Subrecords = CIMultiDict([
     ('TNAM', CString('utf8') * 'Text / Topic'),
     ('SNAM', FNV_FormID(['SOUN', 'NPC_', 'CREA']) * 'Sound / Actor'),
 ],
-    **FNV_ModelCollection
+    **ModelCollection
 )
 
 
 NPC__Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('ACBS', Struct(
         "flags" / FlagsEnum(
@@ -378,7 +378,7 @@ NPC__Subrecords = CIMultiDict([
     ('RNAM', FNV_FormID(['RACE']) * 'Race'),
     ('SPLO', FNV_FormID(['SPEL']) * 'Actor Effect'),
     ('EITM', FNV_FormID(['ENCH', 'SPEL']) * 'Unarmed Attack Effect'),
-    ('EAMT', FNV_AttackAnimationsEnum * 'Unarmed Attack Animation'),
+    ('EAMT', AttackAnimationsEnum * 'Unarmed Attack Animation'),
     ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
     ('AIDT', Struct(
         "aggression" / Enum(
@@ -409,8 +409,8 @@ NPC__Subrecords = CIMultiDict([
             angry=6,
             sad=7
         ),
-        "services" / FNV_ServiceFlags,
-        "teaches" / FNV_SkillEnum,
+        "services" / ServiceFlags,
+        "teaches" / SkillEnum,
         "maximum_training_level" / Int8ul,
         "assistance" / Enum(
             Int8sl,
@@ -471,9 +471,9 @@ NPC__Subrecords = CIMultiDict([
     ('HNAM', FNV_FormID(['HAIR']) * 'Hair'),
     ('LNAM', Float32l * 'Hair Length'),
     ('ENAM', FNV_FormID(['EYES']) * 'Eyes'),
-    ('HCLR', FNV_RGBAStruct * 'Hair Color'),
+    ('HCLR', RGBAStruct * 'Hair Color'),
     ('ZNAM', FNV_FormID(['CSTY'])),
-    ('NAM4', FNV_ImpactMaterialEnum * 'Impact Material Type'),
+    ('NAM4', ImpactMaterialEnum * 'Impact Material Type'),
     ('FGGS', GreedyBytes * 'Facegen Geometry - Symmetric'),
     ('FGGA', GreedyBytes * 'Facegen Geometry - Asymmetric'),
     ('FGTS', GreedyBytes * 'Facegen Texture - Symmetric'),
@@ -481,22 +481,22 @@ NPC__Subrecords = CIMultiDict([
     ('NAM6', Float32l * 'Height'),
     ('NAM7', Float32l * 'Weight'),
 ],
-    **FNV_ModelCollection,
-    **FNV_ItemCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **ItemCollection,
+    **DestructionCollection
 )
 
 
 SCPT_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID')
 ],
-    **FNV_ScriptCollection
+    **ScriptCollection
 )
 
 
 STAT_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('BRUS', Enum(
         Int8sl,
         none=-1,
@@ -513,21 +513,21 @@ STAT_Subrecords = CIMultiDict([
     ) * 'Passthrough Sound'),
     ('RNAM', FNV_FormID(['SOUN']) * 'Sound - Random / Looping')
 ],
-    **FNV_ModelCollection
+    **ModelCollection
 )
 
 
 TACT_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
-    ('OBND', FNV_ObjectBoundsStruct * 'Object Bounds'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
     ('FULL', CString('utf8') * 'Name'),
     ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
     ('SNAM', FNV_FormID(['SOUN']) * 'Looping Sound'),
     ('VNAM', FNV_FormID(['VTYP']) * 'Voice Type'),
     ('INAM', FNV_FormID(['SOUN']) * 'Radio Template'),
 ],
-    **FNV_ModelCollection,
-    **FNV_DestructionCollection
+    **ModelCollection,
+    **DestructionCollection
 )
 
 
@@ -550,19 +550,114 @@ TES4_Subrecords = CIMultiDict([
 
 
 RecordMap = CIMultiDict({
+    'ACHR': None,
+    'ACRE': None,
     'ACTI': ACTI_Subrecords,
+    'ADDN': None,
+    'ALCH': None,
+    'ALOC': None,
+    'AMEF': None,
     'AMMO': AMMO_Subrecords,
+    'ANIO': None,
     'ARMO': ARMO_Subrecords,
+    'ARMA': None,
+    'ASPC': None,
+    'AVIF': None,
+    'BOOK': None,
+    'BPTD': None,
+    'CAMS': None,
+    'CCRD': None,
+    'CDCK': None,
+    'CELL': None,
+    'CHAL': None,
+    'CHIP': None,
+    'CLAS': None,
+    'CLMT': None,
+    'CMNY': None,
+    'COBJ': None,
     'CONT': CONT_Subrecords,
+    'CPTH': None,
+    'CREA': None,
+    'CSNO': None,
+    'CSTY': None,
+    'DEBR': None,
+    'DEHY': None,
+    'DIAL': None,
+    'DOBJ': None,
     'DOOR': DOOR_Subrecords,
+    'ECZN': None,
+    'EFSH': None,
+    'ENCH': None,
+    'EXPL': None,
+    'EYES': None,
     'FACT': FACT_Subrecords,
+    'FLST': None,
+    'FURN': None,
+    'GLOB': None,
+    'GMST': None,
+    'GRAS': None,
+    'HAIR': None,
+    'HDPT': None,
+    'HUNG': None,
+    'IDLE': None,
+    'IDLM': None,
+    'IMGS': None,
+    'IMAD': None,
+    'IMOD': None,
+    'INFO': None,
+    'INGR': None,
+    'IPCT': None,
+    'IPDS': None,
     'KEYM': KEYM_Subrecords,
+    'LAND': None,
+    'LGMT': None,
+    'LIGH': None,
+    'LSCR': None,
+    'LSCT': None,
+    'LTEX': None,
+    'LVLC': None,
+    'LVLI': None,
+    'LVLN': None,
+    'MESG': None,
+    'MGEF': None,
+    'MICN': None,
     'MISC': MISC_Subrecords,
+    'MSET': None,
+    'MSTT': None,
+    'MUSC': None,
     'NAVI': NAVI_Subrecords,
+    'NAVM': None,
     'NOTE': NOTE_Subrecords,
     'NPC_': NPC__Subrecords,
+    'PACK': None,
+    'PERK': None,
+    'PGRE': None,
+    'PMIS': None,
+    'PROJ': None,
+    'PWAT': None,
+    'QUST': None,
+    'RACE': None,
+    'RADS': None,
+    'RCCT': None,
+    'RCPE': None,
+    'REFR': None,
+    'REGN': None,
+    'REPU': None,
+    'RGDL': None,
+    'SCOL': None,
     'SCPT': SCPT_Subrecords,
+    'SLPD': None,
+    'SOUN': None,
+    'SPEL': None,
     'STAT': STAT_Subrecords,
     'TACT': TACT_Subrecords,
-    'TES4': TES4_Subrecords
+    'TERM': None,
+    'TES4': TES4_Subrecords,
+    'TREE': None,
+    'TXST': None,
+    'VTYP': None,
+    'WATR': None,
+    'WEAP': None,
+    'WRLD': None,
+    'WTHR': None,
 })
