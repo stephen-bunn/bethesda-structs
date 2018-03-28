@@ -157,6 +157,42 @@ ARMO_Subrecords = CIMultiDict([
 )
 
 
+AVIF_Subrecords = CIMultiDict([
+    ('EDID', CString('utf8') * 'Editor ID'),
+    ('FULL', CString('utf8') * 'Name'),
+    ('DESC', CString('utf8') * 'Description'),
+    ('ICON', CString('utf8') * 'Large Icon Filename'),
+    ('MICO', CString('utf8') * 'Small Icon Filename'),
+    ('ANAM', CString('utf8') * 'Short Name')
+])
+
+
+BOOK_Subrecords = CIMultiDict([
+    ('EDID', CString('utf8') * 'Editor ID'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
+    ('FULL', CString('utf8') * 'Name'),
+    ('ICON', CString('utf8') * 'Large Icon Filename'),
+    ('MICO', CString('utf8') * 'Small Icon Filename'),
+    ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
+    ('DESC', CString('utf8') * 'Description'),
+    ('YNAM', FNV_FormID(['SOUN']) * 'Sound - Pick Up'),
+    ('ZNAM', FNV_FormID(['SOUN']) * 'Sound - Drop'),
+    ('DATA', Struct(
+        "flags" / FlagsEnum(
+            Int8ul,
+            _unknown_0=0x01,
+            cant_be_taken=0x02
+        ),
+        "skill" / SkillEnum,
+        "value" / Int32sl,
+        "weight" / Float32l
+    ) * 'Data')
+],
+    **ModelCollection,
+    **DestructionCollection
+)
+
+
 CONT_Subrecords = CIMultiDict([
     ('EDID', CString('utf8') * 'Editor ID'),
     ('OBND', ObjectBoundsStruct * 'Object Bounds'),
@@ -549,6 +585,251 @@ TES4_Subrecords = CIMultiDict([
 ])
 
 
+WEAP_Subrecords = CIMultiDict([
+    ('EDID', CString('utf8') * 'Editor ID'),
+    ('OBND', ObjectBoundsStruct * 'Object Bounds'),
+    ('FULL', CString('utf8') * 'Name'),
+    ('ICON', CString('utf8') * 'Large Icon Filename'),
+    ('MICO', CString('utf8') * 'Small Icon Filename'),
+    ('SCRI', FNV_FormID(['SCPT']) * 'Script'),
+    ('EITM', FNV_FormID(['ENCH', 'SPEL']) * 'Object Effect'),
+    ('EAMT', Int16sl * 'Enchantment Charge Amount'),
+    ('NAM0', FNV_FormID(['AMMO', 'FLST']) * 'Ammo'),
+    ('REPL', FNV_FormID(['FLST']) * 'Repair List'),
+    ('ETYP', EquipmentTypeEnum * 'Equipment Type'),
+    ('BIPL', FNV_FormID(['FLST']) * 'Biped Model List'),
+    ('YNAM', FNV_FormID(['SOUN']) * 'Sound - Pick Up'),
+    ('ZNAM', FNV_FormID(['SOUN']) * 'Sound - Drop'),
+    ('EFSD', FNV_FormID(['EFSH']) * 'Scope Effect'),
+    ('MWD1', CString('utf8') * 'Model with Mod 1'),
+    ('MWD2', CString('utf8') * 'Model with Mod 2'),
+    ('MWD3', CString('utf8') * 'Model with Mods 1 and 2'),
+    ('MWD4', CString('utf8') * 'Model with Mod 3'),
+    ('MWD5', CString('utf8') * 'Model with Mods 1 and 3'),
+    ('MWD6', CString('utf8') * 'Model with Mods 2 and 3'),
+    ('MWD7', CString('utf8') * 'Model with Mods 1, 2, and 3'),
+    ('VNAM', CString('utf8') * 'VATS Attack Name'),
+    ('NNAM', CString('utf8') * 'Embedded Weapon Node'),
+    ('INAM', FNV_FormID(['IPDS']) * 'Impact Dataset'),
+    ('WNAM', FNV_FormID(['STAT']) * 'First Person Model'),
+    ('WNM1', FNV_FormID(['STAT']) * 'First Person Model with Mod 1'),
+    ('WNM2', FNV_FormID(['STAT']) * 'First Person Model with Mod 2'),
+    ('WNM3', FNV_FormID(['STAT']) * 'First Person Model with Mods 1 and 2'),
+    ('WNM4', FNV_FormID(['STAT']) * 'First Person Model with Mod 3'),
+    ('WNM5', FNV_FormID(['STAT']) * 'First Person Model with Mods 1 and 3'),
+    ('WNM6', FNV_FormID(['STAT']) * 'First Person Model with Mods 2 and 3'),
+    ('WNM7', FNV_FormID(['STAT']) * 'First Person Model with Mods 1, 2, and 3'),
+    ('WMI1', FNV_FormID(['IMOD']) * 'Weapon Mod 1'),
+    ('WMI1', FNV_FormID(['IMOD']) * 'Weapon Mod 2'),
+    ('WMI1', FNV_FormID(['IMOD']) * 'Weapon Mod 3'),
+    ('SNAM', FNV_FormID(['SOUN']) * 'Sound - Gun - Shoot 3D'),
+    ('SNAM', FNV_FormID(['SOUN']) * 'Sound - Gun - Shoot Distant'),
+    ('XNAM', FNV_FormID(['SOUN']) * 'Sound - Gun - Shoot 2D'),
+    ('NAM7', FNV_FormID(['SOUN']) * 'Sound - Gun - Shoot 3D Looping'),
+    ('TNAM', FNV_FormID(['SOUN']) * 'Sound - Melee - Swing / Gun - No Ammo'),
+    ('NAM6', FNV_FormID(['SOUN']) * 'Sound - Block'),
+    ('UNAM', FNV_FormID(['SOUN']) * 'Sound - Idle'),
+    ('NAM9', FNV_FormID(['SOUN']) * 'Sound - Equip'),
+    ('NAM8', FNV_FormID(['SOUN']) * 'Sound - Unequip'),
+    ('WMS1', FNV_FormID(['SOUN']) * 'Sound - Mod 1 - Shoot 3D'),
+    ('WMS1', FNV_FormID(['SOUN']) * 'Sound - Mod 1 - Shoot Distant'),
+    ('WMS2', FNV_FormID(['SOUN']) * 'Sound - Mod 1 - Shoot 2D'),
+    ('DATA', Struct(
+        "value" / Int32sl,
+        "health" / Int32sl,
+        "weight" / Float32l,
+        "base_damage" / Int16sl,
+        "clip_size" / Int8ul
+    ) * 'Data'),
+    ('DNAM', Struct(
+        "animation_type" / WeaponAnimationEnum,
+        "animation_multiplier" / Float32l,
+        "reach" / Float32l,
+        "flags_1" / FlagsEnum(
+            Int8ul,
+            ignores_normal_weapon_resistance=0x01,
+            is_automatic=0x02,
+            has_scope=0x04,
+            cant_drop=0x08,
+            hide_backpack=0x10,
+            embedded_weapon=0x20,
+            dont_use_first_person_animations=0x40,
+            non_playable=0x80
+        ),
+        "grip_animation" / Enum(
+            Int8ul,
+            handgrip_1=230,
+            handgrip_2=231,
+            handgrip_3=232,
+            handgrip_4=233,
+            handgrip_5=234,
+            handgrip_6=235,
+            default=255
+        ),
+        "ammo_use" / Int8ul,
+        "reload_animation" / ReloadAnimationEnum,
+        "min_spread" / Float32l,
+        "spread" / Float32l,
+        "_unknown_0" / Bytes(4),
+        "sight_fov" / Float32l,
+        "_unknown_1" / Float32l,
+        "projectile" / FNV_FormID(['PROJ']),
+        "base_vats_to_hit_chance" / Int8ul,
+        "attack_animation" / Enum(
+            Int8ul,
+            attack_left=26,
+            attack_right=32,
+            attack_3=38,
+            attack_4=44,
+            attack_5=50,
+            attack_6=56,
+            attack_7=62,
+            attack_8=68,
+            attack_loop=74,
+            attack_spin=80,
+            attack_spin_2=86,
+            place_mine=102,
+            place_mine_2=108,
+            attack_throw=114,
+            attack_throw_2=120,
+            attack_throw_3=126,
+            attack_throw_4=132,
+            attack_throw_5=138,
+            attack_9=144,
+            attack_throw_6=150,
+            attack_throw_7=156,
+            attack_throw_8=162,
+            default=255
+        ),
+        "projectile_cound" / Int8ul,
+        "embedded_weapon_actor_value" / Enum(
+            Int8ul,
+            perception=0,
+            endurance=1,
+            left_attack=2,
+            right_attack=3,
+            left_mobility=4,
+            right_mobility=5,
+            brain=6
+        ),
+        "min_range" / Float32l,
+        "max_range" / Float32l,
+        "on_hit" / Enum(
+            Int32ul,
+            normal_formula_behavior=0,
+            dismember_only=1,
+            explode_only=2,
+            no_dismember_explode=3
+        ),
+        "flags_2" / FlagsEnum(
+            Int32ul,
+            player_only=0x00000001,
+            npcs_use_ammo=0x00000002,
+            no_jam_after_reload=0x00000004,
+            override_action_points=0x00000008,
+            minor_crime=0x00000010,
+            range_fixed=0x00000020,
+            not_used_in_normal_combat=0x00000040,
+            override_damage_to_weapon_multiplier=0x00000080,
+            dont_use_3d_person_animations=0x00000100,
+            short_burst=0x00000200,
+            rumble_alternate=0x00000400,
+            long_burst=0x00000800,
+            scope_has_night_vision=0x00001000,
+            scope_from_mod=0x00002000
+        ),
+        "animation_attack_multiplier" / Float32l,
+        "fire_rate" / Float32l,
+        "override_action_points" / Float32l,
+        "rumble_left_motor_strength" / Float32l,
+        "rumble_right_motor_strength" / Float32l,
+        "rumble_duration" / Float32l,
+        "override_damage_to_weapon_mult" / Float32l,
+        "attack_shots_per_second" / Float32l,
+        "reload_time" / Float32l,
+        "jam_time" / Float32l,
+        "aim_arc" / Float32l,
+        "skill" / ActorValuesEnum,
+        "rumble_pattern" / Enum(
+            Int32ul,
+            constant=0,
+            square=1,
+            triangle=2,
+            sawtooth=3
+        ),
+        "rumble_wavelength" / Float32l,
+        "limb_damage_multiplier" / Float32l,
+        "reistance_type" / ActorValuesEnum,
+        "sight_usage" / Float32l,
+        "semi_automatic_fire_delay_min" / Float32l,
+        "semi_automatic_fire_delay_max" / Float32l,
+        "_unknown_2" / Float32l,
+        "effect_mod_1" / ModEffectEnum,
+        "effect_mod_2" / ModEffectEnum,
+        "effect_mod_3" / ModEffectEnum,
+        "value_a_mod_1" / Float32l,
+        "value_a_mod_2" / Float32l,
+        "value_a_mod_3" / Float32l,
+        "override_power_attack_animation" / Enum(
+            Int32ul,
+            _unknown_0=0,
+            attack_custom_1_power=97,
+            attack_custom_2_power=98,
+            attack_custom_3_power=99,
+            attack_custom_4_power=100,
+            attack_custom_5_power=101,
+            default=255
+        ),
+        "strength_requirement" / Int32ul,
+        "_unknown_3" / Byte,
+        "reload_animation_mod" / ReloadAnimationEnum,
+        "_unknown_4" / Bytes(2),
+        "regen_rate" / Float32l,
+        "kill_impulse" / Float32l,
+        "value_b_mod_1" / Float32l,
+        "value_b_mod_2" / Float32l,
+        "value_b_mod_3" / Float32l,
+        "impulse_distance" / Float32l,
+        "skill_requirement" / Int32ul
+    ) * 'Configuration'),
+    ('CRDT', Struct(
+        "critical_damage" / Int16ul,
+        "_unused_0" / Bytes(2),
+        "critical_percentage_multiplier" / Float32l,
+        "flags" / FlagsEnum(
+            Int8ul,
+            on_death=0x01
+        ),
+        "_unused_1" / Bytes(3),
+        "effect" / FNV_FormID(['SPEL'])
+    ) * 'Critical Data'),
+    ('VATS', Struct(
+        "effect" / FNV_FormID(['SPEL']),
+        "skill" / Float32l,
+        "damage_multiplier" / Float32l,
+        "ap" / Float32l,
+        "silent" / Enum(
+            Int8ul,
+            no=0,
+            yes=1
+        ),
+        "mod_required" / Enum(
+            Int8ul,
+            no=0,
+            yes=1
+        ),
+        "_unused_0" / Bytes(2)
+    ) * 'VATS'),
+    ('VNAM', SoundLevelEnum * 'Sound Level')
+],
+    **ModelCollection,
+    **DestructionCollection,
+    **Model2Collection,
+    **Model3Collection,
+    **Model4Collection
+)
+
+
 RecordMap = CIMultiDict({
     'ACHR': None,
     'ACRE': None,
@@ -562,8 +843,8 @@ RecordMap = CIMultiDict({
     'ARMO': ARMO_Subrecords,
     'ARMA': None,
     'ASPC': None,
-    'AVIF': None,
-    'BOOK': None,
+    'AVIF': AVIF_Subrecords,
+    'BOOK': BOOK_Subrecords,
     'BPTD': None,
     'CAMS': None,
     'CCRD': None,
@@ -657,7 +938,7 @@ RecordMap = CIMultiDict({
     'TXST': None,
     'VTYP': None,
     'WATR': None,
-    'WEAP': None,
+    'WEAP': WEAP_Subrecords,
     'WRLD': None,
     'WTHR': None,
 })

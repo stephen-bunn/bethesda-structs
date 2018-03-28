@@ -133,6 +133,7 @@ class FNV_Plugin(BasePlugin):
         "groups" / GreedyRange(group_struct)
     ) * 'The plugin structure for Fallout: New Vegas'
 
+    _subrecord_counts = {}
 
     @property
     def plugin_structure(self) -> Struct:
@@ -166,12 +167,16 @@ class FNV_Plugin(BasePlugin):
             return header.type == 'TES4' and header.version == 15
 
     @classmethod
-    def get_struct(cls, record_type: str, subrecord_type: str) -> Struct:
+    def get_struct(
+        cls, record_type: str, subrecord_type: str,
+        subrecord_index: int=0
+    ) -> Struct:
         """ Gets the appropriate structure for parsing a subrecord.
 
         Args:
             record_type (str): The type of the parent record
             subrecord_type (str): The type of the subrecord
+            subrecord_index (int): The index of the subrecord to retrieve
 
         Returns:
             Struct: The appropriate subrecord structure
@@ -182,9 +187,11 @@ class FNV_Plugin(BasePlugin):
         if record_type in RecordMap:
             record_entry = RecordMap.get(record_type, None)
             if record_entry:
-                subrecord_entry = record_entry.get(subrecord_type, None)
-                if subrecord_entry:
-                    subrecord_struct = subrecord_entry
+                subrecord_entries = record_entry.getall(subrecord_type, None)
+                if subrecord_entries:
+                    subrecord_struct = subrecord_entries[
+                        (subrecord_index % len(subrecord_entries))
+                    ]
 
         return subrecord_struct
 
@@ -203,12 +210,16 @@ class FNV_Plugin(BasePlugin):
             Generator[Container]: A list of Fields
         """
 
-        field_structure = cls.get_struct(record_type, subrecord_type)
+        field_structure = cls.get_struct(
+            record_type, subrecord_type,
+            cls._subrecord_counts.get(subrecord_type, 0)
+        )
         if field_structure:
             field = Container(
                 value=field_structure.parse(subrecord_data),
                 description=field_structure.docs
             )
+            # TODO: handle multiple of the same subrecord type
             return field
 
     @classmethod
@@ -225,11 +236,18 @@ class FNV_Plugin(BasePlugin):
             List[Container]: A list of FNV_Subrecord
         """
 
+        cls._subrecord_counts = {}
+
         while record_data and len(record_data) > 0:
             subrecord = cls.subrecord_struct.parse(
                 record_data,
                 parent=record_type
             )
+
+            if subrecord.type not in cls._subrecord_counts:
+                cls._subrecord_counts[subrecord.type] = 0
+            cls._subrecord_counts[subrecord.type] += 1
+
             record_data = record_data[(subrecord.data_size + 6):]
 
             yield subrecord
