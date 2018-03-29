@@ -6,6 +6,7 @@ import os
 import io
 from typing import (List, Generator,)
 
+from multidict import CIMultiDict
 from construct import (
     Construct, Struct, Container, GreedyBytes, GreedyRange, Switch, LazyBound,
     Bytes, Int32ul, Int32sl, Int16ul, Int16sl, Int8sl,
@@ -27,6 +28,7 @@ class FNVPlugin(BasePlugin):
         "data_size" / Int16ul,
         "data" / Bytes(lambda this: this.data_size),
         "parsed" / Computed(lambda this: FNVPlugin.parse_subrecord(
+            this._.id,
             this._.type,
             this.type,
             this.data
@@ -84,7 +86,7 @@ class FNVPlugin(BasePlugin):
         ),
         "subrecords" / Computed(lambda this: GreedyRange(
             FNVPlugin.subrecord_struct
-        ).parse(this.data, type=this.type))
+        ).parse(this.data, id=this.id, type=this.type))
     ) * 'Record structure for Fallout: New Vegas'
 
     group_struct = Struct(
@@ -155,6 +157,10 @@ class FNVPlugin(BasePlugin):
         "groups" / GreedyRange(group_struct) * 'Plugin groups'
     ) * 'Plugin structure for Fallout: New Vegas.'
 
+    # NOTE: working record is mangaled in order to protect state during
+    # subrecord parsing for record state
+    __working_record = {}
+
     @classmethod
     def can_handle(cls, filepath: str) -> bool:
         """Determines if a given file can be handled by the plugin.
@@ -175,6 +181,7 @@ class FNVPlugin(BasePlugin):
     @classmethod
     def parse_subrecord(
         cls,
+        record_id: int,
         record_type: str,
         subrecord_type: str,
         subrecord_data: bytes
@@ -193,6 +200,17 @@ class FNVPlugin(BasePlugin):
         (record_type, subrecord_type,) = \
             (record_type.upper(), subrecord_type.upper(),)
 
+        # handle reset of working record state
+        if record_id not in cls.__working_record:
+            cls.__working_record = {}
+            cls.__working_record[record_id] = CIMultiDict()
+
         record_subrecords = RecordMapping.get(record_type)
         if record_subrecords:
-            return record_subrecords.handle(subrecord_type, subrecord_data)
+            parsed = record_subrecords.handle(
+                subrecord_type,
+                subrecord_data,
+                cls.__working_record[record_id]
+            )
+            cls.__working_record[record_id].add(subrecord_type, parsed)
+            return parsed

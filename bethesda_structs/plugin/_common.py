@@ -118,12 +118,19 @@ class RecordSubrecords(object):
                 f"recieved {value!r} which is a {type(value)!r}"
             ))
 
-    def handle(self, subrecord_type: str, subrecord_data: bytes) -> Container:
+    def handle(
+        self,
+        subrecord_type: str,
+        subrecord_data: bytes,
+        working_record: CIMultiDict=None
+    ) -> Container:
         """Handles the parsing of a subrecord's data.
 
         Args:
             subrecord_type (str): The type of the subrecord
-            subrecord_data (bytes): The data of a subrecrod
+            subrecord_data (bytes): The data of a subrecord
+            working_record (CIMultiDict, optional): The working record state
+                instance, default is None
 
         Returns:
             Container: The resulting container
@@ -145,6 +152,8 @@ class RecordSubrecords(object):
                 Construct: The structure to use for parsing subrecord data
             """
 
+            # TODO: handle if collection is ``required`` or ``multiple``
+
             for subrecord_structure in collection.subrecords:
                 if isinstance(subrecord_structure, SubrecordStructure) and \
                         subrecord_structure.name == subrecord_type:
@@ -156,6 +165,8 @@ class RecordSubrecords(object):
                     )
 
             return (GreedyBytes * 'Not Handled')
+
+        # TODO: handle subrecord_type positioning requirements
 
         value_structure = handle_collection(self, subrecord_type)
         return Container(
