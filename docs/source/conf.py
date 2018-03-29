@@ -41,7 +41,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
-    'sphinx_autodoc_typehints',
+    'sphinxcontrib.napoleon',
 ]
 
 autodoc_member_order = 'bysource'

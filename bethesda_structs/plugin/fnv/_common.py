@@ -11,18 +11,46 @@ from multidict import CIMultiDict
 from .._common import FormID
 
 
-class FNV_FormID(Adapter):
-    """ A Form ID for Fallout: New Vegas.
+class FNVFormID(Adapter):
+    """ Adapts a Fallout: New Vegas field to a FormID.
     """
 
     def __init__(self, forms: List[str], *args: list, **kwargs: dict):
+        """Initializes the form id.
+
+        Args:
+            forms (List[str]): A list of uppercase strings as potential forms.
+        """
+
         super().__init__(Int32ul, *args, **kwargs)
         self.forms = forms
 
-    def _decode(self, obj, context, path):
+    def _decode(self, obj: Construct, context: Container, path: str) -> FormID:
+        """Decodes a given `obj` to a ``FormID``.
+
+        Args:
+            obj (Construct): The construct to decode
+            context (Container): The contextual container to use
+            path (str): The costruct path
+
+        Returns:
+            FormID: The resulting form id
+        """
+
         return FormID(obj, self.forms)
 
-    def _encode(self, obj, context, path):
+    def _encode(self, obj: Construct, context: Container, path: str) -> bytes:
+        """Encodes a ``FormID`` back to bytes.
+
+        Args:
+            obj (Construct): The construct to encode
+            context (Container): The contextual container to use
+            path (str): The construct path
+
+        Returns:
+            bytes: The resulting encoded bytes
+        """
+
         return Int32ul.build(obj.form_id)
 
 
@@ -425,8 +453,8 @@ DestructionCollection = CIMultiDict({
             destroy=0x04
         ),
         "self_damage_per_second" / Int32sl,
-        "explosion" / FNV_FormID(['EXPL']),
-        "debris" / FNV_FormID(['DEBR']),
+        "explosion" / FNVFormID(['EXPL']),
+        "debris" / FNVFormID(['DEBR']),
         "debris_count" / Int32sl
     ) * 'Stage Data',
     'DMDT': GreedyBytes * 'Stage Model Texture File Hashes',
@@ -446,7 +474,7 @@ ModelCollection = CIMultiDict({
                 lambda this: this.name_length,
                 'utf8'
             ),
-            "new_texture" / FNV_FormID(['TXST']),
+            "new_texture" / FNVFormID(['TXST']),
             "3d_index" / Int32sl
         )
     ) * 'Alternate Textures',
@@ -471,7 +499,7 @@ Model2Collection = CIMultiDict({
                 lambda this: this.name_length,
                 'utf8'
             ),
-            "new_texture" / FNV_FormID(['TXST']),
+            "new_texture" / FNVFormID(['TXST']),
             "3d_index" / Int32sl
         )
     ) * 'Alternate Textures'
@@ -489,7 +517,7 @@ Model3Collection = CIMultiDict({
                 lambda this: this.name_length,
                 'utf8'
             ),
-            "new_texture" / FNV_FormID(['TXST']),
+            "new_texture" / FNVFormID(['TXST']),
             "3d_index" / Int32sl
         )
     ) * 'Alternate Textures',
@@ -514,7 +542,7 @@ Model4Collection = CIMultiDict({
                 lambda this: this.name_length,
                 'utf8'
             ),
-            "new_texture" / FNV_FormID(['TXST']),
+            "new_texture" / FNVFormID(['TXST']),
             "3d_index" / Int32sl
         )
     ) * 'Alternate Textures'
@@ -523,15 +551,15 @@ Model4Collection = CIMultiDict({
 
 ItemCollection = CIMultiDict({
     'CNTO': Struct(
-        "item" / FNV_FormID([
+        "item" / FNVFormID([
             'AMRO', 'AMMO', 'MISC', 'WEAP', 'BOOK', 'LVLI', 'KEYM', 'ALCH',
             'NOTE', 'IMOD', 'CMNY', 'CCRD', 'LIGH', 'CHIP', 'MSTT', 'STAT'
         ]),
         "count" / Int32sl
     ) * 'Item',
     'COED': Struct(
-        "owner" / FNV_FormID(['NPC_', 'FACT']),
-        "global_variable" / FNV_FormID(['GLOB']), # FIXME: various types,
+        "owner" / FNVFormID(['NPC_', 'FACT']),
+        "global_variable" / FNVFormID(['GLOB']), # FIXME: various types,
         "item_condition" / Float32l
     ) * 'Extra Data'
 })
@@ -566,7 +594,7 @@ ScriptCollection = CIMultiDict({
         "_unknown_1" / Bytes(7)
     ) * 'Local Variable Data',
     'SCVR': CString('utf8') * 'Local Variable Name',
-    'SCRO': FNV_FormID([
+    'SCRO': FNVFormID([
         'ACTI', 'DOOR', 'STAT', 'FURN', 'CREA', 'SPEL', 'NPC_', 'CONT', 'ARMO',
         'AMMO', 'MISC', 'WEAP', 'IMAD', 'BOOK', 'KEYM', 'ALCH', 'LIGH', 'QUST',
         'PLYR', 'PACK', 'LVLI', 'ECZN', 'EXPL', 'FLST', 'IDLM', 'PMIS', 'FACT',

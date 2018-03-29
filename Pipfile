@@ -7,12 +7,12 @@ name = "pypi"
 construct = "*"
 multidict = "*"
 attrs = "*"
+sphinxcontrib-napoleon = "*"
 
 [dev-packages]
 ptpython = "*"
 "flake8" = "*"
 Sphinx = "*"
-sphinx-autodoc-typehints = "*"
 pytest = "*"
 pytest-cov = "*"
 "pytest-flake8" = "*"

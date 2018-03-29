@@ -1,19 +1,24 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
-# flake8: noqa F405
 
 import os
+import io
 from typing import (List, Generator,)
 
-from construct import *
+from construct import (
+    Construct, Struct, Container, GreedyBytes, GreedyRange, Switch, LazyBound,
+    Bytes, Int32ul, Int32sl, Int16ul, Int16sl, Int8sl,
+    Const, PaddedString, Enum, FlagsEnum,
+    If, IfThenElse, Computed, Compressed, Padding,
+)
 
-from .._common import (BasePlugin, FormID,)
-from ._common import FNV_FormID
-from .records import RecordMap
+from .._common import BasePlugin
+from ._common import FNVFormID
+from .records import RecordMapping
 
 
-class FNV_Plugin(BasePlugin):
+class FNVPlugin(BasePlugin):
     """ The plugin for Fallout: New Vegas.
     """
 
@@ -21,12 +26,12 @@ class FNV_Plugin(BasePlugin):
         "type" / PaddedString(4, 'utf8'),
         "data_size" / Int16ul,
         "data" / Bytes(lambda this: this.data_size),
-        "parsed" / Computed(lambda this: FNV_Plugin._parse_fields(
-            this._.parent,
+        "parsed" / Computed(lambda this: FNVPlugin.parse_subrecord(
+            this._.type,
             this.type,
             this.data
         ))
-    ) * 'The subrecord structure for Fallout: New Vegas'
+    ) * 'Subrecord structure for Fallout: New Vegas.'
 
     record_struct = Struct(
         "type" / PaddedString(4, 'utf8'),
@@ -34,9 +39,9 @@ class FNV_Plugin(BasePlugin):
         "flags" / FlagsEnum(
             Int32ul,
             master=0x00000001,
-            _unknown_0=0x00000002,  # NOTE: unknown flag
-            _unknown_1=0x00000004,  # NOTE: unknown flag
-            _unknown_2=0x00000008,  # NOTE: unknown flag
+            _unknown_0=0x00000002,
+            _unknown_1=0x00000004,
+            _unknown_2=0x00000008,
             form_initialized=0x00000010,
             deleted=0x00000020,
             constant=0x00000040,
@@ -53,10 +58,10 @@ class FNV_Plugin(BasePlugin):
             dangerous=0x00020000,
             compressed=0x00040000,
             cant_wait=0x00080000,
-            _unknown_3=0x00100000,  # NOTE: unknown flag
-            _unknown_4=0x00200000,  # NOTE: unknown flag
-            _unknown_5=0x00400000,  # NOTE: unknown flag
-            _unknown_6=0x00800000,  # NOTE: unknown flag
+            _unknown_3=0x00100000,
+            _unknown_4=0x00200000,
+            _unknown_5=0x00400000,
+            _unknown_6=0x00800000,
             destructible=0x01000000,
             obstacle=0x02000000,
             navmesh_filter=0x04000000,
@@ -64,27 +69,31 @@ class FNV_Plugin(BasePlugin):
             non_pipboy=0x10000000,
             child_can_use=0x20000000,
             navmesh_ground=0x40000000,
-            _unknown_7=0x80000000,  # NOTE: unknown flag
+            _unknown_7=0x80000000,
         ),
         "id" / Int32ul,
         "revision" / Int32ul,
         "version" / Int16ul,
         "_unknown_0" / Int16ul,
+        # NOTE: ignores compressed data size as it is handled by GreedyBytes
         If(lambda this: this.flags.compressed, Padding(Int32ul.sizeof())),
         "data" / IfThenElse(
             lambda this: this.flags.compressed,
             Compressed(GreedyBytes, 'zlib'),
             Bytes(lambda this: this.data_size)
         ),
-        "subrecords" / Computed(lambda this: list(
-            FNV_Plugin._parse_subrecords(this.data, this.type)
-        ))
-    ) * 'The record structure for Fallout: New Vegas'
+        "subrecords" / Computed(lambda this: GreedyRange(
+            FNVPlugin.subrecord_struct
+        ).parse(this.data, type=this.type))
+    ) * 'Record structure for Fallout: New Vegas'
 
     group_struct = Struct(
         "type" / Const(b'GRUP'),
         "group_size" / Int32ul,
-        "_label" / Bytes(4), # NOTE: deferred until group_type is determined
+        # TODO: find a better way of lazily building ``label`` in place
+        # instead of computing it later
+        # NOTE: deferred until group_type is determined
+        "_label" / Bytes(4),
         "group_type" / Enum(
             Int32sl,
             top_level=0,
@@ -99,177 +108,91 @@ class FNV_Plugin(BasePlugin):
             cell_temporary_children=9,
             cell_visible_distant_children=10
         ),
-        "label" / Computed(lambda this: {
-            'top_level': PaddedString(4, 'utf8'),
-            'world_children': FNV_FormID(['WRLD']),
-            'interior_cell_block': Int32sl,
-            'interior_cell_subblock': Int32sl,
-            'exterior_cell_block': Struct(
-                Int16sl,
-                "y" / Int8sl,
-                "x" / Int8sl
-            ),
-            'exterior_cell_subblock': Struct(
-                Int16sl,
-                "y" / Int8sl,
-                "x" / Int8sl
-            ),
-            'cell_children': FNV_FormID(['CELL']),
-            'topic_children': FNV_FormID(['DIAL']),
-            'cell_persistent_children': FNV_FormID(['CELL']),
-            'cell_temporary_children': FNV_FormID(['CELL']),
-            'cell_visible_distant_children': FNV_FormID(['CELL'])
-        }[this.group_type].parse(this._label)),
+        "label" / Computed(lambda this: Switch(
+            this.group_type,
+            {
+                'top_level': PaddedString(4, 'utf8'),
+                'world_children': FNVFormID(['WRLD']),
+                'interior_cell_block': Int32sl,
+                'interior_cell_subblock': Int32sl,
+                'exterior_cell_block': Struct(
+                    Int16sl,
+                    "y" / Int8sl,
+                    "x" / Int8sl
+                ),
+                'exterior_cell_subblock': Struct(
+                    Int16sl,
+                    "y" / Int8sl,
+                    "x" / Int8sl
+                ),
+                'cell_children': FNVFormID(['CELL']),
+                'topic_children': FNVFormID(['DIAL']),
+                'cell_persistent_children': FNVFormID(['CELL']),
+                'cell_temporary_children': FNVFormID(['CELL']),
+                'cell_visible_distant_children': FNVFormID(['CELL'])
+            },
+            default=GreedyBytes
+        ).parse(this._label)),
         "stamp" / Int16ul,
-        "unknown" / Bytes(6),
+        "_unknown_0" / Bytes(6),
         "data" / Bytes(lambda this: this.group_size - 24),
-        "records" / Computed(lambda this: list(
-            FNV_Plugin._parse_records(this.data)
-        ))
-    ) * 'The group structure for Fallout: New Vegas'
+        "subgroups" / If(
+            lambda this: (len(this.data) > 4 and this.data[:4] == b'GRUP'),
+            Computed(lambda this: GreedyRange(
+                LazyBound(lambda: FNVPlugin.group_struct)
+            ).parse(this.data))
+        ),
+        "records" / If(
+            lambda this: this.subgroups is None,
+            Computed(lambda this: GreedyRange(
+                FNVPlugin.record_struct
+            ).parse(this.data))
+        )
+    ) * 'Group structure for Fallout: New Vegas.'
 
     plugin_struct = Struct(
-        "header" / record_struct,
-        "groups" / GreedyRange(group_struct)
-    ) * 'The plugin structure for Fallout: New Vegas'
-
-    _subrecord_counts = {}
-
-    @property
-    def plugin_structure(self) -> Struct:
-        """ The base structure of the plugin.
-
-        Returns:
-            Struct: The base structure of the plugin
-        """
-
-        return self.plugin_struct
+        "header" / record_struct * 'Plugin header record',
+        "groups" / GreedyRange(group_struct) * 'Plugin groups'
+    ) * 'Plugin structure for Fallout: New Vegas.'
 
     @classmethod
     def can_handle(cls, filepath: str) -> bool:
-        """ Determines if a file can be handled by the plugin.
+        """Determines if a given file can be handled by the plugin.
 
         Args:
-            filepath (str): The filepath of the file to handle
+            filepath (str): The filepath to evaluate
 
         Raises:
-            FileNotFoundError: If the given filepath doesn't exist
+            FileNotFoundError: When the given `filepath` cannot be found
 
         Returns:
-            bool: True if the file can be handled by the plugin
+            bool: True if file can be handled, otherwise False
         """
 
-        if not os.path.isfile(filepath):
-            raise FileNotFoundError(f"no such file {filepath!r} exists")
-
-        with open(filepath, 'rb') as stream:
-            header = cls.record_struct.parse_stream(stream)
-            return header.type == 'TES4' and header.version == 15
+        header = cls.record_struct.parse_file(filepath)
+        return header.type == 'TES4' and header.version == 15
 
     @classmethod
-    def get_struct(
-        cls, record_type: str, subrecord_type: str,
-        subrecord_index: int=0
-    ) -> Struct:
-        """ Gets the appropriate structure for parsing a subrecord.
+    def parse_subrecord(
+        cls,
+        record_type: str,
+        subrecord_type: str,
+        subrecord_data: bytes
+    ) -> Container:
+        """Parses a subrecord's data.
 
         Args:
-            record_type (str): The type of the parent record
-            subrecord_type (str): The type of the subrecord
-            subrecord_index (int): The index of the subrecord to retrieve
+            record_type (str): The parent record type
+            subrecord_type (str): The subrecord type
+            subrecord_data (bytes): The subrecord data to parse
 
         Returns:
-            Struct: The appropriate subrecord structure
+            Container: The resulting parsed container
         """
 
-        subrecord_struct = (GreedyBytes * 'Unhandled')
+        (record_type, subrecord_type,) = \
+            (record_type.upper(), subrecord_type.upper(),)
 
-        if record_type in RecordMap:
-            record_entry = RecordMap.get(record_type, None)
-            if record_entry:
-                subrecord_entries = record_entry.getall(subrecord_type, None)
-                if subrecord_entries:
-                    subrecord_struct = subrecord_entries[
-                        (subrecord_index % len(subrecord_entries))
-                    ]
-
-        return subrecord_struct
-
-    @classmethod
-    def _parse_fields(
-        cls, record_type: str, subrecord_type: str, subrecord_data: bytes,
-    ) -> Generator[Container, None, None]:
-        """ Parses fields from subrecord data.
-
-        Args:
-            record_type (str): The type of the record
-            subrecord_type (str): The type of the subrecord
-            subrecord_data (bytes): The data of the subrecord
-
-        Returns:
-            Generator[Container]: A list of Fields
-        """
-
-        field_structure = cls.get_struct(
-            record_type, subrecord_type,
-            cls._subrecord_counts.get(subrecord_type, 0)
-        )
-        if field_structure:
-            field = Container(
-                value=field_structure.parse(subrecord_data),
-                description=field_structure.docs
-            )
-            # TODO: handle multiple of the same subrecord type
-            return field
-
-    @classmethod
-    def _parse_subrecords(
-        cls, record_data: bytes, record_type: str
-    ) -> Generator[Container, None, None]:
-        """ Parses subrecords from record data.
-
-        Args:
-            record_data (bytes): The data of a record
-            record_type (str): The type of a record
-
-        Returns:
-            List[Container]: A list of FNV_Subrecord
-        """
-
-        cls._subrecord_counts = {}
-
-        while record_data and len(record_data) > 0:
-            subrecord = cls.subrecord_struct.parse(
-                record_data,
-                parent=record_type
-            )
-
-            if subrecord.type not in cls._subrecord_counts:
-                cls._subrecord_counts[subrecord.type] = 0
-            cls._subrecord_counts[subrecord.type] += 1
-
-            record_data = record_data[(subrecord.data_size + 6):]
-
-            yield subrecord
-
-    @classmethod
-    def _parse_records(
-        cls, group_data: bytes
-    ) -> Generator[Container, None, None]:
-        """ Parses records from a group's data.
-
-        Args:
-            group_data (bytes): The data of a group
-
-        Returns:
-            Generator[Container]: A list of FNV_Record
-        """
-
-        while group_data and len(group_data) > 0:
-            record = cls.record_struct.parse(group_data)
-            group_data = group_data[(record.data_size + 24):]
-
-            # register record in plugin's record registry
-            cls.record_registry.add(record.type, record.id)
-
-            yield record
+        record_subrecords = RecordMapping.get(record_type)
+        if record_subrecords:
+            return record_subrecords.handle(subrecord_type, subrecord_data)
