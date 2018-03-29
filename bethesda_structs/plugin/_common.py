@@ -139,7 +139,8 @@ class RecordSubrecords(object):
 
         def handle_collection(
             collection: Any,
-            subrecord_type: str
+            subrecord_type: str,
+            working_record: CIMultiDict=None
         ) -> Construct:
             """Handles discovery with a sequence of ``SubrecordStructures``.
 
@@ -147,6 +148,8 @@ class RecordSubrecords(object):
                 collection (Any): The collection to use
                     (``RecordSubrecords`` or ``SubrecordCollection``)
                 subrecord_type (str): The type of subrecord to discover
+                working_record (CIMultiDict, optional): The working record
+                    state instance, default is None
 
             Returns:
                 Construct: The structure to use for parsing subrecord data

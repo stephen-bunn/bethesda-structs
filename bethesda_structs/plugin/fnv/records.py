@@ -3,6 +3,7 @@
 
 from construct import (
     Struct, CString,
+    GreedyBytes, GreedyRange,
     Float32l, Int64ul, Int32ul
 )
 
@@ -42,7 +43,12 @@ TES4_Subrecords = RecordSubrecords([
     SubrecordCollection([
         SubrecordStructure('MAST', CString('utf8') * 'Master Plugin'),
         SubrecordStructure('DATA', Int64ul * 'File Size')
-    ], optional=True, multiple=True)
+    ], optional=True, multiple=True),
+    SubrecordStructure(
+        'ONAM', GreedyRange(Int32ul) * 'Overridden Records',
+        optional=True
+    ),
+    SubrecordStructure('SCRN', GreedyBytes * 'Screenshot', optional=True)
 ])
 
 
