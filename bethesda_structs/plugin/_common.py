@@ -3,7 +3,7 @@
 
 import io
 import abc
-from typing import (Any, Union, List,)
+from typing import (TypeVar, Generic, Union, Any, Dict, List, Tuple,)
 
 import attr
 from construct import (Construct, Container, GreedyBytes,)
@@ -45,7 +45,7 @@ class FormID(object):
 
 
 @attr.s
-class SubrecordStructure(object):
+class Subrecord(object):
     """Defines a the structure of a subrecord.
     """
 
@@ -58,124 +58,113 @@ class SubrecordStructure(object):
     multiple = attr.ib(type=bool, default=False)
 
 
+T_SubrecordCollection = TypeVar('SubrecordCollection')
+
+
 @attr.s
-class SubrecordCollection(object):
+class SubrecordCollection(Generic[T_SubrecordCollection]):
     """Defines a collection of subrecord structures.
     """
 
     subrecords = attr.ib(
-        type=List[SubrecordStructure],
+        type=List[Union[Subrecord, T_SubrecordCollection]],
         default=attr.Factory(list)
     )
     optional = attr.ib(type=bool, default=False)
     multiple = attr.ib(type=bool, default=False)
 
-    @subrecords.validator
-    def validate(self, attribute: str, value: Any):
-        """Validates subrecords.
-
-        Args:
-            attribute (str): Should always be ``subrecords``
-            value (Any): Should be a list of ``SubrecordStructure``
-        """
-
-        if not isinstance(value, list) or not all(
-            isinstance(entry, SubrecordStructure)
-            for entry in value
-        ):
-            raise ValueError((
-                f"subrecords must be a list of SubrecordStructure, "
-                f"recieved {value!r} which is a {type(value)!r}"
-            ))
-
-
-@attr.s
-class RecordSubrecords(object):
-    """Defines a record's subrecord structures.
-    """
-
-    subrecords = attr.ib(
-        type=List[Union[SubrecordStructure, SubrecordCollection]],
-        default=attr.Factory(list)
-    )
-
-    @subrecords.validator
-    def validate(self, attribute: str, value: Any):
-        """Validates subrecords.
-
-        Args:
-            attribute (str): Should always be ``subrecords``
-            value (Any): Should be a list of ``SubrecordStructure`` or
-                ``SubrecordCollection``
-        """
-
-        if not isinstance(value, list) or not all(
-            isinstance(entry, (SubrecordStructure, SubrecordCollection))
-            for entry in value
-        ):
-            raise ValueError((
-                f"subrecords must be a list of SubrecordStructure, "
-                f"recieved {value!r} which is a {type(value)!r}"
-            ))
-
-    def handle(
+    def _flatten_collection(
         self,
-        subrecord_type: str,
-        subrecord_data: bytes,
-        working_record: CIMultiDict=None
-    ) -> Container:
-        """Handles the parsing of a subrecord's data.
+        collection: T_SubrecordCollection
+    ) -> CIMultiDict:
+        """Flattens the collection to a case insensitive multidict.
 
         Args:
-            subrecord_type (str): The type of the subrecord
-            subrecord_data (bytes): The data of a subrecord
-            working_record (CIMultiDict, optional): The working record state
-                instance, default is None
+            collection (T_SubrecordCollection): The collection to flatten
 
         Returns:
-            Container: The resulting container
-                (should contain ``value`` and ``description`` fields at least)
+            CIMultiDict: The resulting multidict
         """
 
-        def handle_collection(
-            collection: Any,
-            subrecord_type: str,
-            working_record: CIMultiDict=None
-        ) -> Construct:
-            """Handles discovery with a sequence of ``SubrecordStructures``.
+        flat = CIMultiDict()
+        for entry in collection.subrecords:
+            if isinstance(entry, Subrecord):
+                flat.add(entry.name, entry)
+            elif isinstance(entry, SubrecordCollection):
+                flat.extend(self._flatten_collection(entry))
+        return flat
 
-            Args:
-                collection (Any): The collection to use
-                    (``RecordSubrecords`` or ``SubrecordCollection``)
-                subrecord_type (str): The type of subrecord to discover
-                working_record (CIMultiDict, optional): The working record
-                    state instance, default is None
+    def be(
+        self,
+        optional: bool=None,
+        multiple: bool=None
+    ) -> T_SubrecordCollection:
+        """Modifies the operation of a collection in place.
 
-            Returns:
-                Construct: The structure to use for parsing subrecord data
-            """
+        Args:
+            optional (bool, optional): Defaults to None. Modifies the
+                optional field
+            multiple (bool, optional): Defaults to None. Updates the
+                multiple field
 
-            # TODO: handle if collection is ``required`` or ``multiple``
+        Returns:
+            T_SubrecordCollection: The collection the updates were applied to
+        """
 
-            for subrecord_structure in collection.subrecords:
-                if isinstance(subrecord_structure, SubrecordStructure) and \
-                        subrecord_structure.name == subrecord_type:
-                    return subrecord_structure.structure
-                elif isinstance(subrecord_structure, SubrecordCollection):
-                    return handle_collection(
-                        subrecord_structure,
-                        subrecord_type
-                    )
+        if isinstance(optional, bool):
+            self.optional = optional
+        if isinstance(multiple, bool):
+            self.multiple = multiple
+        return self
 
-            return (GreedyBytes * 'Not Handled')
+    def handle_subrecord(
+        self,
+        subrecord_name: str,
+        subrecord_data: bytes,
+        working_record: Dict[str, int]=None
+    ) -> Tuple[Dict[str, int], Container]:
+        """Handles the desconstruction of a given subrecord.
 
-        # TODO: handle subrecord_type positioning requirements
+        Args:
+            subrecord_name (str): The type of the subrecord
+            subrecord_data (bytes): The data of the subrecord
+            working_record (Dict[str, int], optional): Defaults to None. The
+                working record dictionary (used for better determination of
+                what structure to use)
 
-        value_structure = handle_collection(self, subrecord_type)
-        return Container(
+        Returns:
+            Tuple[Dict[str, int], Container]: A tuple of the updated
+                `working_record` context and the deconstructed ``Collection``
+        """
+
+        subrecord_name = subrecord_name.upper()
+        if working_record is None:
+            working_record = {}
+
+        # FIXME: currently this is a VERY naive way of determining which
+        # subrecord structure to use. This should be updated to also take
+        # advantage of the `optional` and `multiple` fields given to the
+        # Subrecord and SubrecordCollection instances
+        flat_collection = self._flatten_collection(self).getall(subrecord_name)
+        value_structure = GreedyBytes * 'Not Handled'
+        try:
+            subrecord_structure = flat_collection[(
+                working_record.get(subrecord_name, 0) % len(flat_collection)
+            )]
+            if subrecord_name not in working_record:
+                working_record[subrecord_name] = 0
+            working_record[subrecord_name] += 1
+
+            value_structure = subrecord_structure.structure
+        except IndexError:
+            pass
+
+        parsed_container = Container(
             value=value_structure.parse(subrecord_data),
             description=value_structure.docs
         )
+
+        return (parsed_container, working_record)
 
 
 class BasePlugin(abc.ABC, Construct):

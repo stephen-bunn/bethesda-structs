@@ -203,14 +203,14 @@ class FNVPlugin(BasePlugin):
         # handle reset of working record state
         if record_id not in cls.__working_record:
             cls.__working_record = {}
-            cls.__working_record[record_id] = CIMultiDict()
+            cls.__working_record[record_id] = {}
 
         record_subrecords = RecordMapping.get(record_type)
         if record_subrecords:
-            parsed = record_subrecords.handle(
+            (parsed, working_record) = record_subrecords.handle_subrecord(
                 subrecord_type,
                 subrecord_data,
                 cls.__working_record[record_id]
             )
-            cls.__working_record[record_id].add(subrecord_type, parsed)
+            cls.__working_record[record_id] = working_record
             return parsed
