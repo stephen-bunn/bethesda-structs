@@ -1,15 +1,30 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
+import os
 import io
 import abc
 
-from construct import (Construct, Container,)
+from typing import (TypeVar, Generic,)
+
+import attr
+from construct import (Construct, Container, Subconstruct,)
 
 
-class BaseArchive(abc.ABC, Construct):
+T_BaseArchive = TypeVar('BaseArchive')
+
+
+@attr.s
+class BaseArchive(abc.ABC, Generic[T_BaseArchive]):
     """The base class all Archives should subclass.
     """
+
+    content = attr.ib(type=bytes, repr=False)
+    filepath = attr.ib(type=str, default=None)
+    container = attr.ib(type=Container, default=None, repr=False, init=False)
+
+    def __attrs_post_init__(self):
+        self.container = self.archive_struct.parse(self.content)
 
     @abc.abstractproperty
     def archive_struct(self) -> Construct:
@@ -37,50 +52,28 @@ class BaseArchive(abc.ABC, Construct):
 
         raise NotImplementedError
 
-    def _parse(
-        self,
+    @classmethod
+    def parse_bytes(
+        cls,
+        content: bytes,
+        filepath: str=None
+    ) -> T_BaseArchive:
+        return cls(content, filepath=filepath)
+
+    @classmethod
+    def parse_stream(
+        cls,
         stream: io.BufferedReader,
-        context: Container,
-        path: str
-    ) -> Container:
-        """Parses the given stream using the archive struct.
+        filepath: str=None
+    ) -> T_BaseArchive:
+        return cls.parse_bytes(stream.read(), filepath=filepath)
 
-        Args:
-            stream (io.BufferedReader): The stream of bytes to parse
-            context (Container): The contextual container to use
-            path (str): The construct path
-
-        Returns:
-            Container: The resulting parsed container
-        """
-
-        return self.archive_struct._parse(stream, context, path)
-
-    def _build(
-        self,
-        obj: Construct,
-        stream: io.BufferedWriter,
-        context: Container,
-        path: str
-    ) -> bytes:
-        """Builds a given `obj` using the given `stream`.
-
-        Args:
-            obj (Construct): The construct to build
-            stream (io.BufferedWriter): The stream to build the given `obj`
-            context (Container): The contextual container to use
-            path (str): The construct path
-
-        Raises:
-            NotImplementedError: Is not currently supported
-
-        Returns:
-            bytes: The resulting built bytes
-        """
-
-        raise NotImplementedError(
-            f"{self!r} does not currently support building archives"
-        )
+    @classmethod
+    def parse_file(cls, filepath: str) -> T_BaseArchive:
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f"no such file '{filepath!r}' exists")
+        with open(filepath, 'rb') as stream:
+            return cls.parse_stream(stream, filepath)
 
     @abc.abstractmethod
     def extract(self, to_dir: str):
