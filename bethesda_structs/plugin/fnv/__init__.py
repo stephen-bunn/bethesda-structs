@@ -1,22 +1,39 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
-
-import os
 import io
-from typing import (List, Generator,)
+import os
+from typing import List, Generator
 
-from multidict import CIMultiDict
 from construct import (
-    Construct, Struct, Container, GreedyBytes, GreedyRange, Switch, LazyBound,
-    Bytes, Int32ul, Int32sl, Int16ul, Int16sl, Int8sl,
-    Const, PaddedString, Enum, FlagsEnum,
-    If, IfThenElse, Computed, Compressed, Padding,
+    If,
+    Enum,
+    Bytes,
+    Const,
+    Int8sl,
+    Struct,
+    Switch,
+    Int16sl,
+    Int16ul,
+    Int32sl,
+    Int32ul,
+    Padding,
+    Computed,
+    Construct,
+    Container,
+    FlagsEnum,
+    LazyBound,
+    Compressed,
+    IfThenElse,
+    GreedyBytes,
+    GreedyRange,
+    PaddedString
 )
+from multidict import CIMultiDict
 
-from .._common import BasePlugin
 from ._common import FNVFormID
 from .records import RecordMapping
+from .._common import BasePlugin
 
 
 class FNVPlugin(BasePlugin):
@@ -24,19 +41,18 @@ class FNVPlugin(BasePlugin):
     """
 
     subrecord_struct = Struct(
-        "type" / PaddedString(4, 'utf8'),
+        "type" / PaddedString(4, "utf8"),
         "data_size" / Int16ul,
         "data" / Bytes(lambda this: this.data_size),
-        "parsed" / Computed(lambda this: FNVPlugin.parse_subrecord(
-            this._.id,
-            this._.type,
-            this.type,
-            this.data
-        ))
-    ) * 'Subrecord structure for Fallout: New Vegas.'
+        "parsed" / Computed(
+            lambda this: FNVPlugin.parse_subrecord(
+                this._.id, this._.type, this.type, this.data
+            )
+        ),
+    ) * "Subrecord structure for Fallout: New Vegas."
 
     record_struct = Struct(
-        "type" / PaddedString(4, 'utf8'),
+        "type" / PaddedString(4, "utf8"),
         "data_size" / Int32ul,
         "flags" / FlagsEnum(
             Int32ul,
@@ -81,16 +97,18 @@ class FNVPlugin(BasePlugin):
         If(lambda this: this.flags.compressed, Padding(Int32ul.sizeof())),
         "data" / IfThenElse(
             lambda this: this.flags.compressed,
-            Compressed(GreedyBytes, 'zlib'),
-            Bytes(lambda this: this.data_size)
+            Compressed(GreedyBytes, "zlib"),
+            Bytes(lambda this: this.data_size),
         ),
-        "subrecords" / Computed(lambda this: GreedyRange(
-            FNVPlugin.subrecord_struct
-        ).parse(this.data, id=this.id, type=this.type))
-    ) * 'Record structure for Fallout: New Vegas'
+        "subrecords" / Computed(
+            lambda this: GreedyRange(FNVPlugin.subrecord_struct).parse(
+                this.data, id=this.id, type=this.type
+            )
+        ),
+    ) * "Record structure for Fallout: New Vegas"
 
     group_struct = Struct(
-        "type" / Const(b'GRUP'),
+        "type" / Const(b"GRUP"),
         "group_size" / Int32ul,
         # TODO: find a better way of lazily building ``label`` in place
         # instead of computing it later
@@ -108,54 +126,60 @@ class FNVPlugin(BasePlugin):
             topic_children=7,
             cell_persistent_children=8,
             cell_temporary_children=9,
-            cell_visible_distant_children=10
+            cell_visible_distant_children=10,
         ),
-        "label" / Computed(lambda this: Switch(
-            this.group_type,
-            {
-                'top_level': PaddedString(4, 'utf8'),
-                'world_children': FNVFormID(['WRLD']),
-                'interior_cell_block': Int32sl,
-                'interior_cell_subblock': Int32sl,
-                'exterior_cell_block': Struct(
-                    Int16sl,
-                    "y" / Int8sl,
-                    "x" / Int8sl
-                ),
-                'exterior_cell_subblock': Struct(
-                    Int16sl,
-                    "y" / Int8sl,
-                    "x" / Int8sl
-                ),
-                'cell_children': FNVFormID(['CELL']),
-                'topic_children': FNVFormID(['DIAL']),
-                'cell_persistent_children': FNVFormID(['CELL']),
-                'cell_temporary_children': FNVFormID(['CELL']),
-                'cell_visible_distant_children': FNVFormID(['CELL'])
-            },
-            default=GreedyBytes
-        ).parse(this._label)),
+        "label" / Computed(
+            lambda this: Switch(
+                this.group_type,
+                {
+                    "top_level": PaddedString(4, "utf8"),
+                    "world_children": FNVFormID(["WRLD"]),
+                    "interior_cell_block": Int32sl,
+                    "interior_cell_subblock": Int32sl,
+                    "exterior_cell_block": Struct(
+                        "y" / Int8sl,
+                        "x" / Int8sl
+                    ),
+                    "exterior_cell_subblock": Struct(
+                        "y" / Int8sl,
+                        "x" / Int8sl
+                    ),
+                    "cell_children": FNVFormID(["CELL"]),
+                    "topic_children": FNVFormID(["DIAL"]),
+                    "cell_persistent_children": FNVFormID(["CELL"]),
+                    "cell_temporary_children": FNVFormID(["CELL"]),
+                    "cell_visible_distant_children": FNVFormID(["CELL"]),
+                },
+                default=GreedyBytes,
+            ).parse(
+                this._label
+            )
+        ),
         "stamp" / Int16ul,
         "_unknown_0" / Bytes(6),
         "data" / Bytes(lambda this: this.group_size - 24),
         "subgroups" / If(
-            lambda this: (len(this.data) > 4 and this.data[:4] == b'GRUP'),
-            Computed(lambda this: GreedyRange(
-                LazyBound(lambda: FNVPlugin.group_struct)
-            ).parse(this.data))
+            lambda this: (len(this.data) > 4 and this.data[:4] == b"GRUP"),
+            Computed(
+                lambda this: GreedyRange(
+                    LazyBound(lambda: FNVPlugin.group_struct)
+                ).parse(
+                    this.data
+                )
+            ),
         ),
         "records" / If(
             lambda this: this.subgroups is None,
-            Computed(lambda this: GreedyRange(
-                FNVPlugin.record_struct
-            ).parse(this.data))
-        )
-    ) * 'Group structure for Fallout: New Vegas.'
+            Computed(
+                lambda this: GreedyRange(FNVPlugin.record_struct).parse(this.data)
+            ),
+        ),
+    ) * "Group structure for Fallout: New Vegas."
 
     plugin_struct = Struct(
-        "header" / record_struct * 'Plugin header record',
-        "groups" / GreedyRange(group_struct) * 'Plugin groups'
-    ) * 'Plugin structure for Fallout: New Vegas.'
+        "header" / record_struct * "Plugin header record",
+        "groups" / GreedyRange(group_struct) * "Plugin groups"
+    ) * "Plugin structure for Fallout: New Vegas."
 
     # NOTE: working record is mangaled in order to protect state during
     # subrecord parsing for record state
@@ -176,7 +200,7 @@ class FNVPlugin(BasePlugin):
         """
 
         header = cls.record_struct.parse_file(filepath)
-        return header.type == 'TES4' and header.version == 15
+        return header.type == "TES4" and header.version == 15
 
     @classmethod
     def parse_subrecord(
@@ -184,7 +208,7 @@ class FNVPlugin(BasePlugin):
         record_id: int,
         record_type: str,
         subrecord_type: str,
-        subrecord_data: bytes
+        subrecord_data: bytes,
     ) -> Container:
         """Parses a subrecord's data.
 
@@ -197,8 +221,7 @@ class FNVPlugin(BasePlugin):
             Container: The resulting parsed container
         """
 
-        (record_type, subrecord_type,) = \
-            (record_type.upper(), subrecord_type.upper(),)
+        (record_type, subrecord_type) = (record_type.upper(), subrecord_type.upper())
 
         # handle reset of working record state
         if record_id not in cls.__working_record:
@@ -208,9 +231,7 @@ class FNVPlugin(BasePlugin):
         record_subrecords = RecordMapping.get(record_type)
         if record_subrecords:
             (parsed, working_record) = record_subrecords.handle_subrecord(
-                subrecord_type,
-                subrecord_data,
-                cls.__working_record[record_id]
+                subrecord_type, subrecord_data, cls.__working_record[record_id]
             )
             cls.__working_record[record_id] = working_record
             return parsed

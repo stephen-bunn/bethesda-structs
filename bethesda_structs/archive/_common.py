@@ -90,10 +90,7 @@ class BaseArchive(abc.ABC, Generic[T_BaseArchive]):
         """
         if not isinstance(stream.peek(1), bytes):
             raise ValueError(
-                (
-                    f"stream {stream!r} is not a stream of bytes, "
-                    f"recieved {type(stream)!r}"
-                )
+                f"stream {stream!r} is not a stream of bytes, recieved {type(stream)!r}"
             )
 
         return cls.parse_bytes(stream.read(), filepath=filepath)
