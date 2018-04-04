@@ -74,34 +74,40 @@ class BSAArchive(BaseArchive):
         ),
     )
 
+    file_record_struct = Struct(
+        "name_hash" / Int64ul,
+        "size" / Int32ul,
+        "offset" / Int32ul
+    )
+
+    file_block_struct = Struct(
+        "name" / If(
+            lambda this: this._.header.flags.has_names_for_directories,
+            PascalString(VarInt, "utf8"),
+        ),
+        "records" / Array(
+            lambda this: this._.directory_records[this._._index].file_count,
+            file_record_struct
+        ),
+    )
+
+    directory_record_struct = Struct(
+        "name_hash" / Int64ul,
+        "file_count" / Int32ul,
+        "_unknown_0" / Int32ul,
+        "file_offset" / Int32ul,
+        "_unknown_1" / Int32ul,
+    )
+
     archive_struct = Struct(
         "header" / header_struct,
         "directory_records" / Array(
             lambda this: this.header.directory_count,
-            Struct(
-                "name_hash" / Int64ul,
-                "file_count" / Int32ul,
-                "_unknown_0" / Int32ul,
-                "file_offset" / Int32ul,
-                "_unknown_1" / Int32ul,
-            ),
+            directory_record_struct,
         ),
         "file_blocks" / Array(
             lambda this: this.header.directory_count,
-            Struct(
-                "name" / If(
-                    lambda this: this._.header.flags.has_names_for_directories,
-                    PascalString(VarInt, "utf8"),
-                ),
-                "records" / Array(
-                    lambda this: this._.directory_records[this._._index].file_count,
-                    Struct(
-                        "name_hash" / Int64ul,
-                        "size" / Int32ul,
-                        "offset" / Int32ul
-                    ),
-                ),
-            ),
+            file_block_struct
         ),
         "file_names" / If(
             lambda this: this.header.flags.has_names_for_files,
@@ -128,7 +134,9 @@ class BSAArchive(BaseArchive):
         if not os.path.isfile(filepath):
             raise FileNotFoundError(f'no such filepath {filepath!r} exists')
         header = cls.header_struct.parse_file(filepath)
-        return header.magic == b"BSA\x00" and header.version in (103, 104, 105)
+
+        # TODO: support bsa version 103
+        return header.magic == b"BSA\x00" and header.version in (104, 105,)
 
     def extract(self, to_dir: str, progress_hook: Callable[[int, int, str], None]=None):
         """Extract the content of a BSA archive out to a given directory.
@@ -154,6 +162,7 @@ class BSAArchive(BaseArchive):
             raise NotADirectoryError(f"no such directory '{to_dir!r}' exists")
 
         # defines the compressed and uncompressed file structure using an EmbeddedSwitch
+        # TODO: correctly handle compressed files
         file_struct = EmbeddedSwitch(
             Struct(
                 "name" / If(

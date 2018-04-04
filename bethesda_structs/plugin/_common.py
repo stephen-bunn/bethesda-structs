@@ -10,6 +10,8 @@ import attr
 from construct import Construct, Container, GreedyBytes
 from multidict import CIMultiDict
 
+from .._common import BaseFiletype
+
 T_BasePlugin = TypeVar("BasePlugin")
 T_SubrecordCollection = TypeVar("SubrecordCollection")
 
@@ -159,7 +161,7 @@ class SubrecordCollection(Generic[T_SubrecordCollection]):
 
 
 @attr.s
-class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
+class BasePlugin(BaseFiletype, abc.ABC, Generic[T_BasePlugin]):
     """The base class all Plugins should subclass.
     """
 
@@ -181,21 +183,6 @@ class BasePlugin(abc.ABC, Generic[T_BasePlugin]):
         if not hasattr(self, "_container"):
             self._container = self.plugin_struct.parse(self.content)
         return self._container
-
-    @abc.abstractclassmethod
-    def can_handle(cls, filepath: str) -> bool:
-        """Determines if a given `filepath` can be handled by the plugin.
-
-        Args:
-            filepath (str): The filepath to evaluate
-
-        Raises:
-            NotImplementedError: Subclasses must implement
-
-        Returns:
-            bool: True if the `filepath` can be handled, otherwise False
-        """
-        raise NotImplementedError
 
     @classmethod
     def parse_bytes(cls, content: bytes, filepath: str = None) -> T_BasePlugin:

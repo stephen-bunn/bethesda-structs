@@ -9,11 +9,13 @@ from typing import Generic, TypeVar, Callable
 import attr
 from construct import Construct, Container, Subconstruct
 
+from .._common import BaseFiletype
+
 T_BaseArchive = TypeVar("BaseArchive")
 
 
 @attr.s
-class BaseArchive(abc.ABC, Generic[T_BaseArchive]):
+class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
     """The base class all Archives should subclass.
     """
     content = attr.ib(type=bytes, repr=False)
@@ -31,21 +33,6 @@ class BaseArchive(abc.ABC, Generic[T_BaseArchive]):
 
         Returns:
             Construct: The archive structure
-        """
-        raise NotImplementedError
-
-    @abc.abstractclassmethod
-    def can_handle(cls, filepath: str) -> bool:
-        """Determines if a given `filepath` can be handled by the archive.
-
-        Args:
-            filepath (str): The filepath to evaluate
-
-        Raises:
-            NotImplementedError: Subclasses must implement
-
-        Returns:
-            bool: True if the `filepath` can be handled, otherwise False
         """
         raise NotImplementedError
 
