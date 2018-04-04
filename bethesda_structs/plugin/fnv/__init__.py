@@ -199,6 +199,9 @@ class FNVPlugin(BasePlugin):
             bool: True if file can be handled, otherwise False
         """
 
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f'file {filepath!r} does not exist')
+
         header = cls.record_struct.parse_file(filepath)
         return header.type == "TES4" and header.version == 15
 

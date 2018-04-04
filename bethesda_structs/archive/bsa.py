@@ -39,41 +39,43 @@ class BSAArchive(BaseArchive):
         offsets need to be chosen from the file and directory records with a bit more
         logic than the base structure should handle.
     """
-    archive_struct = Struct(
-        "header" / Struct(
-            "magic" / Const(b"BSA\x00"),
-            "version" / Int32ul,
-            "offset" / Int32ul,
-            "flags" / FlagsEnum(
-                Int32ul,
-                has_names_for_directories=0x001,
-                has_names_for_files=0x002,
-                files_compressed=0x004,
-                _unknown_0=0x008,
-                _unknown_1=0x010,
-                _unknown_2=0x020,
-                xbox360_archive=0x040,
-                _unknown_3=0x100,
-                _unknown_4=0x200,
-                _unknown_5=0x400,
-            ),
-            "directory_count" / Int32ul,
-            "file_count" / Int32ul,
-            "directory_names_length" / Int32ul,
-            "file_names_length" / Int32ul,
-            "file_flags" / FlagsEnum(
-                Int32ul,
-                meshes=0x001,
-                textures=0x002,
-                menus=0x004,
-                sounds=0x008,
-                voices=0x010,
-                shaders=0x020,
-                trees=0x040,
-                fonts=0x080,
-                miscellaneous=0x100,
-            ),
+    header_struct = Struct(
+        "magic" / Const(b"BSA\x00"),
+        "version" / Int32ul,
+        "offset" / Int32ul,
+        "flags" / FlagsEnum(
+            Int32ul,
+            has_names_for_directories=0x001,
+            has_names_for_files=0x002,
+            files_compressed=0x004,
+            _unknown_0=0x008,
+            _unknown_1=0x010,
+            _unknown_2=0x020,
+            xbox360_archive=0x040,
+            _unknown_3=0x100,
+            _unknown_4=0x200,
+            _unknown_5=0x400,
         ),
+        "directory_count" / Int32ul,
+        "file_count" / Int32ul,
+        "directory_names_length" / Int32ul,
+        "file_names_length" / Int32ul,
+        "file_flags" / FlagsEnum(
+            Int32ul,
+            meshes=0x001,
+            textures=0x002,
+            menus=0x004,
+            sounds=0x008,
+            voices=0x010,
+            shaders=0x020,
+            trees=0x040,
+            fonts=0x080,
+            miscellaneous=0x100,
+        ),
+    )
+
+    archive_struct = Struct(
+        "header" / header_struct,
         "directory_records" / Array(
             lambda this: this.header.directory_count,
             Struct(
@@ -118,11 +120,13 @@ class BSAArchive(BaseArchive):
             filepath (str): The filepath to evaluate
 
         Raises:
-            NotImplementedError: Subclasses must implement
+            FileNotFoundError: If the given `filepath` does not exist
 
         Returns:
             bool: True if the `filepath` can be handled, otherwise False
         """
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f'no such filepath {filepath!r} exists')
         header = cls.header_struct.parse_file(filepath)
         return header.magic == b"BSA\x00" and header.version in (103, 104, 105)
 
