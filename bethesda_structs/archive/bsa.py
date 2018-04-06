@@ -5,54 +5,78 @@ import os
 from typing import Callable
 from pathlib import Path, PureWindowsPath
 
+import lz4.frame
 from construct import (
     If,
     Array,
     Bytes,
-    Const,
     Probe,
-    Int8ul,
+    Union,
     Struct,
+    Switch,
     VarInt,
+    Adapter,
     CString,
     Int32ul,
     Int64ul,
+    Embedded,
     FlagsEnum,
     Compressed,
     IfThenElse,
     GreedyBytes,
-    GreedyRange,
-    PaddedString,
     PascalString,
-    EmbeddedSwitch
+    EmbeddedSwitch,
+    ExprSymmetricAdapter
 )
 
 from ._common import BaseArchive
 
 
+class LZ4CompressionAdapter(Adapter):
+
+    def _decode(self, obj, context, path):
+        return lz4.frame.decompress(obj)
+
+    def _encode(self, obj, context, path):
+        return lz4.frame.compress(obj)
+
+
 class BSAArchive(BaseArchive):
-    """The archive for BSA file formats.
+    """The archive for BSA file structures.
+
+    Based on the structures implemented by `BAE`_.
 
     Note:
         This archive does *not* extract the file structures from the given
-        content. This is handled during extraction due to the nature of how the file
-        offsets need to be chosen from the file and directory records with a bit more
-        logic than the base structure should handle.
+        content during parsing. Instead, this is handled during extraction due to the
+        nature of how the file offsets need to be chosen from the file and directory
+        records with a bit more logic than the base structure should handle.
+
+    .. _BAE:
+        https://github.com/jonwd7/bae
     """
+
+    OB_VERSION = 0x67
+    FO3_VERSION = 0x68
+    SSE_VERSION = 0x69
+
+    SIZE_MASK = 0x3fffffff
+    COMPRESSED_MASK = 0xc0000000
+
     header_struct = Struct(
-        "magic" / Const(b"BSA\x00"),
+        "magic" / Bytes(4),
         "version" / Int32ul,
-        "offset" / Int32ul,
-        "flags" / FlagsEnum(
+        "directory_offset" / Int32ul,
+        "archive_flags" / FlagsEnum(
             Int32ul,
-            has_names_for_directories=0x001,
-            has_names_for_files=0x002,
+            directories_named=0x001,
+            files_named=0x002,
             files_compressed=0x004,
             _unknown_0=0x008,
             _unknown_1=0x010,
             _unknown_2=0x020,
             xbox360_archive=0x040,
-            _unknown_3=0x100,
+            files_prefixed=0x100,
             _unknown_4=0x200,
             _unknown_5=0x400,
         ),
@@ -62,181 +86,163 @@ class BSAArchive(BaseArchive):
         "file_names_length" / Int32ul,
         "file_flags" / FlagsEnum(
             Int32ul,
-            meshes=0x001,
-            textures=0x002,
-            menus=0x004,
-            sounds=0x008,
-            voices=0x010,
-            shaders=0x020,
-            trees=0x040,
-            fonts=0x080,
-            miscellaneous=0x100,
-        ),
-    )
-
-    file_record_struct = Struct(
-        "name_hash" / Int64ul,
-        "size" / Int32ul,
-        "offset" / Int32ul
-    )
-
-    file_block_struct = Struct(
-        "name" / If(
-            lambda this: this._.header.flags.has_names_for_directories,
-            PascalString(VarInt, "utf8"),
-        ),
-        "records" / Array(
-            lambda this: this._.directory_records[this._._index].file_count,
-            file_record_struct
+            nif=0x001,
+            dds=0x002,
+            xml=0x004,
+            wav=0x008,
+            mp3=0x010,
+            txt=0x020,
+            html=0x020,
+            bat=0x020,
+            scc=0x020,
+            spt=0x040,
+            tex=0x080,
+            fnt=0x080,
+            ctl=0x100,
         ),
     )
 
     directory_record_struct = Struct(
-        "name_hash" / Int64ul,
-        "file_count" / Int32ul,
-        "_unknown_0" / Int32ul,
-        "file_offset" / Int32ul,
-        "_unknown_1" / Int32ul,
+        "hash" / Int64ul * "Directory hash",
+        "file_count" / Int32ul * "Number of files in directory",
+        "_unknown_0" / If(
+            lambda this: this._.header.version != BSAArchive.OB_VERSION,
+            Int32ul
+        ) * "Unknown",
+        "name_offset" / IfThenElse(
+            lambda this: this._.header.version == BSAArchive.OB_VERSION,
+            Int32ul,
+            Int64ul,
+        ) * "Directory name offset",
+    )
+
+    file_record_struct = Struct(
+        "hash" / Int64ul * "Filename hash",
+        "size" / Int32ul * "Raw file size flags",
+        "offset" / Int32ul * "Raw file data offset",
+    )
+
+    directory_block_struct = Struct(
+        "name" / If(
+            lambda this: this._.header.archive_flags.directories_named,
+            PascalString(VarInt, "utf8"),
+        ) * "Directory name",
+        "file_records" / Array(
+            lambda this: this._.directory_records[this._._index].file_count,
+            file_record_struct,
+        ) * "File records within the directory",
     )
 
     archive_struct = Struct(
-        "header" / header_struct,
+        "header" / header_struct * "Archive header",
         "directory_records" / Array(
             lambda this: this.header.directory_count,
-            directory_record_struct,
-        ),
-        "file_blocks" / Array(
+            directory_record_struct
+        ) * "Array of directory records",
+        "directory_blocks" / Array(
             lambda this: this.header.directory_count,
-            file_block_struct
-        ),
+            directory_block_struct
+        ) * "Array of file blocks",
         "file_names" / If(
-            lambda this: this.header.flags.has_names_for_files,
-            Array(
-                lambda this: this.header.file_count,
-                CString("utf8")
-            ),
-        ),
+            lambda this: this.header.archive_flags.files_named,
+            Array(lambda this: this.header.file_count, CString("utf8")),
+        ) * "Array of file names",
     )
 
     @classmethod
     def can_handle(cls, filepath: str) -> bool:
-        """Determines if a given `filepath` can be handled by the archive.
-
-        Args:
-            filepath (str): The filepath to evaluate
-
-        Raises:
-            FileNotFoundError: If the given `filepath` does not exist
-
-        Returns:
-            bool: True if the `filepath` can be handled, otherwise False
-        """
         if not os.path.isfile(filepath):
-            raise FileNotFoundError(f'no such filepath {filepath!r} exists')
-        header = cls.header_struct.parse_file(filepath)
+            raise FileNotFoundError(f"no such file {filepath!r} exists")
 
-        # TODO: support bsa version 103
-        return header.magic == b"BSA\x00" and header.version in (104, 105,)
-
-    def extract(self, to_dir: str, progress_hook: Callable[[int, int, str], None]=None):
-        """Extract the content of a BSA archive out to a given directory.
-
-        Note:
-            Progress hooks are very basic and implemented in two stages. This means
-            that you will mostly get duplicate calls with the same ``current``,
-            ``total``, and ``current_filepath``. This shouldn't be much of a problem
-            for your hooks because you should make sure that an update with duplicate
-            data doesn't change the displayed progress.
-
-        Args:
-            to_dir (str): The directory to extract the content into
-            progress_hook (Callable[[int, int, str], None], optional): Defaults to None.
-                A progress hook that should expect (``current``, ``total``,
-                ``current_filepath``) as arguments
-
-        Raises:
-            NotADirectoryError: If the given directory does not exist
-            ValueError: Various file reading errors
-        """
-        if not os.path.isdir(to_dir):
-            raise NotADirectoryError(f"no such directory '{to_dir!r}' exists")
-
-        # defines the compressed and uncompressed file structure using an EmbeddedSwitch
-        # TODO: correctly handle compressed files
-        file_struct = EmbeddedSwitch(
-            Struct(
-                "name" / If(
-                    self.container.header.flags.files_compressed,
-                    CString("utf8")
-                )
-            ),
-            self.container.header.flags.files_compressed,
-            {
-                True: Struct(
-                    "original_size" / Int32ul,
-                    "data" / Compressed(GreedyBytes, "zlib")
-                ),
-                False: Struct("data" / GreedyBytes),
-            },
+        header = Struct("magic" / Bytes(4), "version" / Int32ul).parse_file(filepath)
+        return header.magic == b"BSA\x00" and header.version in (
+            cls.OB_VERSION, cls.FO3_VERSION, cls.SSE_VERSION
         )
 
-        # NOTE: could be either compressed or uncompressed size
+    def extract(
+        self, to_dir: str, progress_hook: Callable[[int, int, str], None] = None
+    ):
+        if not os.path.isdir(to_dir):
+            raise NotADirectoryError(f"no such directory {to_dir!r} exists")
+
+        to_dir = Path(to_dir)
+        file_index = 0
         total_size = sum(
-            record.size
-            for block in self.container.file_blocks
-            for record in block.records
+            record.size & self.SIZE_MASK
+            for block in self.container.directory_blocks
+            for record in block.file_records
         )
         current_size = 0
-        file_index = 0
-        to_dir = Path(to_dir)
 
-        # iterate over zipped directory records and file blocks
-        # (should always be the same length)
-        for (directory_record, file_block) in zip(
-            self.container.directory_records, self.container.file_blocks
+        compressed_file_struct = Struct(
+            "name" / If(
+                self.container.header.version != self.OB_VERSION
+                and self.container.header.archive_flags.files_prefixed,
+                CString('utf8')
+            ),
+            "original_size" / Int32ul,
+            "data" / IfThenElse(
+                self.container.header.version != self.SSE_VERSION,
+                Compressed(GreedyBytes, "zlib"),
+                LZ4CompressionAdapter(GreedyBytes)
+            )
+        ) * "File structure for compressed files"
+        uncompressed_file_struct = Struct(
+            "name" / If(
+                self.container.header.version != self.OB_VERSION
+                and self.container.header.archive_flags.files_prefixed,
+                CString("utf8"),
+            ),
+            "data" / GreedyBytes
+        ) * "File structure for uncompressed files"
+
+        file_struct = uncompressed_file_struct
+        if self.container.header.archive_flags.files_compressed:
+            file_struct = compressed_file_struct
+
+        for (directory_record, directory_block) in zip(
+            self.container.directory_records, self.container.directory_blocks
         ):
             directory_path = to_dir
-            if isinstance(file_block.name, str):
+            if isinstance(directory_block.name, str):
                 directory_path = directory_path.joinpath(
-                    PureWindowsPath(file_block.name[:-1])
+                    PureWindowsPath(directory_block.name[:-1])
                 )
 
-            # iterate over all files in the file block
-            for file_record in file_block.records:
+            for file_record in directory_block.file_records:
                 to_path = directory_path
+
+                if file_record.size > 0 and (
+                    self.container.header.archive_flags.files_compressed != bool(
+                        file_record.size & self.COMPRESSED_MASK
+                    )
+                ):
+                    file_struct = compressed_file_struct
+
+                # FIXME: for SSE I am encountering some kind of header which I haven't seen yet
+                # And after the file content header, it doesnt even look like the data is compressed
+                # no signs of zlib magic...
+                # TODO: LZ4F extraction...
                 file_container = file_struct.parse(
                     self.content[
                         file_record.offset:(file_record.offset + file_record.size)
                     ]
                 )
+
                 if isinstance(file_container.name, str):
                     to_path = to_dir.joinpath(PureWindowsPath(file_container.name))
                 else:
                     if len(self.container.file_names) <= 0:
                         raise ValueError((
                             f"no available file name for file {file_container!r}, "
-                            f"maybe corrupt file or unsupported bsa version"
+                            f"maybe corrupt file or unsuported bsa format"
                         ))
 
-                    # archive file names should always be the same length of the
-                    # header's `file_count`
-                    to_path = directory_path.joinpath(
-                        self.container.file_names[file_index]
-                    )
+                    to_path = directory_path.joinpath(self.container.file_names[file_index])
                     file_index += 1
 
-                posix_path = to_path.as_posix()
-                # push pre-stage progress (includes 0.0 for first call)
-                if callable(progress_hook):
-                    progress_hook(current_size, total_size, posix_path)
-
-                # create parent directories and write data out
                 if not to_path.parent.is_dir():
                     to_path.parent.mkdir(parents=True)
                 with to_path.open("wb") as stream:
                     stream.write(file_container.data)
                 current_size += len(file_container.data)
-
-                # push post-stage progress (includes 100.0 for last call)
-                if callable(progress_hook):
-                    progress_hook(current_size, total_size, posix_path)

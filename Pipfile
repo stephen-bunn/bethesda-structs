@@ -8,6 +8,7 @@ construct = "*"
 multidict = "*"
 attrs = "*"
 sphinxcontrib-napoleon = "*"
+"lz4" = "*"
 
 [dev-packages]
 ptpython = "*"
