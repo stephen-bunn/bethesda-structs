@@ -15,41 +15,16 @@ To get started using this package, please see the :ref:`getting-started` page!
 
 ---
 
-.. image:: https://img.shields.io/pypi/v/bethesda-structs.svg
-   :target: https://pypi.org/project/bethesda-structs/
-   :alt: PyPi Status
+.. raw:: html
 
-.. image:: https://img.shields.io/pypi/pyversions/bethesda-structs.svg
-   :target: https://pypi.org/project/bethesda-structs/
-   :alt: Supported Versions
-
-.. image:: https://img.shields.io/pypi/status/bethesda-structs.svg
-   :target: https://pypi.org/project/bethesda-structs/
-   :alt: Release Status
-
-.. image:: https://img.shields.io/github/last-commit/stephen-bunn/bethesda-structs.svg
-   :target: https://github.com/stephen-bunn/bethesda-structs
-   :alt: Last Commit
-
-.. image:: https://img.shields.io/github/license/stephen-bunn/bethesda-structs.svg
-   :target: https://github.com/stephen-bunn/bethesda-structs/blob/master/LICENSE
-   :alt: License
-
-.. image:: https://readthedocs.org/projects/bethesda-structs/badge/?version=latest
-   :target: http://bethesda-structs.readthedocs.io/en/latest/?badge=latest
-   :alt: Documentation Status
-
-.. image:: https://travis-ci.org/stephen-bunn/bethesda-structs.svg?branch=master
-   :target: https://travis-ci.org/stephen-bunn/bethesda-structs
-   :alt: Build Status
-
-.. image:: https://requires.io/github/stephen-bunn/bethesda-structs/requirements.svg?branch=master
-   :target: https://requires.io/github/stephen-bunn/bethesda-structs/requirements/?branch=master
-   :alt: Requirements Status
-
-.. image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg
-   :target: https://saythanks.io/to/stephen-bunn
-   :alt: Say Thanks
+   <p align="center">
+      <a href="https://pypi.org/project/bethesda-structs/" target="_blank"><img alt="PyPi Status" src="https://img.shields.io/pypi/v/bethesda-structs.svg"></a>
+      <a href="https://pypi.org/project/bethesda-structs/" target="_blank"><img alt="Supported Versions" src="https://img.shields.io/pypi/pyversions/bethesda-structs.svg"></a>
+      <a href="https://github.com/stephen-bunn/bethesda-structs/blob/master/LICENSE" target="_blank"><img alt="License" src="https://img.shields.io/github/license/stephen-bunn/bethesda-structs.svg"></a>
+      <a href="http://bethesda-structs.readthedocs.io/en/latest/?badge=latest" target="_blank"><img alt="Documentation Status" src="https://readthedocs.org/projects/bethesda-structs/badge/?version=latest"></a>
+      <a href="https://travis-ci.org/stephen-bunn/bethesda-structs" target="_blank"><img alt="Build Status" src="https://travis-ci.org/stephen-bunn/bethesda-structs.svg?branch=master"></a>
+      <a href="https://github.com/ambv/black" target="_blank"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+   </p>
 
 
 User Documentation
