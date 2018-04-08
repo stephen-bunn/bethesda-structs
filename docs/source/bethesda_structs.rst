@@ -12,3 +12,4 @@ Bethesda Structs Package
    :caption: Subpackages
 
    bethesda_structs.plugin
+   bethesda_structs.archive

@@ -2,35 +2,76 @@
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 from typing import Generator
-from pathlib import PureWindowsPath
+from pathlib import Path, PureWindowsPath
 
+import lz4.frame
 from construct import (
     If,
     Array,
     Bytes,
     Struct,
     VarInt,
+    Adapter,
     CString,
     Int32ul,
     Int64ul,
+    Container,
     FlagsEnum,
     Compressed,
+    IfThenElse,
     GreedyBytes,
-    PascalString
+    PascalString,
 )
 
-from .._common import ArchiveFile, BaseArchive
+from ._common import ArchiveFile, BaseArchive
+
+
+class LZ4CompressedAdapter(Adapter):
+    """An adapter for LZ4 compressed data.
+
+    Note:
+        v105 BSA's utilize `LZ4 <https://github.com/lz4/lz4>`_ compression instead of
+        `zlib <https://zlib.net/>`_.
+    """
+
+    def _decode(self, obj: bytes, context: Container, path: str) -> bytes:
+        """Decompresses the given bytes.
+
+        Args:
+            obj (bytes): The LZ4 compressed bytes
+            context (Container): The context container
+            path (str): The construct path
+
+        Returns:
+            bytes: The resulting decompressed bytes
+        """
+        return lz4.frame.decompress(obj)
+
+    def _encode(self, obj: bytes, context: Container, path: str) -> bytes:
+        """Compresses the given bytes.
+
+        Args:
+            obj (bytes): The uncompressed bytes
+            context (Container): The context container
+            path (str): The construct path
+
+        Returns:
+            bytes: The resulting compressed bytes
+        """
+        return lz4.frame.compress(obj)
 
 
 class BSAArchive(BaseArchive):
-    """BSAArchive for version 104 of BSA files.
-
-    Note:
-        - Used by Skyrim
+    """Archive type for BSA files.
     """
 
     SIZE_MASK = 0x3fffffff
+    """int: The Int32ul size mask.
+    """
+
     COMPRESSED_MASK = 0xc0000000
+    """int: The Int32ul compressed mask.
+    """
 
     header_struct = Struct(
         "magic" / Bytes(4),
@@ -72,10 +113,23 @@ class BSAArchive(BaseArchive):
             ctl=0x100,
         ),
     )
+    """Struct: The structure of BSA headers.
+    """
+
     directory_record_struct = Struct(
-        "hash" / Int64ul, "file_count" / Int32ul, "name_offset" / Int32ul
+        "hash" / Int64ul,
+        "file_count" / Int32ul,
+        "_unknown_0" / If(lambda this: this._.header.version >= 105, Int32ul),
+        "name_offset"
+        / IfThenElse(lambda this: this._.header.version >= 105, Int64ul, Int32ul),
     )
+    """Struct: The structure of directory records.
+    """
+
     file_record_struct = Struct("hash" / Int64ul, "size" / Int32ul, "offset" / Int32ul)
+    """Struct: The structure of file records.
+    """
+
     directory_block_struct = Struct(
         "name"
         / If(
@@ -88,6 +142,9 @@ class BSAArchive(BaseArchive):
             file_record_struct,
         ),
     )
+    """Struct: The structure of directory blocks.
+    """
+
     archive_struct = Struct(
         "header" / header_struct,
         "directory_records"
@@ -100,11 +157,42 @@ class BSAArchive(BaseArchive):
             Array(lambda this: this.header.file_count, CString("utf8")),
         ),
     )
+    """Struct: The structure of BSA archives.
+    """
+
+    @property
+    def uncompressed_file_struct(self) -> Struct:
+        """Struct: The uncompressed file structure for uncompressed files.
+        """
+        return Struct("data" / GreedyBytes)
+
+    @property
+    def compressed_file_struct(self) -> Struct:
+        """Struct: The compressed file structure for compressed files.
+        """
+        return Struct(
+            "original_size" / Int32ul,
+            "data"
+            / IfThenElse(
+                self.container.header.version >= 105,
+                LZ4CompressedAdapter(GreedyBytes),
+                Compressed(GreedyBytes, "zlib"),
+            ),
+        )
 
     @classmethod
     def can_handle(cls, filepath: str) -> bool:
+        """Determines if a given file can be handled by the current archive.
+
+        Args:
+            filepath (str): The filepath to check if can be handled
+
+        Returns:
+            bool: True if the file can be handled, otherwise False
+        """
+
         header = cls.header_struct.parse_file(filepath)
-        return header.magic == b"BSA\x00" and header.version == 104
+        return header.magic == b"BSA\x00" and header.version in (103, 104, 105)
 
     def iter_files(self) -> Generator[ArchiveFile, None, None]:
         """Iterates over the parsed data and yeilds instances of `ArchiveFile`
@@ -112,22 +200,14 @@ class BSAArchive(BaseArchive):
         Raises:
             ValueError: If a filename cannot be determined for a specific file record
 
-        Yeilds:
+        Yields:
             ArchiveFile: An file contained within the archive
         """
 
-        # locally define file structures
-        uncompressed_file_struct = Struct(
-            "data" / GreedyBytes
-        ) * "Structure for uncompressed files"
-        compressed_file_struct = Struct(
-            "original_size" / Int32ul, "data" / Compressed(GreedyBytes, "zlib")
-        ) * "Structure for compressed files"
-
         file_index = 0
-        file_struct = uncompressed_file_struct
+        file_struct = self.uncompressed_file_struct
         if self.container.header.archive_flags.files_compressed:
-            file_struct = compressed_file_struct
+            file_struct = self.compressed_file_struct
 
         for (directory_record, directory_block) in zip(
             self.container.directory_records, self.container.directory_blocks
@@ -135,12 +215,12 @@ class BSAArchive(BaseArchive):
             # get directory path from directory block
             directory_path = PureWindowsPath(directory_block.name[:-1])
             for file_record in directory_block.file_records:
-                # choose compressed file structure if compressed mask is set
+                # choose the compressed file structure if compressed mask is set
                 if file_record.size > 0 and (
                     self.container.header.archive_flags.files_compressed
                     != bool(file_record.size & self.COMPRESSED_MASK)
                 ):
-                    file_struct = compressed_file_struct
+                    file_struct = self.compressed_file_struct
 
                 file_container = file_struct.parse(
                     self.content[
@@ -150,17 +230,11 @@ class BSAArchive(BaseArchive):
                     ]
                 )
 
-                if len(self.container.file_names) <= 0:
-                    raise ValueError(
-                        (
-                            f"no available file name for file {file_container!r}, "
-                            f"maybe corrupt file or unsupported format"
-                        )
-                    )
-
-                archived_path = directory_path.joinpath(
-                    self.container.file_names[file_index]
+                yield ArchiveFile(
+                    filepath=directory_path.joinpath(
+                        self.container.file_names[file_index]
+                    ),
+                    data=file_container.data,
                 )
-                file_index += 1
 
-                yield ArchiveFile(filepath=archived_path, data=file_container.data)
+                file_index += 1
