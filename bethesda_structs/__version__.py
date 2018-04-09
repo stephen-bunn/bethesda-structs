@@ -2,6 +2,7 @@
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 __name__ = 'bethesda-structs'
+__repo__ = 'https://github.com/stephen-bunn/bethesda-structs'
 __description__ = (
     'A wrapper for some of Bethesda\'s popular plugin/archive file formats'
 )
