@@ -2,3 +2,4 @@
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 from .bsa import BSAArchive
+from .btdx import BTDXArchive

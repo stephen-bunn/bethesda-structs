@@ -195,7 +195,7 @@ class BSAArchive(BaseArchive):
         return header.magic == b"BSA\x00" and header.version in (103, 104, 105)
 
     def iter_files(self) -> Generator[ArchiveFile, None, None]:
-        """Iterates over the parsed data and yeilds instances of `ArchiveFile`
+        """Iterates over the parsed data and yields instances of `ArchiveFile`
 
         Raises:
             ValueError: If a filename cannot be determined for a specific file record
