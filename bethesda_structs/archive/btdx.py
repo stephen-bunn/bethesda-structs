@@ -3,7 +3,7 @@
 
 import warnings
 from enum import IntEnum
-from typing import Generator
+from typing import Tuple, Generator
 from pathlib import PureWindowsPath
 
 from construct import (
@@ -21,6 +21,8 @@ from construct import (
     Int64ul,
     Container,
     FlagsEnum,
+    Compressed,
+    GreedyBytes,
     PaddedString,
     PascalString,
 )
@@ -30,10 +32,31 @@ from ._common import ArchiveFile, BaseArchive
 
 
 def MAKEFOURCC(ch0: str, ch1: str, ch2: str, ch3: str) -> int:
+    """Implementation of Window's `MAKEFOURCC`.
+
+    This is simply just returning the bytes of the joined characters.
+    `MAKEFOURCC(*"DX10")` can also be implemented by `Bytes("DX10")`.
+
+    Note:
+        https://msdn.microsoft.com/en-us/library/windows/desktop/bb153349(v=vs.85).aspx
+
+    Args:
+        ch0 (str): First char
+        ch1 (str): Second char
+        ch2 (str): Third char
+        ch3 (str): Fourth char
+
+    Returns:
+        int: The integer representation of given characters.
+    """
+
     return (ord(ch0) << 0) | (ord(ch1) << 8) | (ord(ch2) << 16) | (ord(ch3) << 24)
 
 
-class DXGI_FORMAT(IntEnum):
+class DXGIFormats(IntEnum):
+    """IntEnum: The format enum for DXGI files.
+    """
+
     DXGI_FORMAT_UNKNOWN = 0
     DXGI_FORMAT_R32G32B32A32_TYPELESS = 1
     DXGI_FORMAT_R32G32B32A32_FLOAT = 2
@@ -156,44 +179,51 @@ class DXGI_FORMAT(IntEnum):
     DXGI_FORMAT_FORCE_UINT = 0xffffffff
 
 
+class D3D10ResourceDimension(IntEnum):
+    """IntEnum: The dimension enum for D3D10 resources.
+    """
+
+    D3D10_RESOURCE_DIMENSION_UNKNOWN = 0
+    D3D10_RESOURCE_DIMENSION_BUFFER = 1
+    D3D10_RESOURCE_DIMENSION_TEXTURE1D = 2
+    D3D10_RESOURCE_DIMENSION_TEXTURE2D = 3
+    D3D10_RESOURCE_DIMENSION_TEXTURE3D = 4
+
+
+class D3D10ResourceMiscFlag(IntEnum):
+    """IntEnum: The miscellaneous flags for D3D10 resources.
+    """
+
+    D3D10_RESOURCE_MISC_GENERATE_MIPS = 0x00000001
+    D3D10_RESOURCE_MISC_SHARED = 0x00000002
+    D3D10_RESOURCE_MISC_TEXTURECUBE = 0x00000004
+    D3D10_RESOURCE_MISC_SHARED_KEYEDMUTEX = 0x00000010
+    D3D10_RESOURCE_MISC_GDI_COMPATIBLE = 0x00000020
+
+
 class BTDXArchive(BaseArchive):
 
-    DXGI_FORMAT = Enum(Int32ul, DXGI_FORMAT)
+    DXGI_FORMAT = Enum(Int32ul, DXGIFormats)
     """Enum: DXGI_FORMAT structure.
 
     Note:
         https://msdn.microsoft.com/en-us/library/windows/desktop/bb173059(v=vs.85).aspx
     """
 
-    D3D10_RESOURCE_DIMENSION = Enum(
-        Int32ul,
-        D3D10_RESOURCE_DIMENSION_UNKNOWN=0,
-        D3D10_RESOURCE_DIMENSION_BUFFER=1,
-        D3D10_RESOURCE_DIMENSION_TEXTURE1D=2,
-        D3D10_RESOURCE_DIMENSION_TEXTURE2D=3,
-        D3D10_RESOURCE_DIMENSION_TEXTURE3D=4,
-    )
+    D3D10_RESOURCE_DIMENSION = Enum(Int32ul, D3D10ResourceDimension)
     """Enum: D3D10_RESOURCE_DIMENSION structure.
 
     Note:
         https://msdn.microsoft.com/en-us/library/windows/desktop/bb172411(v=vs.85).aspx
     """
 
-    D3D10_RESOURCE_MISC_FLAG = FlagsEnum(
-        Int32ul,
-        D3D10_RESOURCE_MISC_GENERATE_MIPS=0x00000001,
-        D3D10_RESOURCE_MISC_SHARED=0x00000002,
-        D3D10_RESOURCE_MISC_TEXTURECUBE=0x00000004,
-        D3D10_RESOURCE_MISC_SHARED_KEYEDMUTEX=0x00000010,
-        D3D10_RESOURCE_MISC_GDI_COMPATIBLE=0x00000020,
-    )
+    D3D10_RESOURCE_MISC_FLAG = FlagsEnum(Int32ul, D3D10ResourceMiscFlag)
     """FlagsEnum: D3D10_RESOURCE_MISC_FLAG structure.
 
     Note:
         https://msdn.microsoft.com/en-us/library/windows/desktop/bb172412(v=vs.85).aspx
     """
 
-    DDS_MAGIC = 0x20534444
     DDS_PIXELFORMAT = Struct(
         "dwSize" / Const(32, Int32ul),
         "dwFlags"
@@ -241,7 +271,7 @@ class BTDXArchive(BaseArchive):
         "dwPitchOrLinearSize" / Int32ul,
         "dwDepth" / Default(Int32ul, 0),
         "dwMipMapCount" / Default(Int32ul, 0),
-        "dwReserved1" / Array(11, Default(Int32ul, 0)),
+        "dwReserved1" / Default(Array(11, Int32ul), [0] * 11),
         "ddspf" / DDS_PIXELFORMAT,
         "dwCaps"
         / FlagsEnum(
@@ -251,16 +281,19 @@ class BTDXArchive(BaseArchive):
             DDSCAPS_MIPMAP=0x00400000,
         ),
         "dwCaps2"
-        / FlagsEnum(
-            Int32ul,
-            DDSCAPS2_CUBEMAP=0x00000200,
-            DDSCAPS2_CUBEMAP_POSITIVEX=0x00000400,
-            DDSCAPS2_CUBEMAP_NEGATIVEX=0x00000800,
-            DDSCAPS2_CUBEMAP_POSITIVEY=0x00001000,
-            DDSCAPS2_CUBEMAP_NEGATIVEY=0x00002000,
-            DDSCAPS2_CUBEMAP_POSITIVEZ=0x00004000,
-            DDSCAPS2_CUBEMAP_NEGATIVEZ=0x00008000,
-            DDSCAPS2_VOLUME=0x00200000,
+        / Default(
+            FlagsEnum(
+                Int32ul,
+                DDSCAPS2_CUBEMAP=0x00000200,
+                DDSCAPS2_CUBEMAP_POSITIVEX=0x00000400,
+                DDSCAPS2_CUBEMAP_NEGATIVEX=0x00000800,
+                DDSCAPS2_CUBEMAP_POSITIVEY=0x00001000,
+                DDSCAPS2_CUBEMAP_NEGATIVEY=0x00002000,
+                DDSCAPS2_CUBEMAP_POSITIVEZ=0x00004000,
+                DDSCAPS2_CUBEMAP_NEGATIVEZ=0x00008000,
+                DDSCAPS2_VOLUME=0x00200000,
+            ),
+            0,
         ),
         "dwCaps3" / Default(Int32ul, 0),
         "dwCaps4" / Default(Int32ul, 0),
@@ -273,18 +306,21 @@ class BTDXArchive(BaseArchive):
     """
 
     DDS_HEADER_DX10 = Struct(
-        "dxgiFormat" / DXGI_FORMAT,
-        "resourceDimension" / D3D10_RESOURCE_DIMENSION,
-        "miscFlag" / D3D10_RESOURCE_MISC_FLAG,
-        "arraySize" / Int32ul,
+        "dxgiFormat" / Default(DXGI_FORMAT, 0),
+        "resourceDimension" / Default(D3D10_RESOURCE_DIMENSION, 0),
+        "miscFlag" / Default(D3D10_RESOURCE_MISC_FLAG, 0),
+        "arraySize" / Default(Int32ul, 0),
         "miscFlags2"
-        / FlagsEnum(
-            Int32ul,
-            DDS_ALPHA_MODE_UNKNOWN=0x00000000,
-            DDS_ALPHA_MODE_STRAIGHT=0x00000001,
-            DDS_ALPHA_MODE_PREMULTIPLIED=0x00000002,
-            DDS_ALPHA_MODE_OPAQUE=0x00000003,
-            DDS_ALPHA_MODE_CUSTOM=0x00000004,
+        / Default(
+            FlagsEnum(
+                Int32ul,
+                DDS_ALPHA_MODE_UNKNOWN=0x00000000,
+                DDS_ALPHA_MODE_STRAIGHT=0x00000001,
+                DDS_ALPHA_MODE_PREMULTIPLIED=0x00000002,
+                DDS_ALPHA_MODE_OPAQUE=0x00000003,
+                DDS_ALPHA_MODE_CUSTOM=0x00000004,
+            ),
+            0,
         ),
     )
     """Struct: DDS_HEADER_DX10 structure.
@@ -359,54 +395,185 @@ class BTDXArchive(BaseArchive):
         header = cls.header_struct.parse_file(filepath)
         return header.magic == b"BTDX" and header.version >= 1
 
-    def _build_dds_header(self, file_container: Container) -> bytes:
-        header_data = dict(
-            dwFlags=dict(
-                DDSD_CAPS=True,
-                DDSD_HEIGHT=True,
-                DDSD_WIDTH=True,
-                DDSD_PIXELFORMAT=True,
-                DDSD_MIPMAPCOUNT=True,
-                DDSD_LINEARSIZE=True,
-            ),
-            dwHeight=file_container.header.height,
-            dwWidth=file_container.header.width,
-            dwMipMapCount=file_container.header.mips_count,
-            dwCaps=dict(
-                DDSCAPS_COMPLEX=True, DDSCAPS_TEXTURE=True, DDSCAPS_MIPMAP=True
-            ),
-        )
+    def _build_dds_headers(self, file_container: Container) -> Tuple[bytes, bytes]:
+        """Builds DDS and DX10 secion headers for a given `file_container`.
+
+        Args:
+            file_container (Container): File container to build headers for
+
+        Returns:
+            Tuple[bytes, bytes]: A tuple of `DDS_HEADER` and `DX10_HEADER` (maybe None)
+        """
+
+        header_data = {
+            "dwFlags": {
+                "DDSD_CAPS": True,
+                "DDSD_HEIGHT": True,
+                "DDSD_WIDTH": True,
+                "DDSD_PIXELFORMAT": True,
+                "DDSD_MIPMAPCOUNT": True,
+                "DDSD_LINEARSIZE": True,
+            },
+            "dwHeight": file_container.header.height,
+            "dwWidth": file_container.header.width,
+            "dwMipMapCount": file_container.header.mips_count,
+            "dwCaps": {
+                "DDSCAPS_COMPLEX": True, "DDSCAPS_TEXTURE": True, "DDSCAPS_MIPMAP": True
+            },
+        }
 
         if file_container.header._unknown_1 == 2049:
             header_data.update(
-                dict(
-                    dwCaps2=dict(
-                        DDSCAPS2_CUBEMAP=True,
-                        DDSCAPS2_CUBEMAP_POSITIVEX=True,
-                        DDSCAPS2_CUBEMAP_NEGATIVEX=True,
-                        DDSCAPS2_CUBEMAP_POSITIVEY=True,
-                        DDSCAPS2_CUBEMAP_NEGATIVEY=True,
-                        DDSCAPS2_CUBEMAP_POSITIVEZ=True,
-                        DDSCAPS2_CUBEMAP_NEGATIVEZ=True,
-                    )
-                )
+                {
+                    "dwCaps2": {
+                        "DDSCAPS2_CUBEMAP": True,
+                        "DDSCAPS2_CUBEMAP_POSITIVEX": True,
+                        "DDSCAPS2_CUBEMAP_NEGATIVEX": True,
+                        "DDSCAPS2_CUBEMAP_POSITIVEY": True,
+                        "DDSCAPS2_CUBEMAP_NEGATIVEY": True,
+                        "DDSCAPS2_CUBEMAP_POSITIVEZ": True,
+                        "DDSCAPS2_CUBEMAP_NEGATIVEZ": True,
+                    }
+                }
             )
 
-        pixel_data = dict()
-        if file_container.header.format == DXGI_FORMAT.DXGI_FORMAT_BC1_UNORM:
-            pixel_data.update(dict(
-                dwFlags=dict(DDPF_FORUCC=True),
-
-            ))
+        # TODO: find a cleaner more ovbious way of implementing this logic
+        dx10_header_data = {}
+        pixel_data = {}
+        if file_container.header.format == DXGIFormats.DXGI_FORMAT_BC1_UNORM:
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_FOURCC=True),
+                    dwFourCC=MAKEFOURCC("D", "X", "T", "1"),
+                )
+            )
             header_data.update(
                 dict(
                     dwPitchOrLinearSize=(
-                        file_container.header.width * file_container.header.height / 2
+                        (file_container.header.width * file_container.header.height)
+                        // 2
                     )
                 )
             )
+        elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC2_UNORM:
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_FOURCC=True),
+                    dwFourCC=MAKEFOURCC("D", "X", "T", "3"),
+                )
+            )
+            header_data.update(
+                dict(
+                    dwPitchOrLinearSize=(
+                        file_container.header.width * file_container.header.height
+                    )
+                )
+            )
+        elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC3_UNORM:
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_FOURCC=True),
+                    dwFourCC=MAKEFOURCC("D", "X", "T", "5"),
+                )
+            )
+            header_data.update(
+                dict(
+                    dwPitchOrLinearSize=(
+                        file_container.header.width * file_container.header.height
+                    )
+                )
+            )
+        elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC5_UNORM:
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_FOURCC=True),
+                    dwFourCC=MAKEFOURCC("A", "T", "I", "2"),
+                )
+            )
+            header_data.update(
+                dict(
+                    dwPitchOrLinearSize=(
+                        file_container.header.width * file_container.header.height
+                    )
+                )
+            )
+        elif file_container.header.format in (
+            DXGIFormats.DXGI_FORMAT_BC7_UNORM, DXGIFormats.DXGI_FORMAT_BC7_UNORM_SRGB
+        ):
+            # FIXME: There may be a header differnce between BC7_UNORM and
+            # BC7_UNORM_SRGB, but I haven't noticed any
+            # (someone with more experience will have to let me know)
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_FOURCC=True),
+                    dwFourCC=MAKEFOURCC("D", "X", "1", "0"),
+                )
+            )
+            header_data.update(
+                dict(
+                    dwPitchOrLinearSize=(
+                        file_container.header.width * file_container.header.height
+                    )
+                )
+            )
+            dx10_header_data.update(
+                {
+                    "dxgiFormat": file_container.header.format,
+                    "resourceDimension": (
+                        D3D10ResourceDimension.D3D10_RESOURCE_DIMENSION_TEXTURE2D.value
+                    ),
+                    "miscFlag": 0,
+                    "arraySize": 1,
+                    "miscFlags2": 0,
+                }
+            )
+        elif file_container.header.format == DXGIFormats.DXGI_FORMAT_B8G8R8A8_UNORM:
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_ALPHA=True, DDPF_RBG=True),
+                    dwRGBBitCount=32,
+                    dwABitMask=0xff000000,
+                    dwRBitMask=0x00ff0000,
+                    dwGBitMask=0x0000ff00,
+                    dwBBitMask=0x000000ff,
+                )
+            )
+            header_data.update(
+                dict(
+                    dwPitchOrLinearSize=(
+                        (file_container.header.width * file_container.header.height) * 4
+                    )
+                )
+            )
+        elif file_container.header.format == DXGIFormats.DXGI_FORMAT_R8_UNORM:
+            pixel_data.update(
+                dict(
+                    dwFlags=dict(DDPF_RGB=True), dwRGBBitCount=8, dwRBitMask=0x000000ff
+                )
+            )
+            header_data.update(
+                dict(
+                    dwPitchOrLinearSize=(
+                        file_container.header.width * file_container.header.height
+                    )
+                )
+            )
+        else:
+            warnings.warn(
+                (
+                    f"unsupported DXGI format "
+                    f"{DXGIFormats(file_container.header.format).name}, "
+                    f"please create an issue on {__version__.__repo__} if you see this"
+                ),
+                UserWarning,
+            )
+            return
 
-        return self.DDS_HEADER.build(header_data)
+        header_data.update({"ddspf": pixel_data})
+        dx10_header = None
+        if len(dx10_header_data) > 0:
+            dx10_header = self.DDS_HEADER_DX10.build(dx10_header_data)
+        return (self.DDS_HEADER.build(header_data), dx10_header)
 
     def _iter_gnrl_files(self) -> Generator[ArchiveFile, None, None]:
         """Iterates over the parsed data for GNRL fiels and yields instances of
@@ -450,120 +617,37 @@ class BTDXArchive(BaseArchive):
         filename_offset = 0
         for (file_idx, file_container) in enumerate(self.container.files):
 
-            dds_header = self._build_dds_header(file_container)
+            filepath_content = self.content[
+                (self.container.header.names_offset + filename_offset):
+            ]
+            filepath = PascalString(Int16ul, "utf8").parse(filepath_content)
+            filename_offset += len(filepath) + 2
 
-            print(dds_header)
-            yield
+            (dds_header, dx10_header) = self._build_dds_headers(file_container)
+            if dds_header:
+                dds_content = b"DDS "
+                dds_content += dds_header
 
-    # header_dict = {
-    #     "dwSize": self.DDS_HEADER.sizeof(),
-    #     "dwHeaderFlags": {"texture": True, "linearsize": True, "mipmap": True},
-    #     "dwHeight": file_container.header.height,
-    #     "dwWidth": file_container.header.width,
-    #     "dwMipMapCount": file_container.header.mips_count,
-    #     "dwSurfaceFlags": {"texture": True, "mipmap": True},
-    # }
+                if dx10_header:
+                    dds_content += dx10_header
 
-    # if file_container.header._unknown_1 == 2049:
-    #     header_dict["dwCubemapFlags"] = {
-    #         "positivex": True,
-    #         "negativex": True,
-    #         "positivey": True,
-    #         "negativey": True,
-    #         "positivez": True,
-    #         "negativez": True,
-    #     }
+                for tex_chunk in file_container.chunks:
+                    if tex_chunk.packed_size > 0:
+                        dds_content += Compressed(GreedyBytes, "zlib").parse(
+                            self.content[
+                                tex_chunk.offset:(
+                                    tex_chunk.offset + tex_chunk.packed_size
+                                )
+                            ]
+                        )
+                    else:
+                        dds_content += self.content[
+                            tex_chunk.offset:(
+                                tex_chunk.offset + tex_chunk.unpacked_size
+                            )
+                        ]
 
-    # pixel_dict = dict(dwSize=self.DDS_PIXELFORMAT.sizeof())
-    # dx10_header_dict = {}
-    # if file_container.header.format == DXGIFormats.DXGI_FORMAT_BC1_UNORM:
-    #     pixel_dict.update(
-    #         {
-    #             "dwFlags": {"fourcc": True},
-    #             "dwFourCC": MAKEFOURCC("D", "X", "T", "1"),
-    #         }
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height / 2
-    # elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC2_UNORM:
-    #     pixel_dict.update(
-    #         {
-    #             "dwFlags": {"fourcc": True},
-    #             "dwFourCC": MAKEFOURCC("D", "X", "T", "3"),
-    #         }
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height
-    # elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC3_UNORM:
-    #     pixel_dict.update(
-    #         {
-    #             "dwFlags": {"fourcc": True},
-    #             "dwFourCC": MAKEFOURCC("D", "X", "T", "5"),
-    #         }
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height
-    # elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC5_UNORM:
-    #     pixel_dict.update(
-    #         {
-    #             "dwFlags": {"fourcc": True},
-    #             "dwFourCC": MAKEFOURCC("A", "T", "I", "2"),
-    #         }
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height
-    # elif file_container.header.format == DXGIFormats.DXGI_FORMAT_BC7_UNORM:
-    #     pixel_dict.update(
-    #         {
-    #             "dwFlags": {"fourcc": True},
-    #             "dwFourCC": MAKEFOURCC("D", "X", "1", "0"),
-    #         }
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height
-    #     dx10_header_dict["dxgiFormat"] = file_container.header.format
-    # elif file_container.header.format == DXGIFormats.DXGI_FORMAT_B8G8R8A8_UNORM:
-    #     pixel_dict.update(
-    #         {
-    #             "dwFlags": {"rgba": True},
-    #             "dwRGBBitCount": 32,
-    #             "dwRBitMask": 0x00ff0000,
-    #             "dwGBitMask": 0x0000ff00,
-    #             "dwBBitMask": 0x000000ff,
-    #             "dwABitMask": 0xff000000,
-    #         }
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height * 4
-    # elif file_container.header.format == DXGIFormats.DXGI_FORMAT_R8_UNORM:
-    #     pixel_dict.update(
-    #         {"dwFlags": {"rgb": True}, "dwRGBBitCount": 8, "dwRBitMask": 0xff}
-    #     )
-    #     header_dict[
-    #         "dwPitchOrLinearSize"
-    #     ] = file_container.header.width * file_container.header.height
-    # else:
-    #     warnings.warn(
-    #         (
-    #             f"unsupported dxgi format "
-    #             f"{DXGIFormats(file_container.header.format).name!r} detected, "
-    #             f"please submit an issue to <{__version__.__repo__}>"
-    #         ),
-    #         UserWarning,
-    #     )
-    #     continue
-
-    # print(DXGIFormats(file_container.header.format).name)
-    # print(pixel_dict)
-    # print(self.DDS_PIXELFORMAT.build(pixel_dict))
-
-    # input()
+                yield ArchiveFile(filepath=PureWindowsPath(filepath), data=dds_content)
 
     def iter_files(self) -> Generator[ArchiveFile, None, None]:
         """Iterates over the parsed data and yields instances of `ArchiveFile`
