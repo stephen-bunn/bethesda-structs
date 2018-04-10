@@ -307,13 +307,17 @@ class BTDXArchive(BaseArchive):
             # prefix and suffix bytes
             filename_offset += len(filepath) + 2
 
+            file_data = self.content[
+                file_container.offset:(
+                    file_container.offset + file_container.unpacked_size
+                )
+            ]
+            if file_container.packed_size > 0:
+                file_data = Compressed(GreedyBytes, "zlib").parse(file_data)
+
             yield ArchiveFile(
                 filepath=PureWindowsPath(filepath[1:]),
-                data=self.content[
-                    file_container.offset:(
-                        file_container.offset + file_container.unpacked_size
-                    )
-                ],
+                data=file_data,
             )
 
     def _iter_dx10_files(self) -> Generator[ArchiveFile, None, None]:
