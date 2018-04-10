@@ -22,7 +22,7 @@ def MAKEFOURCC(ch0: str, ch1: str, ch2: str, ch3: str) -> int:
         int: The integer representation of given characters.
 
     **Reference**:
-        `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb153349(v=vs.85).aspx>`__
+        `Microsoft <https://goo.gl/bjtMFA>`__
     """
     return (ord(ch0) << 0) | (ord(ch1) << 8) | (ord(ch2) << 16) | (ord(ch3) << 24)
 
@@ -179,21 +179,21 @@ DXGI_FORMAT = Enum(Int32ul, DXGIFormats)
 """The ``DXGI_FORMAT`` structure.
 
 **Reference**:
-    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb173059(v=vs.85).aspx>`__
+    `Microsoft <https://goo.gl/zast7X>`__
 """
 
 D3D10_RESOURCE_DIMENSION = Enum(Int32ul, D3D10ResourceDimension)
 """The ``D3D10_RESOURCE_DIMENSION`` structure.
 
 **Reference**:
-    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb172411(v=vs.85).aspx>`__
+    `Microsoft <https://goo.gl/ijDpqi>`__
 """
 
 D3D10_RESOURCE_MISC_FLAG = FlagsEnum(Int32ul, D3D10ResourceMiscFlag)
 """The ``D3D10_RESOURCE_MISC_FLAG`` structure.
 
 **Reference**:
-    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb172412(v=vs.85).aspx>`__
+    `Microsoft <https://goo.gl/MazAYd>`__
 """
 
 DDS_PIXELFORMAT = Struct(
@@ -221,7 +221,7 @@ DDS_PIXELFORMAT = Struct(
 """The ``DDS_PIXELFORMAT`` structure.
 
 **Reference**:
-    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb943984(v=vs.85).aspx>`__
+    `Microsoft <https://goo.gl/1N5KYC>`__
 """
 
 DDS_HEADER = Struct(
@@ -274,7 +274,7 @@ DDS_HEADER = Struct(
 """The ``DDS_HEADER`` structure.
 
 **Reference**:
-    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb943982(v=vs.85).aspx>`__
+    `Microsoft <https://goo.gl/mJzLkj>`__
 """
 
 DDS_HEADER_DX10 = Struct(
@@ -298,5 +298,5 @@ DDS_HEADER_DX10 = Struct(
 """The ``DDS_HEADER_DX10`` structure.
 
 **Reference**:
-    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb943983(v=vs.85).aspx>`__
+    `Microsoft <https://goo.gl/1RM6MV>`__
 """

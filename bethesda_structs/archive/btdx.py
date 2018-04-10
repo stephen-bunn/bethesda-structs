@@ -154,7 +154,6 @@ class BTDXArchive(BaseArchive):
         :class:`~construct.core.Struct`: The **partial** structure of BTDX archives
     """
 
-
     @classmethod
     def can_handle(cls, filepath: str) -> bool:
         """Determines if a given file can be handled by the current archive.
