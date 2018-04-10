@@ -18,15 +18,33 @@ T_BaseArchive = TypeVar("BaseArchive")
 
 @attr.s
 class ArchiveFile(object):
-    """An generic archive file object.
+    """A generic archive file object that can be used for extracting.
+
+    The purpose of this object is to provide some generic format for
+    :func:`~BaseArchive.iter_files` to yield so that the :func:`~BaseArchive.extract`
+    method can be abstracted away from the archive subclasses.
     """
 
     filepath = attr.ib(type=str, converter=Path)
+    """The relative filepath of the archived file.
+
+    Returns:
+        str: The relative filepath of the archived file
+    """
+
     data = attr.ib(type=bytes, repr=False)
+    """The raw data of the archived file.
+
+    Returns:
+        bytes: The raw data of the archived file
+    """
 
     @property
     def size(self) -> int:
-        """int: The full size of the file.
+        """The size of the raw data.
+
+        Returns:
+            int: The size of the raw data
         """
         return len(self.data)
 
@@ -46,27 +64,30 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
 
     @abc.abstractproperty
     def archive_struct(self) -> Construct:
-        """The base archive structure to use for parsing the archive.
+        """The base archive structure to use for parsing the **full** archive.
+
+        Raises:
+            NotImplementedError: Subclasses must implement
 
         Returns:
-            Construct: The archive structure
+            :class:`construct.Construct`: The archive structure
         """
         raise NotImplementedError
 
     @classmethod
     def parse_bytes(cls, content: bytes, filepath: str = None) -> T_BaseArchive:
-        """Create a `BaseArchive` from a byte array.
+        """Create a :class:`BaseArchive` from a byte array.
 
         Args:
             content (bytes): The byte content of the archive
-            filepath (str, optional): Defaults to None. Sets the filepath attribute for
-                user's reference
+            filepath (str, optional): Defaults to None.
+                Sets the filepath attribute for user's reference
 
         Raises:
             ValueError: If the given content is not of bytes
 
         Returns:
-            T_BaseArchive: A created `BaseArchive`
+            :class:`BaseArchive`: An archive instance
         """
         if not isinstance(content, bytes):
             raise ValueError(
@@ -79,18 +100,18 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
     def parse_stream(
         cls, stream: io.BufferedReader, filepath: str = None
     ) -> T_BaseArchive:
-        """Create a `BaseArchive` from a file stream.
+        """Create a :class:`BaseArchive` from a file stream.
 
         Args:
             stream (io.BufferedReader): A file stream to read from.
-            filepath (str, optional): Defaults to None. Sets the filepath attribute for
-                user's reference.
+            filepath (str, optional): Defaults to None.
+                Sets the filepath attribute for user's reference.
 
         Raises:
             ValueError: If the given stream is not of ``bytes``
 
         Returns:
-            T_BaseArchive: A created `BaseArchive`
+            :class:`BaseArchive`: An archive instance
         """
         if not isinstance(stream.peek(1), bytes):
             raise ValueError(
@@ -101,7 +122,7 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
 
     @classmethod
     def parse_file(cls, filepath: str) -> T_BaseArchive:
-        """Create a `BaseArchive` from a given filepath.
+        """Create a :class:`BaseArchive` from a given filepath.
 
         Args:
             filepath (str): The filepath to read from
@@ -110,7 +131,7 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
             FileNotFoundError: If the given filepath does not exist
 
         Returns:
-            T_BaseArchive: A created `BaseArchive`
+            :class:`BaseArchive`: An archive instance
         """
         if not os.path.isfile(filepath):
             raise FileNotFoundError(f"no such file {filepath!r} exists")
@@ -135,16 +156,43 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
     ):
         """Extracts the content of the `BaseArchive` to the given directory.
 
-        Note:
-            The provided progress hook is simple and two-stage. It is called once
-            before a file is being written and once after the same file is done
-            being written.
-
         Args:
             to_dir (str): The directory to extract the content to
             progress_hook (Callable[[int, int, str], None], optional): Defaults to None.
                 A progress hook that should expect (``current``, ``total``,
                 ``current_filepath``) as arguments
+
+        Example:
+            >>> FILEPATH = ""  # absolute path to BSA/BTDX archive
+            >>> archive = bethesda_structs.archive.get_archive(FILEPATH)
+            >>> archive.extract('/home/username/Downloads/extracted')
+
+        Example:
+            >>> def progress_hook(current, total, filepath):
+            ...     print((current / total) * 100.0)
+            >>> FILEPATH = ""  # absolute path to BSA/BTDX archive
+            >>> archive = bethesda_structs.archive.get_archive(FILEPATH)
+            >>> archive.extract(
+            ...     '/home/username/Downloads/extracted',
+            ...     progress_hook=progress_hook
+            ... )
+            0.0
+            12.2
+            12.2
+            12.67
+            12.67
+            50.4443
+            50.4443
+            70.0
+            70.0
+            92.1
+            92.1
+            100.0
+
+        Note:
+            The provided progress hook is simple and two-stage. It is called once
+            before a file is being written and once after the same file is done
+            being written.
         """
 
         if not os.path.isdir(to_dir):

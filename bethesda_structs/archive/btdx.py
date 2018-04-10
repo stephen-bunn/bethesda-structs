@@ -40,6 +40,31 @@ from ..contrib.dds import (
 
 
 class BTDXArchive(BaseArchive):
+    """Archive type for BTDX files (aka. BA2).
+
+    BTDX files (utilize the extension ``.ba2``) are Bethesda's second framework revision
+    for archives.
+    These files have virtually the same goal as :class:`.BSAArchive` but for optimized
+    loading of archived textures directly into the engine instead of simply compressing
+    the files.
+
+    This is done by splitting the BTDX archive into 2 different types:
+        - ``GNRL``: Storage for general files that are simply compressed
+        - ``DX10``: Storage for Microsoft DirectDraw textures in an optimized format
+
+    The extraction for ``GNRL`` files is simple.
+    But the extraction for ``DX10`` requires rebuliding the DDS headers for each of the
+    texture chunks.
+    For this reason the :mod:`.bethesda_structs.contrib.dds` module was added.
+
+    Note:
+        BTDX archives to not read the file data on initialization.
+        Header's, records and names are read in and files are built during
+        :func:`~BTDXArchive.iter_files`.
+
+    **Reference**:
+        - `BAE <https://github.com/jonwd7/bae>`_
+    """
 
     header_struct = Struct(
         "magic" / Bytes(4),
@@ -48,6 +73,12 @@ class BTDXArchive(BaseArchive):
         "file_count" / Int32ul,
         "names_offset" / Int64ul,
     )
+    """The structure of BTDX headers.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of BTDX headers
+    """
+
     file_struct = Struct(
         "hash" / Int32ul,
         "ext" / PaddedString(4, "utf8"),
@@ -58,6 +89,12 @@ class BTDXArchive(BaseArchive):
         "unpacked_size" / Int32ul,
         "_unknown_1" / Int32ul,
     )
+    """The structure of GNRL files.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of GNRL files
+    """
+
     tex_header_struct = Struct(
         "hash" / Int32ul,
         "ext" / PaddedString(4, "utf8"),
@@ -71,6 +108,12 @@ class BTDXArchive(BaseArchive):
         "format" / Int8ul,
         "_unknown_1" / Int16ul,
     )
+    """The structure of DX10 file headers.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of DX10 file headers.
+    """
+
     tex_chunk_struct = Struct(
         "offset" / Int64ul,
         "packed_size" / Int32ul,
@@ -79,10 +122,22 @@ class BTDXArchive(BaseArchive):
         "end_mip" / Int16ul,
         "_unknown_0" / Int32ul,
     )
+    """The structure of DX10 chunks.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of DX10 chunks
+    """
+
     tex_struct = Struct(
         "header" / tex_header_struct,
         "chunks" / Array(lambda this: this.header.chunks_count, tex_chunk_struct),
     )
+    """The structure of DX10 tex files.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of DX10 tex files
+    """
+
     archive_struct = Struct(
         "header" / header_struct,
         "files"
@@ -93,6 +148,12 @@ class BTDXArchive(BaseArchive):
             ),
         ),
     )
+    """The **partial** structure of BTDX archives.
+
+    Returns:
+        :class:`~construct.core.Struct`: The **partial** structure of BTDX archives
+    """
+
 
     @classmethod
     def can_handle(cls, filepath: str) -> bool:
@@ -100,9 +161,6 @@ class BTDXArchive(BaseArchive):
 
         Args:
             filepath (str): The filepath to check if can be handled
-
-        Returns:
-            bool: True if the file can be handled, otherwise False
         """
         header = cls.header_struct.parse_file(filepath)
         return header.magic == b"BTDX" and header.version >= 1
@@ -295,7 +353,7 @@ class BTDXArchive(BaseArchive):
             ValueError: If a filename cannot be determined for a specific file record
 
         Yields:
-            ArchiveFile: An file contained within the archive
+            :class:`.ArchiveFile`: A file contained within the archive
         """
         filename_offset = 0
         for (file_idx, file_container) in enumerate(self.container.files):
@@ -328,7 +386,7 @@ class BTDXArchive(BaseArchive):
             ValueError: If a filename cannot be determined for a specific file record
 
         Yields:
-            ArchiveFile: An file contained within the archive
+            :class:`.ArchiveFile`: A file contained within the archive
         """
         filename_offset = 0
         for (file_idx, file_container) in enumerate(self.container.files):
@@ -372,7 +430,7 @@ class BTDXArchive(BaseArchive):
             ValueError: If a filename cannot be determined for a specific file record
 
         Yields:
-            ArchiveFile: An file contained within the archive
+            :class:`.ArchiveFile`: A file contained within the archive
         """
         iter_method = {"GNRL": self._iter_gnrl_files, "DX10": self._iter_dx10_files}[
             self.container.header.type

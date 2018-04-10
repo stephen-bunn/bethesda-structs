@@ -63,15 +63,28 @@ class LZ4CompressedAdapter(Adapter):
 
 class BSAArchive(BaseArchive):
     """Archive type for BSA files.
+
+    BSA stands for "Bethesda ? Archive".
+    These archives are compressed meshes, textures and other static resources that can
+    be loaded as a single file instead of a directory of files (loose files).
+
+    There are currently 4 versions of BSA:
+        - ???: Morrowind
+        - 103: Oblivion
+        - 104: Fallout 3, Fallout: New Vegas, and Skyrim
+        - 105: Skyrim: Special Edition
+
+    Note:
+        BSA archives to not read the file data on initialization.
+        Header's, records and names are read in and files are built during
+        :func:`~BSAArchive.iter_files`.
+
+    **Credit:**
+        - `BAE <https://github.com/jonwd7/bae>`_
     """
 
     SIZE_MASK = 0x3fffffff
-    """int: The Int32ul size mask.
-    """
-
     COMPRESSED_MASK = 0xc0000000
-    """int: The Int32ul compressed mask.
-    """
 
     header_struct = Struct(
         "magic" / Bytes(4),
@@ -113,7 +126,10 @@ class BSAArchive(BaseArchive):
             ctl=0x100,
         ),
     )
-    """Struct: The structure of BSA headers.
+    """The structure of BSA headers.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of BSA headers
     """
 
     directory_record_struct = Struct(
@@ -123,11 +139,17 @@ class BSAArchive(BaseArchive):
         "name_offset"
         / IfThenElse(lambda this: this._.header.version >= 105, Int64ul, Int32ul),
     )
-    """Struct: The structure of directory records.
+    """The structure of directory records.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of directory records
     """
 
     file_record_struct = Struct("hash" / Int64ul, "size" / Int32ul, "offset" / Int32ul)
-    """Struct: The structure of file records.
+    """The structure of file records.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of file records
     """
 
     directory_block_struct = Struct(
@@ -142,7 +164,10 @@ class BSAArchive(BaseArchive):
             file_record_struct,
         ),
     )
-    """Struct: The structure of directory blocks.
+    """The structure of directory blocks.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of directory blocks
     """
 
     archive_struct = Struct(
@@ -157,18 +182,29 @@ class BSAArchive(BaseArchive):
             Array(lambda this: this.header.file_count, CString("utf8")),
         ),
     )
-    """Struct: The structure of BSA archives.
+    """The **partial** structure of BSA archives.
+
+    Return:
+        :class:`~construct.core.Struct`: The **partial** structure of BSA archives
     """
 
     @property
     def uncompressed_file_struct(self) -> Struct:
-        """Struct: The uncompressed file structure for uncompressed files.
+        """The uncompressed file structure for uncompressed files.
+
+        Returns:
+            :class:`~construct.core.Struct`: The uncompressed file structure for
+            uncompressed files.
         """
         return Struct("data" / GreedyBytes)
 
     @property
     def compressed_file_struct(self) -> Struct:
-        """Struct: The compressed file structure for compressed files.
+        """The compressed file structure for compressed files.
+
+        Returns:
+            :class:`~construct.core.Struct`: The compressed file structure for
+            compressed files.
         """
         return Struct(
             "original_size" / Int32ul,
@@ -186,22 +222,16 @@ class BSAArchive(BaseArchive):
 
         Args:
             filepath (str): The filepath to check if can be handled
-
-        Returns:
-            bool: True if the file can be handled, otherwise False
         """
 
         header = cls.header_struct.parse_file(filepath)
         return header.magic == b"BSA\x00" and header.version in (103, 104, 105)
 
     def iter_files(self) -> Generator[ArchiveFile, None, None]:
-        """Iterates over the parsed data and yields instances of `ArchiveFile`
-
-        Raises:
-            ValueError: If a filename cannot be determined for a specific file record
+        """Iterates over the parsed data and yields instances of :class:`.ArchiveFile`.
 
         Yields:
-            ArchiveFile: An file contained within the archive
+            :class:`.ArchiveFile`: An file contained within the archive
         """
 
         file_index = 0

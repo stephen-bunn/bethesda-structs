@@ -10,10 +10,7 @@ def MAKEFOURCC(ch0: str, ch1: str, ch2: str, ch3: str) -> int:
     """Implementation of Window's `MAKEFOURCC`.
 
     This is simply just returning the bytes of the joined characters.
-    `MAKEFOURCC(*"DX10")` can also be implemented by `Bytes("DX10")`.
-
-    Note:
-        https://msdn.microsoft.com/en-us/library/windows/desktop/bb153349(v=vs.85).aspx
+    `MAKEFOURCC(*"DX10")` can also be implemented by `Bytes(b"DX10")`.
 
     Args:
         ch0 (str): First char
@@ -23,13 +20,15 @@ def MAKEFOURCC(ch0: str, ch1: str, ch2: str, ch3: str) -> int:
 
     Returns:
         int: The integer representation of given characters.
-    """
 
+    **Reference**:
+        `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb153349(v=vs.85).aspx>`__
+    """
     return (ord(ch0) << 0) | (ord(ch1) << 8) | (ord(ch2) << 16) | (ord(ch3) << 24)
 
 
 class DXGIFormats(IntEnum):
-    """IntEnum: The format enum for DXGI files.
+    """The format enum for DXGI files.
     """
 
     DXGI_FORMAT_UNKNOWN = 0
@@ -155,7 +154,7 @@ class DXGIFormats(IntEnum):
 
 
 class D3D10ResourceDimension(IntEnum):
-    """IntEnum: The dimension enum for D3D10 resources.
+    """The dimension enum for D3D10 resources.
     """
 
     D3D10_RESOURCE_DIMENSION_UNKNOWN = 0
@@ -166,7 +165,7 @@ class D3D10ResourceDimension(IntEnum):
 
 
 class D3D10ResourceMiscFlag(IntEnum):
-    """IntEnum: The miscellaneous flags for D3D10 resources.
+    """The miscellaneous flags for D3D10 resources.
     """
 
     D3D10_RESOURCE_MISC_GENERATE_MIPS = 0x00000001
@@ -177,24 +176,24 @@ class D3D10ResourceMiscFlag(IntEnum):
 
 
 DXGI_FORMAT = Enum(Int32ul, DXGIFormats)
-"""Enum: DXGI_FORMAT structure.
+"""The ``DXGI_FORMAT`` structure.
 
-Note:
-    https://msdn.microsoft.com/en-us/library/windows/desktop/bb173059(v=vs.85).aspx
+**Reference**:
+    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb173059(v=vs.85).aspx>`__
 """
 
 D3D10_RESOURCE_DIMENSION = Enum(Int32ul, D3D10ResourceDimension)
-"""Enum: D3D10_RESOURCE_DIMENSION structure.
+"""The ``D3D10_RESOURCE_DIMENSION`` structure.
 
-Note:
-    https://msdn.microsoft.com/en-us/library/windows/desktop/bb172411(v=vs.85).aspx
+**Reference**:
+    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb172411(v=vs.85).aspx>`__
 """
 
 D3D10_RESOURCE_MISC_FLAG = FlagsEnum(Int32ul, D3D10ResourceMiscFlag)
-"""FlagsEnum: D3D10_RESOURCE_MISC_FLAG structure.
+"""The ``D3D10_RESOURCE_MISC_FLAG`` structure.
 
-Note:
-    https://msdn.microsoft.com/en-us/library/windows/desktop/bb172412(v=vs.85).aspx
+**Reference**:
+    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb172412(v=vs.85).aspx>`__
 """
 
 DDS_PIXELFORMAT = Struct(
@@ -219,10 +218,10 @@ DDS_PIXELFORMAT = Struct(
     "dwBBitMask" / Default(Int32ul, 0),
     "dwABitMask" / Default(Int32ul, 0),
 )
-"""Struct: DDS_PIXELFORMAT structure.
+"""The ``DDS_PIXELFORMAT`` structure.
 
-Note:
-    https://msdn.microsoft.com/en-us/library/windows/desktop/bb943984(v=vs.85).aspx
+**Reference**:
+    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb943984(v=vs.85).aspx>`__
 """
 
 DDS_HEADER = Struct(
@@ -272,10 +271,10 @@ DDS_HEADER = Struct(
     "dwCaps4" / Default(Int32ul, 0),
     "dwReserved2" / Default(Int32ul, 0),
 )
-"""Struct: DDS_HEADER structure.
+"""The ``DDS_HEADER`` structure.
 
-Note:
-    https://msdn.microsoft.com/en-us/library/windows/desktop/bb943982(v=vs.85).aspx
+**Reference**:
+    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb943982(v=vs.85).aspx>`__
 """
 
 DDS_HEADER_DX10 = Struct(
@@ -296,8 +295,8 @@ DDS_HEADER_DX10 = Struct(
         0,
     ),
 )
-"""Struct: DDS_HEADER_DX10 structure.
+"""The ``DDS_HEADER_DX10`` structure.
 
-Note:
-    https://msdn.microsoft.com/en-us/library/windows/desktop/bb943983(v=vs.85).aspx
+**Reference**:
+    `Microsoft <https://msdn.microsoft.com/en-us/library/windows/desktop/bb943983(v=vs.85).aspx>`__
 """

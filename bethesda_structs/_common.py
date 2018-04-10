@@ -17,8 +17,5 @@ class BaseFiletype(abc.ABC):
 
         Raises:
             NotImplementedError: Subclasses must implement
-
-        Returns:
-            bool: True if the `filepath` can be handled, otherwise False
         """
         raise NotImplementedError

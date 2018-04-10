@@ -10,6 +10,8 @@ Bethesda Structs Package
 
 .. toctree::
    :caption: Subpackages
+   :titlesonly:
 
-   bethesda_structs.plugin
-   bethesda_structs.archive
+   Plugin <bethesda_structs.plugin>
+   Archive <bethesda_structs.archive>
+   Contrib <bethesda_structs.contrib>
