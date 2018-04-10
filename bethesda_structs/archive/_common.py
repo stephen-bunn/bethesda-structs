@@ -8,10 +8,9 @@ from typing import Generic, TypeVar, Callable, Generator
 from pathlib import Path
 
 import attr
-from construct import Construct, Container, Subconstruct
+from construct import Construct, Container, StreamError, Subconstruct
 
 from .._common import BaseFiletype
-
 
 T_BaseArchive = TypeVar("BaseArchive")
 
@@ -54,13 +53,22 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
     """The base class all Archives should subclass.
     """
     content = attr.ib(type=bytes, repr=False)
-    filepath = attr.ib(type=str, default=None, converter=Path)
+    filepath = attr.ib(type=str, default=None)
     container = attr.ib(type=Container, default=None, repr=False, init=False)
 
     def __attrs_post_init__(self):
         """Initializes the non-init attributes.
         """
-        self.container = self.archive_struct.parse(self.content)
+        if self.filepath:
+            self.filepath = Path(self.filepath)
+
+        try:
+            self.container = self.archive_struct.parse(self.content)
+        except StreamError as exc:
+            raise ValueError((
+                f"parsing {self.__class__.__name__} archive struct is not large "
+                f"enough, {exc}"
+            ))
 
     @abc.abstractproperty
     def archive_struct(self) -> Construct:
@@ -75,7 +83,7 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
         raise NotImplementedError
 
     @classmethod
-    def parse_bytes(cls, content: bytes, filepath: str = None) -> T_BaseArchive:
+    def parse(cls, content: bytes, filepath: str = None) -> T_BaseArchive:
         """Create a :class:`BaseArchive` from a byte array.
 
         Args:
@@ -118,7 +126,7 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
                 f"stream {stream!r} is not a stream of bytes, recieved {type(stream)!r}"
             )
 
-        return cls.parse_bytes(stream.read(), filepath=filepath)
+        return cls.parse(stream.read(), filepath=filepath)
 
     @classmethod
     def parse_file(cls, filepath: str) -> T_BaseArchive:
