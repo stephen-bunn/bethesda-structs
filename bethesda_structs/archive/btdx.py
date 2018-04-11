@@ -191,8 +191,8 @@ class BTDXArchive(BaseArchive):
             },
         }
 
-        # FIXME: I'm unsure what this field "is", but BAE has logic to build complete
-        # cubemaps for the DDS_HEADER
+        # NOTE: I'm unsure what this field "is", but BAE has logic to build complete
+        # cubemaps for the DDS_HEADER if set to 2049
         if file_container.header._unknown_1 == 2049:
             header_data.update(
                 {
@@ -208,7 +208,7 @@ class BTDXArchive(BaseArchive):
                 }
             )
 
-        # TODO: find a cleaner more ovbious way of implementing this logic
+        # TODO: find a cleaner more obvious way of implementing this logic
         dx10_header_data = {}
         pixel_data = {}
         if file_container.header.format == DXGIFormats.DXGI_FORMAT_BC1_UNORM:
