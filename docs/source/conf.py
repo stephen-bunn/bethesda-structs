@@ -17,6 +17,8 @@
 import os
 import sys
 
+import alabaster
+
 sys.path.insert(0, os.path.abspath("../.."))
 
 from bethesda_structs import __version__
@@ -37,6 +39,7 @@ extensions = [
     "sphinx_autodoc_typehints",
     "sphinx.ext.intersphinx",
     "sphinx.ext.viewcode",
+    "alabaster",
 ]
 
 autodoc_member_order = "bysource"
@@ -92,13 +95,35 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
+html_theme_path = [alabaster.get_path()]
 html_theme = "alabaster"
+html_sidebars = {
+    "**": [
+        "about.html",
+        "navigation.html",
+        "relations.html",
+        "searchbox.html",
+    ]
+}
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-#
-# html_theme_options = {}
+
+html_theme_options = {
+    "logo": "logo.png",
+    "description": __version__.__description__,
+    "github_user": "stephen-bunn",
+    "github_repo": "bethesda-structs",
+    "github_type": "watch",
+    "github_count": False,
+    "analytics_id": "UA-110798724-2",
+    "page_width": "1000px",
+    "sidebar_collapse": True,
+    "extra_nav_links": {
+        "stephen-bunn@web": "http://stephen.bunn.io/",
+    }
+}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
