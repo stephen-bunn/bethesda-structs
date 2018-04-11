@@ -2,7 +2,7 @@
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 from typing import Generator
-from pathlib import Path, PureWindowsPath
+from pathlib import PureWindowsPath
 
 import lz4.frame
 from construct import (
@@ -239,9 +239,7 @@ class BSAArchive(BaseArchive):
         if self.container.header.archive_flags.files_compressed:
             file_struct = self.compressed_file_struct
 
-        for (directory_record, directory_block) in zip(
-            self.container.directory_records, self.container.directory_blocks
-        ):
+        for directory_block in self.container.directory_blocks:
             # get directory path from directory block
             directory_path = PureWindowsPath(directory_block.name[:-1])
             for file_record in directory_block.file_records:

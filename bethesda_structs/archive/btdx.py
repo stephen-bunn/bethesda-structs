@@ -2,12 +2,10 @@
 # GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
 
 import warnings
-from enum import IntEnum
 from typing import Tuple, Generator
 from pathlib import PureWindowsPath
 
 from construct import (
-    Enum,
     Array,
     Bytes,
     Const,
@@ -33,7 +31,6 @@ from ..contrib.dds import (
     DDS_HEADER,
     MAKEFOURCC,
     DDS_HEADER_DX10,
-    DDS_PIXELFORMAT,
     DXGIFormats,
     D3D10ResourceDimension,
 )
@@ -357,7 +354,7 @@ class BTDXArchive(BaseArchive):
             :class:`.ArchiveFile`: A file contained within the archive
         """
         filename_offset = 0
-        for (file_idx, file_container) in enumerate(self.container.files):
+        for file_container in self.container.files:
             filepath_content = self.content[
                 (self.container.header.names_offset + filename_offset):
             ]

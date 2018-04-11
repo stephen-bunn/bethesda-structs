@@ -21,9 +21,8 @@ from construct import (
     FlagsEnum,
     GreedyBytes,
     GreedyString,
-    PaddedString,
+    PaddedString
 )
-from multidict import CIMultiDict
 
 from .._common import FormID, Subrecord, SubrecordCollection
 
