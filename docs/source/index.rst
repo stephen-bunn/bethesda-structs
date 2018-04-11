@@ -23,6 +23,7 @@ To get started using this package, please see the :ref:`getting-started` page!
       <a href="https://github.com/stephen-bunn/bethesda-structs/blob/master/LICENSE" target="_blank"><img alt="License" src="https://img.shields.io/github/license/stephen-bunn/bethesda-structs.svg"></a>
       <a href="http://bethesda-structs.readthedocs.io/en/latest/?badge=latest" target="_blank"><img alt="Documentation Status" src="https://readthedocs.org/projects/bethesda-structs/badge/?version=latest"></a>
       <a href="https://travis-ci.org/stephen-bunn/bethesda-structs" target="_blank"><img alt="Build Status" src="https://travis-ci.org/stephen-bunn/bethesda-structs.svg?branch=master"></a>
+      <a class="badge-align" href="https://www.codacy.com/app/stephen-bunn/bethesda-structs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=stephen-bunn/bethesda-structs&amp;utm_campaign=Badge_Grade" target="_blank"><img src="https://api.codacy.com/project/badge/Grade/2546de38602c41aebddd94843760f968"/></a>
       <a href="https://github.com/ambv/black" target="_blank"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
    </p>
 

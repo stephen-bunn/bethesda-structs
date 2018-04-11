@@ -21,6 +21,7 @@ sphinxcontrib-napoleon = "*"
 Flask-Sphinx-Themes = "*"
 black = "*"
 sphinx-autodoc-typehints = "*"
+codacy-coverage = "*"
 
 [requires]
 python_version = "3.6"
@@ -29,4 +30,7 @@ python_version = "3.6"
 allow_prereleases = true
 
 [scripts]
-test = "pytest --cov"
+test = "pytest"
+test-cov = "pytest --cov"
+make-docs = "make -C ./docs html"
+open-docs = "python -mwebbrowser ./docs/build/html/index.html"

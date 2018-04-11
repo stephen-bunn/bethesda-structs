@@ -374,10 +374,7 @@ class BTDXArchive(BaseArchive):
             if file_container.packed_size > 0:
                 file_data = Compressed(GreedyBytes, "zlib").parse(file_data)
 
-            yield ArchiveFile(
-                filepath=PureWindowsPath(filepath[1:]),
-                data=file_data,
-            )
+            yield ArchiveFile(filepath=PureWindowsPath(filepath[1:]), data=file_data)
 
     def _iter_dx10_files(self) -> Generator[ArchiveFile, None, None]:
         """Iterates over the parsed data for DX10 archives and yields instances of
