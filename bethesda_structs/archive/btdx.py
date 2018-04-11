@@ -384,7 +384,7 @@ class BTDXArchive(BaseArchive):
             :class:`.ArchiveFile`: A file contained within the archive
         """
         filename_offset = 0
-        for (file_idx, file_container) in enumerate(self.container.files):
+        for file_container in self.container.files:
 
             filepath_content = self.content[
                 (self.container.header.names_offset + filename_offset):

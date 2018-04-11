@@ -8,7 +8,7 @@ from typing import Generic, TypeVar, Callable, Generator
 from pathlib import Path
 
 import attr
-from construct import Construct, Container, StreamError, Subconstruct
+from construct import Construct, Container, StreamError
 
 from .._common import BaseFiletype
 
