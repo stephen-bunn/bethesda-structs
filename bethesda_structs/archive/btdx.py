@@ -191,6 +191,8 @@ class BTDXArchive(BaseArchive):
             },
         }
 
+        # FIXME: I'm unsure what this field "is", but BAE has logic to build complete
+        # cubemaps for the DDS_HEADER
         if file_container.header._unknown_1 == 2049:
             header_data.update(
                 {
