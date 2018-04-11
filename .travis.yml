@@ -7,9 +7,11 @@ python:
 install:
   - pip install pipenv
   - pipenv install --dev --skip-lock
-  - pipenv run pip install codecov
 script:
-  - pytest
+  - pytest --cov
+after_success:
+  - coverage xml -o coverage.xml
+  - python-codacy-coverage -r coverage.xml
 notifications:
   email:
     on_success: never
