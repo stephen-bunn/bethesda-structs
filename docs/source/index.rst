@@ -43,4 +43,3 @@ Project Reference
    :maxdepth: 2
 
    bethesda_structs
-   structures/index
