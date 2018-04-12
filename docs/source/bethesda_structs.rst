@@ -23,6 +23,6 @@ But, in this project, repetition is sacrificed for standardization.
 
 .. toctree::
 
-   Plugin Structures <bethesda_structs.plugin>
-   Archive Structures <bethesda_structs.archive>
-   Additional Structures <bethesda_structs.contrib>
+   Plugins <bethesda_structs.plugin>
+   Archives <bethesda_structs.archive>
+   Additional <bethesda_structs.contrib>

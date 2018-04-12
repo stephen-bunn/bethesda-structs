@@ -18,6 +18,7 @@ import os
 import sys
 
 import alabaster
+from recommonmark.parser import CommonMarkParser
 
 sys.path.insert(0, os.path.abspath("../.."))
 
@@ -51,7 +52,8 @@ templates_path = ["_templates"]
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = ".rst"
+source_parsers = {".md": CommonMarkParser}
+source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
@@ -99,12 +101,7 @@ html_theme_path = [alabaster.get_path()]
 html_theme = "alabaster"
 html_favicon = "_static/img/favicon.png"
 html_sidebars = {
-    "**": [
-        "about.html",
-        "navigation.html",
-        "relations.html",
-        "searchbox.html",
-    ]
+    "**": ["about.html", "navigation.html", "relations.html", "searchbox.html"]
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -120,9 +117,7 @@ html_theme_options = {
     "analytics_id": "UA-110798724-2",
     "page_width": "1000px",
     "sidebar_collapse": True,
-    "extra_nav_links": {
-        "stephen-bunn@web": "http://stephen.bunn.io/",
-    },
+    "extra_nav_links": {"stephen-bunn@web": "http://stephen.bunn.io/"},
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -203,4 +198,4 @@ intersphinx_mapping = {
 
 
 def setup(app):
-    app.add_stylesheet('css/custom.css')
+    app.add_stylesheet("css/custom.css")

@@ -23,6 +23,7 @@ black = "*"
 sphinx-autodoc-typehints = "*"
 codacy-coverage = "*"
 alabaster = "*"
+recommonmark = "*"
 
 [requires]
 python_version = "3.6"

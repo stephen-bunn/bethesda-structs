@@ -15,6 +15,7 @@ Changelog
 - added basic support for subrecord structure parsing (*not easy* 😢)
 - added initial archive tests 👨‍🔬
 - added fancy new logos and badges 😄
+- added beginnings of generic structure documentation
 
 `0.0.1`_ (*2018-01-12*)
 -----------------------
