@@ -18,9 +18,6 @@ Bethesda Structs
    </p>
 
 
-Usage
------
-
 | A real parser for Bethesda's file formats.
 | Read about more complex usage in the `documentation <https://bethesda-structs.readthedocs.io/en/latest/>`_.
 |
