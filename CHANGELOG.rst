@@ -6,10 +6,15 @@ Changelog
 | The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 |
 
-*unreleased*
-------------
-* WIP
-
+**WIP: 1.0.0** (*unreleased*)
+-----------------------------
+- full rewrite using `construct <https://construct.readthedocs.io/en/latest/>`_.
+- added complete support for BTDX archives
+- added complete support for BSA archives (*not including Morrowind*)
+- added initial support for FNV plugins
+- added basic support for subrecord structure parsing (*not easy* 😢)
+- added initial archive tests 👨‍🔬
+- added fancy new logos and badges 😄
 
 `0.0.1`_ (*2018-01-12*)
 -----------------------

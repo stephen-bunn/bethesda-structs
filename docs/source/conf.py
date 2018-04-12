@@ -97,6 +97,7 @@ todo_include_todos = False
 
 html_theme_path = [alabaster.get_path()]
 html_theme = "alabaster"
+html_favicon = "_static/img/favicon.png"
 html_sidebars = {
     "**": [
         "about.html",
@@ -111,18 +112,17 @@ html_sidebars = {
 # documentation.
 
 html_theme_options = {
-    "logo": "logo.png",
+    "logo": "img/logo.png",
     "description": __version__.__description__,
     "github_user": "stephen-bunn",
     "github_repo": "bethesda-structs",
-    "github_type": "watch",
-    "github_count": False,
+    "github_type": "star",
     "analytics_id": "UA-110798724-2",
     "page_width": "1000px",
     "sidebar_collapse": True,
     "extra_nav_links": {
         "stephen-bunn@web": "http://stephen.bunn.io/",
-    }
+    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -200,3 +200,7 @@ intersphinx_mapping = {
     "python": ("https://docs.python.org/3.6/", None),
     "construct": ("https://construct.readthedocs.io/en/latest/", None),
 }
+
+
+def setup(app):
+    app.add_stylesheet('css/custom.css')
