@@ -26,3 +26,14 @@ Credit
    | This documenation helps with some of the specific structures used in "The Elder Scrolls" series.
       Although the documentation of records and subrecord structures is sometimes hard to understand, contains a lot of useful information that *Fopdoc* does not cover
    | **Best for filling in the blanks regarding TES that Fopdoc doesn't cover.**
+
+
+The Icon
+========
+
+| I know that the icon doesn't 100% match the title of the project, but I really enjoy Bethesda Game Studio's logo.
+   The reason the logo contains the text "Structs for Bethesda" instead of "Bethesda Structs" is because I didn't want to use "Bethesda" as the primary text.
+| *This might allow the project be misconstrued as a product of Bethesda.*
+
+| The font used in the icon is `Microsquare <https://www.fontspring.com/fonts/fontsite/microsquare>`_.
+| The partial gear icon is contributed to `Bethesda Game Studios <https://bethesdagamestudios.com/>`_.
