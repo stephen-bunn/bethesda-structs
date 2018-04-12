@@ -1,0 +1,10 @@
+formats:
+  - epub
+  - pdf
+requirements_file: requirements-dev.txt
+build:
+  # TODO: make sure to change this when merged from feature-construct
+  image: feature-construct
+python:
+  version: 3.6
+  pip_install: true
