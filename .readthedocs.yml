@@ -1,7 +1,7 @@
 formats:
   - epub
   - pdf
-requirements_file: requirements-dev.txt
+requirements_file: requirements-docs.txt
 build:
   image: latest
 python:
