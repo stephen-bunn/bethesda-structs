@@ -1,6 +1,7 @@
-================
-Bethesda Structs
-================
+.. image:: https://github.com/stephen-bunn/bethesda-structs/raw/feature/construct/docs/source/_static/img/logo.png
+   :alt: Bethesda Structs Logo
+   :width: 800
+   :align: center
 
 .. raw:: html
 
