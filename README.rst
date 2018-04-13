@@ -20,13 +20,13 @@
    </p>
 
 
-| A real parser for Bethesda's file formats.
+| A **real** and **usable** parser for some of Bethesda's file formats.
 | Read about more complex usage in the `documentation <https://bethesda-structs.readthedocs.io/en/latest/>`_.
 |
 
 
 Extracting a BSA archive
-''''''''''''''''''''''''
+------------------------
 
 .. code-block:: python
 
@@ -45,7 +45,7 @@ Extracting a BSA archive
 
 
 Display masters of a FNV plugin
-'''''''''''''''''''''''''''''''
+-------------------------------
 
 .. code-block:: python
 
