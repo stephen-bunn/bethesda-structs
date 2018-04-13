@@ -1,5 +1,5 @@
 # Copyright (c) 2018 Stephen Bunn (stephen@bunn.io)
-# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
+# MIT License <https://choosealicense.com/licenses/mit/>
 
 __name__ = "bethesda-structs"
 __repo__ = "https://github.com/stephen-bunn/bethesda-structs"

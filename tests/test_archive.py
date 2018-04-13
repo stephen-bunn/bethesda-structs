@@ -1,5 +1,5 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
-# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
+# MIT License <https://choosealicense.com/licenses/mit/>
 
 from bethesda_structs.archive import get_archive, AVAILABLE_ARCHIVES
 from bethesda_structs.archive.bsa import BSAArchive
