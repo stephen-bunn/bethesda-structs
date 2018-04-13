@@ -19,7 +19,7 @@
 
 ### Your Environment
 <!--- Include as many relevant details about the environment you experienced the bug in -->
-* SandPaper Version:
+* Bethesda Structs Version:
 * Python Version:
 * Operating System and Version:
 * Link to your branch (if applicable):
