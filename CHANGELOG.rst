@@ -16,6 +16,9 @@ Changelog
 - added initial archive tests 👨‍🔬
 - added fancy new logos and badges 😄
 - added beginnings of generic structure documentation
+- **deprecated** all old structures and files from versions ``<1.0.0`` 👍
+
+-----
 
 `0.0.1`_ (*2018-01-12*)
 -----------------------
