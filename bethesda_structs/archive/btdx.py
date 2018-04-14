@@ -28,11 +28,7 @@ from construct import (
 from .. import __version__
 from ._common import ArchiveFile, BaseArchive
 from ..contrib.dds import (
-    DDS_HEADER,
-    MAKEFOURCC,
-    DDS_HEADER_DX10,
-    DXGIFormats,
-    D3D10ResourceDimension,
+    DDS_HEADER, MAKEFOURCC, DDS_HEADER_DX10, DXGIFormats, D3D10ResourceDimension
 )
 
 

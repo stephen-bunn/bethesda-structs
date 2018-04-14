@@ -65,10 +65,12 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
         try:
             self.container = self.archive_struct.parse(self.content)
         except StreamError as exc:
-            raise ValueError((
-                f"parsing {self.__class__.__name__} archive struct is not large "
-                f"enough, {exc}"
-            ))
+            raise ValueError(
+                (
+                    f"parsing {self.__class__.__name__} archive struct is not large "
+                    f"enough, {exc}"
+                )
+            )
 
     @abc.abstractproperty
     def archive_struct(self) -> Construct:

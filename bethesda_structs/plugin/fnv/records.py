@@ -81,7 +81,8 @@ AMMO_Subrecords = SubrecordCollection(
             "DATA",
             Struct(
                 "speed" / Float32l,
-                "flags" / FlagsEnum(
+                "flags"
+                / FlagsEnum(
                     Int8ul, ignores_normal_weapon_resistance=0x1, non_playable=0x2
                 ),
                 "unused" / Bytes(3),
@@ -119,7 +120,8 @@ ARMO_Subrecords = SubrecordCollection(
         Subrecord(
             "BMDT",
             Struct(
-                "biped_flags" / FlagsEnum(
+                "biped_flags"
+                / FlagsEnum(
                     Int32ul,
                     head=0x00000001,
                     hair=0x00000002,
@@ -142,7 +144,8 @@ ARMO_Subrecords = SubrecordCollection(
                     body_addon_2=0x00040000,
                     body_addon_3=0x00080000,
                 ),
-                "general_flags" / FlagsEnum(
+                "general_flags"
+                / FlagsEnum(
                     Int8ul,
                     unknown_1=0x01,
                     unknown_2=0x02,
@@ -154,7 +157,8 @@ ARMO_Subrecords = SubrecordCollection(
                     heavy=0x80,
                 ),
                 "unused" / GreedyBytes,
-            ) * "Biped Data"
+            )
+            * "Biped Data"
         ),
         ModelCollection,
         Model2Collection,
@@ -182,22 +186,21 @@ ARMO_Subrecords = SubrecordCollection(
         Subrecord("ZNAM", FNVFormID(["SOUN"]) * "Sound - Drop", optional=True),
         Subrecord(
             "DATA",
-            Struct(
-                "value" / Int32sl,
-                "max_condition" / Int32sl,
-                "weight" / Float32l
-            ) * "Data"
+            Struct("value" / Int32sl, "max_condition" / Int32sl, "weight" / Float32l)
+            * "Data"
         ),
         Subrecord(
             "DNAM",
             Struct(
-                "ar" / ExprAdapter(
+                "ar"
+                / ExprAdapter(
                     Int16sl, lambda obj_: (obj_ / 100), lambda obj_: (obj_ * 100)
                 ),  # NOTE: value is divided by 100
                 "flags" / FlagsEnum(Int16ul, modulates_voice=0x0001),
                 "dt" / Float32l,
                 "_unknown_0" / Bytes(4),
-            ) * "Unknown"
+            )
+            * "Unknown"
         ),  # FIXME: missing description
         Subrecord(
             "BNAM",
@@ -210,7 +213,8 @@ ARMO_Subrecords = SubrecordCollection(
                 "sound" / FNVFormID(["SOUN"]),
                 "chance" / Int8ul,
                 "_unknown_0" / Bytes(3),
-                "type" / Enum(
+                "type"
+                / Enum(
                     Int32ul,
                     run=19,
                     run_in_armor=20,
@@ -219,7 +223,8 @@ ARMO_Subrecords = SubrecordCollection(
                     walk=23,
                     walk_in_armor=24,
                 ),
-            ) * "Animation Sound",
+            )
+            * "Animation Sound",
             optional=True,
             multiple=True
         ),
@@ -256,7 +261,8 @@ CONT_Subrecords = SubrecordCollection(
             Struct(
                 "flags" / FlagsEnum(Int8ul, _unknown_0=0x1, respawns=0x2),
                 "weight" / Float32l,
-            ) * "Data",
+            )
+            * "Data",
             optional=True
         ),
         Subrecord("SNAM", FNVFormID(["SOUN"]) * "Sound - Open", optional=True),
@@ -307,7 +313,8 @@ DIAL_Subrecords = SubrecordCollection(
         Subrecord(
             "DATA",
             Struct(
-                "type" / Enum(
+                "type"
+                / Enum(
                     Int8ul,
                     topic=0,
                     conversation=1,
@@ -319,7 +326,8 @@ DIAL_Subrecords = SubrecordCollection(
                     radio=7,
                 ),
                 "flags" / FlagsEnum(Int8ul, rumors=0x01, top_level=0x02),
-            ) * "Data"
+            )
+            * "Data"
         ),
     ]
 )
@@ -345,7 +353,8 @@ DOOR_Subrecords = SubrecordCollection(
                 hidden=0x04,
                 minimal_use=0x08,
                 sliding_door=0x10,
-            ) * "Flags"
+            )
+            * "Flags"
         ),
     ]
 )
@@ -360,26 +369,24 @@ FACT_Subrecords = SubrecordCollection(
             Struct(
                 "faction" / FNVFormID(["FACT", "RACE"]),
                 "modifier" / Int32sl,
-                "group_combat_reaction" / Enum(
-                    Int32ul,
-                    neutral=0,
-                    enemy=1,
-                    ally=2,
-                    friend=3
-                ),
-            ) * "Relation",
+                "group_combat_reaction"
+                / Enum(Int32ul, neutral=0, enemy=1, ally=2, friend=3),
+            )
+            * "Relation",
             optional=True,
             multiple=True
         ),
         Subrecord(
             "DATA",
             Struct(
-                "flags_1" / FlagsEnum(
+                "flags_1"
+                / FlagsEnum(
                     Int8ul, hidden_from_pc=0x01, evil=0x02, special_combat=0x04
                 ),
                 "flags_2" / FlagsEnum(Int8ul, track_crime=0x01, allow_sell=0x02),
                 "unused" / Bytes(2),
-            ) * "Data",
+            )
+            * "Data",
             optional=True
         ),
         Subrecord("CNAM", Float32l * "Unused", optional=True),
@@ -442,11 +449,8 @@ MESG_Subrecords = SubrecordCollection(
         Subrecord("NAM9", GreedyBytes * "Unknown", optional=True),
         Subrecord(
             "DNAM",
-            FlagsEnum(
-                Int32ul,
-                message_box=0x00000001,
-                auto_display=0x00000002
-            ) * "Flags"
+            FlagsEnum(Int32ul, message_box=0x00000001, auto_display=0x00000002)
+            * "Flags"
         ),
         Subrecord("TNAM", Int32ul * "Display Time", optional=True),
         SubrecordCollection(
@@ -474,7 +478,8 @@ NAVI_Subrecords = SubrecordCollection(
                 "grid_x" / Int16sl,
                 "grid_y" / Int16sl,
                 "_unknown_1" / GreedyBytes,
-            ) * "Navigation Map Info",
+            )
+            * "Navigation Map Info",
             optional=True,
             multiple=True
         ),
@@ -485,7 +490,8 @@ NAVI_Subrecords = SubrecordCollection(
                 "_unknown_1" / FNVFormID(["NAVM"]),
                 "_unknown_2" / FNVFormID(["NAVM"]),
                 "door" / FNVFormID(["REFR"]),
-            ) * "Unknown",
+            )
+            * "Unknown",
             optional=True,
             multiple=True
         ),
@@ -527,7 +533,8 @@ NPC__Subrecords = SubrecordCollection(
         Subrecord(
             "ACBS",
             Struct(
-                "flags" / FlagsEnum(
+                "flags"
+                / FlagsEnum(
                     Int32ul,
                     biped=0x00000001,
                     essential=0x00000002,
@@ -570,7 +577,8 @@ NPC__Subrecords = SubrecordCollection(
                 "speed_multiplier" / Int16ul,
                 "karma" / Float32l,
                 "disposition_base" / Int16sl,
-                "template_flags" / FlagsEnum(
+                "template_flags"
+                / FlagsEnum(
                     Int16ul,
                     use_traits=0x0001,
                     use_stats=0x0002,
@@ -583,13 +591,15 @@ NPC__Subrecords = SubrecordCollection(
                     use_inventory=0x0100,
                     use_script=0x0200,
                 ),
-            ) * "Configuration"
+            )
+            * "Configuration"
         ),
         Subrecord(
             "SNAM",
             Struct(
                 "faction" / FNVFormID(["FACT"]), "rank" / Int8ul, "unused" / Bytes(3)
-            ) * "Faction",
+            )
+            * "Faction",
             optional=True,
             multiple=True
         ),
@@ -610,20 +620,16 @@ NPC__Subrecords = SubrecordCollection(
         Subrecord(
             "AIDT",
             Struct(
-                "aggression" / Enum(
+                "aggression"
+                / Enum(
                     Int8ul, unaggressive=0, aggressive=1, very_aggressive=2, frenzied=3
                 ),
-                "confidence" / Enum(
-                    Int8ul,
-                    cowardly=0,
-                    cautious=1,
-                    average=2,
-                    brave=3,
-                    foolhardy=4
-                ),
+                "confidence"
+                / Enum(Int8ul, cowardly=0, cautious=1, average=2, brave=3, foolhardy=4),
                 "energy_level" / Int8ul,
                 "responsibility" / Int8ul,
-                "mood" / Enum(
+                "mood"
+                / Enum(
                     Int8ul,
                     neutral=0,
                     afraid=1,
@@ -637,12 +643,14 @@ NPC__Subrecords = SubrecordCollection(
                 "services" / ServiceFlags,
                 "teaches" / SkillEnum,
                 "maximum_training_level" / Int8ul,
-                "assistance" / Enum(
+                "assistance"
+                / Enum(
                     Int8sl, helps_nobody=0, helps_allies=1, helps_friends_and_allies=2
                 ),
                 "aggro_radius_behavior" / FlagsEnum(Int8ul, aggro_radius_behavior=0x01),
                 "aggro_radius" / Int32sl,
-            ) * "AI Data",
+            )
+            * "AI Data",
             optional=True
         ),
         Subrecord(
@@ -661,7 +669,8 @@ NPC__Subrecords = SubrecordCollection(
                 "agility" / Int8ul,
                 "luck" / Int8ul,
                 "unused" / Optional(GreedyBytes),
-            ) * "Data"
+            )
+            * "Data"
         ),
         Subrecord(
             "DNAM",
@@ -694,7 +703,8 @@ NPC__Subrecords = SubrecordCollection(
                 "speech_offset" / Int8ul,
                 "survival_offset" / Int8ul,
                 "unarmed_offset" / Int8ul,
-            ) * "Skills",
+            )
+            * "Skills",
             optional=True
         ),
         Subrecord(
@@ -727,7 +737,8 @@ SPEL_Subrecords = SubrecordCollection(
         Subrecord(
             "SPIT",
             Struct(
-                "type" / Enum(
+                "type"
+                / Enum(
                     Int32ul,
                     actor_effect=0,
                     disease=1,
@@ -743,7 +754,8 @@ SPEL_Subrecords = SubrecordCollection(
                 ),
                 "cost" / Int32ul,
                 "level" / Int32ul,
-                "flags" / FlagsEnum(
+                "flags"
+                / FlagsEnum(
                     Int8ul,
                     no_auto_calc=0x01,
                     immune_to_silence_1=0x02,
@@ -755,7 +767,8 @@ SPEL_Subrecords = SubrecordCollection(
                     force_touch_explode=0x80,
                 ),
                 "_unknown_0" / Bytes(3),
-            ) * "Effect Configuration"
+            )
+            * "Effect Configuration"
         ),
         EffectCollection.be(multiple=True),
     ]
@@ -782,7 +795,8 @@ STAT_Subrecords = SubrecordCollection(
                 bush_h=7,
                 bush_i=8,
                 bush_j=9,
-            ) * "Passthrough Sound",
+            )
+            * "Passthrough Sound",
             optional=True
         ),
         Subrecord(
@@ -815,7 +829,8 @@ TES4_Subrecords = SubrecordCollection(
                 "version" / Float32l,
                 "num_records" / Int32ul,
                 "next_object_id" / Int32ul,
-            ) * "Header"
+            )
+            * "Header"
         ),
         Subrecord("OFST", GreedyBytes * "Unknown", optional=True),
         Subrecord("DELE", GreedyBytes * "Unknown", optional=True),
@@ -944,7 +959,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "weight" / Float32l,
                 "base_damage" / Int16sl,
                 "clip_size" / Int8ul,
-            ) * "Data"
+            )
+            * "Data"
         ),
         Subrecord(
             "DNAM",
@@ -952,7 +968,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "animation_type" / WeaponAnimationEnum,
                 "animation_multiplier" / Float32l,
                 "reach" / Float32l,
-                "flags_1" / FlagsEnum(
+                "flags_1"
+                / FlagsEnum(
                     Int8ul,
                     ignores_normal_weapon_resistance=0x01,
                     is_automatic=0x02,
@@ -963,7 +980,8 @@ WEAP_Subrecords = SubrecordCollection(
                     dont_use_first_person_animations=0x40,
                     non_playable=0x80,
                 ),
-                "grip_animation" / Enum(
+                "grip_animation"
+                / Enum(
                     Int8ul,
                     handgrip_1=230,
                     handgrip_2=231,
@@ -982,7 +1000,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "_unknown_1" / Float32l,
                 "projectile" / FNVFormID(["PROJ"]),
                 "base_vats_to_hit_chance" / Int8ul,
-                "attack_animation" / Enum(
+                "attack_animation"
+                / Enum(
                     Int8ul,
                     attack_left=26,
                     attack_right=32,
@@ -1009,7 +1028,8 @@ WEAP_Subrecords = SubrecordCollection(
                     default=255,
                 ),
                 "projectile_cound" / Int8ul,
-                "embedded_weapon_actor_value" / Enum(
+                "embedded_weapon_actor_value"
+                / Enum(
                     Int8ul,
                     perception=0,
                     endurance=1,
@@ -1021,14 +1041,16 @@ WEAP_Subrecords = SubrecordCollection(
                 ),
                 "min_range" / Float32l,
                 "max_range" / Float32l,
-                "on_hit" / Enum(
+                "on_hit"
+                / Enum(
                     Int32ul,
                     normal_formula_behavior=0,
                     dismember_only=1,
                     explode_only=2,
                     no_dismember_explode=3,
                 ),
-                "flags_2" / FlagsEnum(
+                "flags_2"
+                / FlagsEnum(
                     Int32ul,
                     player_only=0x00000001,
                     npcs_use_ammo=0x00000002,
@@ -1057,13 +1079,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "jam_time" / Float32l,
                 "aim_arc" / Float32l,
                 "skill" / ActorValuesEnum,
-                "rumble_pattern" / Enum(
-                    Int32ul,
-                    constant=0,
-                    square=1,
-                    triangle=2,
-                    sawtooth=3
-                ),
+                "rumble_pattern"
+                / Enum(Int32ul, constant=0, square=1, triangle=2, sawtooth=3),
                 "rumble_wavelength" / Float32l,
                 "limb_damage_multiplier" / Float32l,
                 "reistance_type" / ActorValuesEnum,
@@ -1077,7 +1094,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "value_a_mod_1" / Float32l,
                 "value_a_mod_2" / Float32l,
                 "value_a_mod_3" / Float32l,
-                "override_power_attack_animation" / Enum(
+                "override_power_attack_animation"
+                / Enum(
                     Int32ul,
                     _unknown_0=0,
                     attack_custom_1_power=97,
@@ -1098,7 +1116,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "value_b_mod_3" / Float32l,
                 "impulse_distance" / Float32l,
                 "skill_requirement" / Int32ul,
-            ) * "Configuration"
+            )
+            * "Configuration"
         ),
         Subrecord(
             "CRDT",
@@ -1109,7 +1128,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "flags" / FlagsEnum(Int8ul, on_death=0x01),
                 "_unused_1" / Bytes(3),
                 "effect" / FNVFormID(["SPEL"]),
-            ) * "Critical Data"
+            )
+            * "Critical Data"
         ),
         Subrecord(
             "VATS",
@@ -1121,7 +1141,8 @@ WEAP_Subrecords = SubrecordCollection(
                 "silent" / Enum(Int8ul, no=0, yes=1),
                 "mod_required" / Enum(Int8ul, no=0, yes=1),
                 "_unused_0" / Bytes(2),
-            ) * "VATS",
+            )
+            * "VATS",
             optional=True
         ),
         Subrecord("VNAM", SoundLevelEnum * "Sound Level"),

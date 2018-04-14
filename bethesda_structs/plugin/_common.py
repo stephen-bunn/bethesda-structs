@@ -40,8 +40,11 @@ class FormID(object):
             ValueError: If all entries in `value` are not uppercase strings
         """
 
-        if not isinstance(value, list) or not all(
-            isinstance(entry, str) and entry.upper() == entry for entry in value
+        if (
+            not isinstance(value, list)
+            or not all(
+                isinstance(entry, str) and entry.upper() == entry for entry in value
+            )
         ):
             raise ValueError(
                 f"forms must be a list of uppercase strings, recieved {value!r} "
@@ -279,9 +282,10 @@ class BasePlugin(BaseFiletype, abc.ABC, Generic[T_BasePlugin]):
 
             if group.records is not None:
                 for record in group.records:
-                    if isinstance(
-                        record_type, str
-                    ) and record_type != record.type.upper():
+                    if (
+                        isinstance(record_type, str)
+                        and record_type != record.type.upper()
+                    ):
                         continue
 
                     yield record
@@ -325,9 +329,10 @@ class BasePlugin(BaseFiletype, abc.ABC, Generic[T_BasePlugin]):
             subrecord_type = subrecord_type.upper()
         for record in self.iter_records(record_type, include_header=include_header):
             for subrecord in record.subrecords:
-                if isinstance(
-                    subrecord_type, str
-                ) and subrecord_type != subrecord.type.upper():
+                if (
+                    isinstance(subrecord_type, str)
+                    and subrecord_type != subrecord.type.upper()
+                ):
                     continue
 
                 yield subrecord

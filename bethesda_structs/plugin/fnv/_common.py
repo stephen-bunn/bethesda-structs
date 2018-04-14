@@ -21,7 +21,7 @@ from construct import (
     FlagsEnum,
     GreedyBytes,
     GreedyString,
-    PaddedString
+    PaddedString,
 )
 
 from .._common import FormID, Subrecord, SubrecordCollection
@@ -680,12 +680,7 @@ FunctionIndexEnum = Enum(
 )
 
 
-RGBAStruct = Struct(
-    "red" / Int8ul,
-    "green" / Int8ul,
-    "blue" / Int8ul,
-    "alpha" / Int8ul
-)
+RGBAStruct = Struct("red" / Int8ul, "green" / Int8ul, "blue" / Int8ul, "alpha" / Int8ul)
 
 
 ObjectBoundsStruct = Struct(
@@ -701,7 +696,8 @@ ObjectBoundsStruct = Struct(
 # TODO: Various parameter structures for parameter_1, parameter_2
 # (large and annoying)
 CTDAStruct = Struct(
-    "type" / Enum(
+    "type"
+    / Enum(
         Int8ul,
         use_or=0x0001,
         run_on_target=0x0002,
@@ -718,13 +714,9 @@ CTDAStruct = Struct(
     "function" / FunctionIndexEnum,
     "parameter_1" / Bytes(4),
     "parameter_2" / Bytes(4),
-    "run_on" / Enum(
-        Int32ul,
-        subject=0,
-        target=1,
-        reference=2,
-        combat_target=3,
-        linked_reference=4
+    "run_on"
+    / Enum(
+        Int32ul, subject=0, target=1, reference=2, combat_target=3, linked_reference=4
     ),
     "reference" / FNVFormID(["PLYR", "ACHR", "ACRE", "REFR", "PMIS", "PGRE"]),
 )
@@ -739,7 +731,8 @@ DestructionCollection = SubrecordCollection(
                 "count" / Int8ul,
                 "flags" / FlagsEnum(Int8ul, vats_targetable=0x01),
                 "_unknown_0" / Bytes(2),
-            ) * "Header"
+            )
+            * "Header"
         ),
         SubrecordCollection(
             [
@@ -749,17 +742,16 @@ DestructionCollection = SubrecordCollection(
                         "health_percentage" / Int8ul,
                         "index" / Int8ul,
                         "damage_stage" / Int8ul,
-                        "flags" / FlagsEnum(
-                            Int8ul,
-                            cap_damage=0x01,
-                            disable=0x02,
-                            destroy=0x04
+                        "flags"
+                        / FlagsEnum(
+                            Int8ul, cap_damage=0x01, disable=0x02, destroy=0x04
                         ),
                         "self_damage_per_second" / Int32sl,
                         "explosion" / FNVFormID(["EXPL"]),
                         "debris" / FNVFormID(["DEBR"]),
                         "debris_count" / Int32sl,
-                    ) * "Stage Data"
+                    )
+                    * "Stage Data"
                 ),
                 Subrecord(
                     "DMDL", CString("utf8") * "Stage Model Filename", optional=True
@@ -787,24 +779,21 @@ ModelCollection = SubrecordCollection(
             "MODS",
             Struct(
                 "count" / Int32ul,
-                "alternate_texture" / Struct(
+                "alternate_texture"
+                / Struct(
                     "name_length" / Int32ul,
                     "3d_name" / PaddedString(lambda this: this.name_length, "utf8"),
                     "new_texture" / FNVFormID(["TXST"]),
                     "3d_index" / Int32sl,
                 ),
-            ) * "Alternate Textures",
+            )
+            * "Alternate Textures",
             optional=True
         ),
         Subrecord(
             "MODD",
-            FlagsEnum(
-                Int8ul,
-                head=0x01,
-                torso=0x02,
-                right_hand=0x04,
-                left_hand=0x08
-            ) * "Facegen Model Flags",
+            FlagsEnum(Int8ul, head=0x01, torso=0x02, right_hand=0x04, left_hand=0x08)
+            * "Facegen Model Flags",
             optional=True
         ),
     ]
@@ -819,13 +808,15 @@ Model2Collection = SubrecordCollection(
             "MO2S",
             Struct(
                 "count" / Int32ul,
-                "alternate_texture" / Struct(
+                "alternate_texture"
+                / Struct(
                     "name_length" / Int32ul,
                     "3d_name" / PaddedString(lambda this: this.name_length, "utf8"),
                     "new_texture" / FNVFormID(["TXST"]),
                     "3d_index" / Int32sl,
                 ),
-            ) * "Alternate Textures",
+            )
+            * "Alternate Textures",
             optional=True
         ),
     ]
@@ -840,24 +831,21 @@ Model3Collection = SubrecordCollection(
             "MO3S",
             Struct(
                 "count" / Int32ul,
-                "alternate_texture" / Struct(
+                "alternate_texture"
+                / Struct(
                     "name_length" / Int32ul,
                     "3d_name" / PaddedString(lambda this: this.name_length, "utf8"),
                     "new_texture" / FNVFormID(["TXST"]),
                     "3d_index" / Int32sl,
                 ),
-            ) * "Alternate Textures",
+            )
+            * "Alternate Textures",
             optional=True
         ),
         Subrecord(
             "MOSD",
-            FlagsEnum(
-                Int8ul,
-                head=0x01,
-                torso=0x02,
-                right_hand=0x04,
-                left_hand=0x08
-            ) * "Facegen Model Flags",
+            FlagsEnum(Int8ul, head=0x01, torso=0x02, right_hand=0x04, left_hand=0x08)
+            * "Facegen Model Flags",
             optional=True
         ),
     ]
@@ -872,13 +860,15 @@ Model4Collection = SubrecordCollection(
             "MO4S",
             Struct(
                 "count" / Int32ul,
-                "alternate_texture" / Struct(
+                "alternate_texture"
+                / Struct(
                     "name_length" / Int32ul,
                     "3d_name" / PaddedString(lambda this: this.name_length, "utf8"),
                     "new_texture" / FNVFormID(["TXST"]),
                     "3d_index" / Int32sl,
                 ),
-            ) * "Alternate Textures",
+            )
+            * "Alternate Textures",
             optional=True
         ),
     ]
@@ -895,7 +885,8 @@ EffectCollection = SubrecordCollection(
                 "area" / Int32ul,
                 "duration" / Int32ul,
                 "type" / Enum(Int32ul, self_=0, touch=1, target=2),
-                "actor_value" / Enum(
+                "actor_value"
+                / Enum(
                     Int32sl,
                     none=-1,
                     aggression=0,
@@ -972,7 +963,8 @@ EffectCollection = SubrecordCollection(
                     _unknown_9=71,
                     ignore_negative_effects=72,
                 ),
-            ) * "Effect Data"
+            )
+            * "Effect Data"
         ),
         Subrecord("CTDA", CTDAStruct * "Condition", optional=True),
     ]
@@ -984,7 +976,8 @@ ItemCollection = SubrecordCollection(
         Subrecord(
             "CNTO",
             Struct(
-                "item" / FNVFormID(
+                "item"
+                / FNVFormID(
                     [
                         "AMRO",
                         "AMMO",
@@ -1005,7 +998,8 @@ ItemCollection = SubrecordCollection(
                     ]
                 ),
                 "count" / Int32sl,
-            ) * "Item",
+            )
+            * "Item",
             optional=True
         ),
         Subrecord(
@@ -1014,7 +1008,8 @@ ItemCollection = SubrecordCollection(
                 "owner" / FNVFormID(["NPC_", "FACT"]),
                 "global_variable" / FNVFormID(["GLOB"]),  # FIXME: various types,
                 "item_condition" / Float32l,
-            ) * "Extra Data",
+            )
+            * "Extra Data",
             optional=True
         ),
     ]
@@ -1032,7 +1027,8 @@ ScriptCollection = SubrecordCollection(
                 "variable_count" / Int32ul,
                 "type" / FlagsEnum(Int16ul, object=0x000, quest=0x001, effect=0x100),
                 "flags" / FlagsEnum(Int16ul, enabled=0x0001),
-            ) * "Basic Script Data"
+            )
+            * "Basic Script Data"
         ),
         Subrecord("SCDA", GreedyBytes * "Commpiled Script Source"),
         Subrecord("SCTX", GreedyString("utf8") * "Script Source"),
@@ -1045,7 +1041,8 @@ ScriptCollection = SubrecordCollection(
                         "_unknown_0" / Bytes(12),
                         "flags" / FlagsEnum(Int8ul, is_long_or_short=0x01),
                         "_unknown_1" / Bytes(7),
-                    ) * "Local Variable Data"
+                    )
+                    * "Local Variable Data"
                 ),
                 Subrecord("SCVR", CString("utf8") * "Local Variable Name"),
             ],
@@ -1127,7 +1124,8 @@ ScriptCollection = SubrecordCollection(
                     "ADDN",
                     "NULL",
                 ]
-            ) * "Reference",
+            )
+            * "Reference",
             optional=True,
             multiple=True
         ),

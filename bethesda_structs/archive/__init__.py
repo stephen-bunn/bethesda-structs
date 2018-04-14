@@ -5,7 +5,7 @@ from ._common import BaseArchive
 from .bsa import BSAArchive
 from .btdx import BTDXArchive
 
-AVAILABLE_ARCHIVES = (BSAArchive, BTDXArchive,)
+AVAILABLE_ARCHIVES = (BSAArchive, BTDXArchive)
 
 
 def get_archive(filepath: str) -> BaseArchive:

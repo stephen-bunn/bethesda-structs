@@ -27,7 +27,7 @@ from construct import (
     IfThenElse,
     GreedyBytes,
     GreedyRange,
-    PaddedString
+    PaddedString,
 )
 from multidict import CIMultiDict
 
@@ -37,24 +37,45 @@ from .._common import BasePlugin
 
 
 class FNVPlugin(BasePlugin):
-    """ The plugin for Fallout: New Vegas.
+    """The plugin for Fallout: New Vegas.
+
+    This plugin structure *should* handle plugins for the games:
+        - Fallout 3
+        - Fallout: New Vegas
+
+    Note:
+        This structure *currently* reads all data on initialization.
+        This may appear as *slower* initialization times for larger plugins.
+        Should be fixed by
+        `lazy constructs <https://construct.readthedocs.io/en/latest/lazy.html>`_
+        when they become more stable.
+
+    **Credit:**
+        - `FopDoc <https://tes5edit.github.io/fopdoc/FalloutNV/Records.html>`_
     """
 
     subrecord_struct = Struct(
         "type" / PaddedString(4, "utf8"),
         "data_size" / Int16ul,
         "data" / Bytes(lambda this: this.data_size),
-        "parsed" / Computed(
+        "parsed"
+        / Computed(
             lambda this: FNVPlugin.parse_subrecord(
                 this._.id, this._.type, this.type, this.data
             )
         ),
-    ) * "Subrecord structure for Fallout: New Vegas."
+    )
+    """The structure for FO3/FNV subrecords.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of FO3/FNV subrecords
+    """
 
     record_struct = Struct(
         "type" / PaddedString(4, "utf8"),
         "data_size" / Int32ul,
-        "flags" / FlagsEnum(
+        "flags"
+        / FlagsEnum(
             Int32ul,
             master=0x00000001,
             _unknown_0=0x00000002,
@@ -94,18 +115,25 @@ class FNVPlugin(BasePlugin):
         "version" / Int16ul,
         "_unknown_0" / Int16ul,
         # NOTE: ignores compressed data size as it is handled by GreedyBytes
-        If(lambda this: this.flags.compressed, Padding(Int32ul.sizeof())),
-        "data" / IfThenElse(
+        If(lambda this: this.flags.compressed, Padding(4)),
+        "data"
+        / IfThenElse(
             lambda this: this.flags.compressed,
-            Compressed(GreedyBytes, "zlib"),
+            Compressed(Bytes(lambda this: this.data_size), "zlib"),
             Bytes(lambda this: this.data_size),
         ),
-        "subrecords" / Computed(
+        "subrecords"
+        / Computed(
             lambda this: GreedyRange(FNVPlugin.subrecord_struct).parse(
                 this.data, id=this.id, type=this.type
             )
         ),
-    ) * "Record structure for Fallout: New Vegas"
+    )
+    """The structure for FO3/FNV records.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of FO3/FNV records
+    """
 
     group_struct = Struct(
         "type" / Const(b"GRUP"),
@@ -114,7 +142,8 @@ class FNVPlugin(BasePlugin):
         # instead of computing it later
         # NOTE: deferred until group_type is determined
         "_label" / Bytes(4),
-        "group_type" / Enum(
+        "group_type"
+        / Enum(
             Int32sl,
             top_level=0,
             world_children=1,
@@ -128,7 +157,8 @@ class FNVPlugin(BasePlugin):
             cell_temporary_children=9,
             cell_visible_distant_children=10,
         ),
-        "label" / Computed(
+        "label"
+        / Computed(
             lambda this: Switch(
                 this.group_type,
                 {
@@ -136,14 +166,8 @@ class FNVPlugin(BasePlugin):
                     "world_children": FNVFormID(["WRLD"]),
                     "interior_cell_block": Int32sl,
                     "interior_cell_subblock": Int32sl,
-                    "exterior_cell_block": Struct(
-                        "y" / Int8sl,
-                        "x" / Int8sl
-                    ),
-                    "exterior_cell_subblock": Struct(
-                        "y" / Int8sl,
-                        "x" / Int8sl
-                    ),
+                    "exterior_cell_block": Struct("y" / Int8sl, "x" / Int8sl),
+                    "exterior_cell_subblock": Struct("y" / Int8sl, "x" / Int8sl),
                     "cell_children": FNVFormID(["CELL"]),
                     "topic_children": FNVFormID(["DIAL"]),
                     "cell_persistent_children": FNVFormID(["CELL"]),
@@ -158,7 +182,8 @@ class FNVPlugin(BasePlugin):
         "stamp" / Int16ul,
         "_unknown_0" / Bytes(6),
         "data" / Bytes(lambda this: this.group_size - 24),
-        "subgroups" / If(
+        "subgroups"
+        / If(
             lambda this: (len(this.data) > 4 and this.data[:4] == b"GRUP"),
             Computed(
                 lambda this: GreedyRange(
@@ -168,18 +193,29 @@ class FNVPlugin(BasePlugin):
                 )
             ),
         ),
-        "records" / If(
+        "records"
+        / If(
             lambda this: this.subgroups is None,
             Computed(
                 lambda this: GreedyRange(FNVPlugin.record_struct).parse(this.data)
             ),
         ),
-    ) * "Group structure for Fallout: New Vegas."
+    )
+    """The structure for FO3/FNV groups.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of FO3/FNV groups
+    """
 
     plugin_struct = Struct(
         "header" / record_struct * "Plugin header record",
-        "groups" / GreedyRange(group_struct) * "Plugin groups"
-    ) * "Plugin structure for Fallout: New Vegas."
+        "groups" / GreedyRange(group_struct) * "Plugin groups",
+    )
+    """The structure for FO3/FNV plugins.
+
+    Returns:
+        :class:`~construct.core.Struct`: The structure of FO3/FNV plugins
+    """
 
     # NOTE: working record is mangaled in order to protect state during
     # subrecord parsing for record state
@@ -200,7 +236,7 @@ class FNVPlugin(BasePlugin):
         """
 
         if not os.path.isfile(filepath):
-            raise FileNotFoundError(f'file {filepath!r} does not exist')
+            raise FileNotFoundError(f"file {filepath!r} does not exist")
 
         header = cls.record_struct.parse_file(filepath)
         return header.type == "TES4" and header.version == 15
