@@ -359,6 +359,17 @@ DOOR_Subrecords = SubrecordCollection(
     ]
 )
 
+EYES_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name"),
+        Subrecord("ICON", CString("utf8") * "Texture", optional=True),
+        Subrecord(
+            "DATA",
+            FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04) * "Flags"
+        ),
+    ]
+)
 
 FACT_Subrecords = SubrecordCollection(
     [
@@ -401,6 +412,21 @@ FACT_Subrecords = SubrecordCollection(
             multiple=True,
         ),
         Subrecord("WMI1", FNVFormID(["REPU"]) * "Reputation", optional=True),
+    ]
+)
+
+
+HAIR_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name"),
+        ModelCollection,
+        Subrecord("ICON", CString("utf8") * "Texture"),
+        Subrecord(
+            "DATA",
+            FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04, fixed=0x08)
+            * "Flags"
+        ),
     ]
 )
 
@@ -461,6 +487,116 @@ MESG_Subrecords = SubrecordCollection(
                 ),
             ]
         ),
+    ]
+)
+
+
+MGEF_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        Subrecord("DESC", CString("utf8") * "Description"),
+        Subrecord("ICON", CString("utf8") * "Large Icon Filename"),
+        Subrecord("MICO", CString("utf8") * "Samll Icon Filename"),
+        ModelCollection.be(optional=True),
+        Subrecord(
+            "DATA",
+            Struct(
+                "flags"
+                / FlagsEnum(
+                    Int32ul,
+                    hostile=0x00000001,
+                    recover=0x00000002,
+                    detrimental=0x00000004,
+                    _unknown_0=0x00000008,
+                    actor=0x00000010,  # NOTE: avoiding the use of "self"
+                    touch=0x00000020,
+                    target=0x00000040,
+                    no_duration=0x00000080,
+                    no_magnitude=0x00000100,
+                    no_area=0x00000200,
+                    fx_persist=0x00000400,
+                    _unknown_1=0x00000800,
+                    gory_visuals=0x00001000,
+                    display_name_only=0x00002000,
+                    _unknown_2=0x00004000,
+                    radio_broadcast=0x00008000,
+                    _unknown_3=0x00010000,
+                    _unknown_4=0x00020000,
+                    _unknown_5=0x00040000,
+                    use_skill=0x00080000,
+                    use_attribute=0x00100000,
+                    _unknown_6=0x00200000,
+                    _unknown_7=0x00400000,
+                    _unknown_8=0x00800000,
+                    painless=0x01000000,
+                    spray_projectile=0x02000000,
+                    bolt_projectile=0x04000000,
+                    no_hit_effect=0x08000000,
+                    no_death_dispel=0x10000000,
+                    _unknown_9=0x20000000,
+                )
+            )
+            * "Data"
+        ),
+        "base_cost" / Float32l,
+        "associated_item" / FNVFormID([]),  # NOTE: unknown form id reference
+        "magic_school" / Int32sl,
+        "resistance_type" / ActorValuesEnum,
+        "_unknown_0" / Int16ul,
+        "_unknown_1" / Bytes(2),
+        "light" / FNVFormID(["LIGH"]),
+        "projectile_speed" / Float32l,
+        "effect_shader" / FNVFormID(["EFSH"]),
+        "object_display_shader" / FNVFormID(["EFSH"]),
+        "effect_sound" / FNVFormID(["SOUN"]),
+        "bold_sound" / FNVFormID(["SOUN"]),
+        "hit_sound" / FNVFormID(["SOUN"]),
+        "area_sound" / FNVFormID(["SOUN"]),
+        "constant_effect_enchantment_factor" / Float32l,
+        "constant_effect_barter_factor" / Float32l,
+        "archtype"
+        / Enum(
+            Int32ul,
+            value_modifier=0,
+            script=1,
+            dispel=2,
+            cure_disease=3,
+            _unknown_0=4,
+            _unknown_1=5,
+            _unknown_2=6,
+            _unknown_3=7,
+            _unknown_4=8,
+            _unknown_5=9,
+            _unknown_6=10,
+            invisibility=11,
+            chameleon=12,
+            light=13,
+            _unknown_7=14,
+            _unknown_8=15,
+            lock=16,
+            open=17,
+            bound_item=18,
+            summon_creature=19,
+            _unknown_9=20,
+            _unknown_10=21,
+            _unknown_11=22,
+            _unknown_12=23,
+            paralysis=24,
+            _unknown_13=25,
+            _unknown_14=26,
+            _unknown_15=27,
+            _unknown_16=28,
+            _unknown_17=29,
+            cure_paralysis=30,
+            cure_addiction=31,
+            cure_poison=32,
+            concussion=33,
+            value=34,
+            limb_condition=35,
+            turbo=36,
+        ),
+        "actor_value" / ActorValuesEnum,
     ]
 )
 
@@ -821,6 +957,77 @@ TACT_Subrecords = SubrecordCollection(
 )
 
 
+TERM_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        ModelCollection.be(optional=True),
+        Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
+        DestructionCollection.be(optional=True),
+        Subrecord("DESC", CString("utf8") * "Description"),
+        Subrecord("SNAM", FNVFormID(["SCPT"]) * "Sound - Looping", optional=True),
+        Subrecord("PNAM", FNVFormID(["NOTE"]) * "Password Note", optional=True),
+        Subrecord(
+            "DNAM",
+            Struct(
+                "base_hacking_difficulty"
+                / Enum(
+                    Int8ul,
+                    very_easy=0,
+                    easy=1,
+                    average=2,
+                    hard=3,
+                    very_hard=4,
+                    requires_key=5,
+                ),
+                "flags"
+                / FlagsEnum(
+                    Int8ul,
+                    leveled=0x01,
+                    unlocked=0x02,
+                    alternate_colors=0x04,
+                    hide_welcome_text=0x08,
+                ),
+                "server_type"
+                / Enum(
+                    Int8ul,
+                    server_1=0,
+                    server_2=1,
+                    server_3=2,
+                    server_4=3,
+                    server_5=4,
+                    server_6=5,
+                    server_7=6,
+                    server_8=7,
+                    server_9=8,
+                    server_10=9,
+                ),
+                "_unknown_0" / Bytes(1),
+            )
+            * "Data"
+        ),
+        SubrecordCollection(
+            [
+                Subrecord("ITXT", CString("utf8") * "Item Text", optional=True),
+                Subrecord("RNAM", CString("utf8") * "Result Text"),
+                Subrecord(
+                    "ANAM",
+                    FlagsEnum(Int8ul, add_note=0x01, force_redraw=0x02) * "Flags"
+                ),
+                Subrecord("INAM", FNVFormID(["NOTE"]) * "Display Note", optional=True),
+                Subrecord("TNAM", FNVFormID(["TERM"]) * "Sub Menu", optional=True),
+                ScriptCollection,
+                Subrecord(
+                    "CTDA", CTDAStruct * "Condition", optional=True, multiple=True
+                ),
+            ],
+            optional=True,
+            multiple=True,
+        ),
+    ]
+)
+
 TES4_Subrecords = SubrecordCollection(
     [
         Subrecord(
@@ -1158,9 +1365,12 @@ RecordMapping = {
     "CONT": CONT_Subrecords,
     "DIAL": DIAL_Subrecords,
     "DOOR": DOOR_Subrecords,
+    "EYES": EYES_Subrecords,
     "FACT": FACT_Subrecords,
+    "HAIR": HAIR_Subrecords,
     "KEYM": KEYM_Subrecords,
     "MESG": MESG_Subrecords,
+    "MGEF": MGEF_Subrecords,
     "MISC": MISC_Subrecords,
     "NAVI": NAVI_Subrecords,
     "NOTE": NOTE_Subrecords,
@@ -1169,6 +1379,7 @@ RecordMapping = {
     "SPEL": SPEL_Subrecords,
     "STAT": STAT_Subrecords,
     "TACT": TACT_Subrecords,
+    "TERM": TERM_Subrecords,
     "TES4": TES4_Subrecords,
     "WEAP": WEAP_Subrecords,
 }
