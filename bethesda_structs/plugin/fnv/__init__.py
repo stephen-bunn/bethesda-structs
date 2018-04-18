@@ -135,6 +135,9 @@ class FNVPlugin(BasePlugin):
         :class:`~construct.core.Struct`: The structure of FO3/FNV records
     """
 
+    # TODO: instead of using ``GreedyRange`` to handle parsing unknown length lists,
+    # should probably use other repeaters to avoid messy construct debugging
+    # (will always raise exception when expects record type to exist, but gets 0 bytes)
     group_struct = Struct(
         "type" / Const(b"GRUP"),
         "group_size" / Int32ul,

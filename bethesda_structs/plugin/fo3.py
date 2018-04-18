@@ -5,7 +5,15 @@ from .fnv import FNVPlugin, FNVFormID
 
 
 class FO3FormID(FNVFormID):
-    """The form id for Fallout 3.
+    """A formid wrapper for Fallout 3.
+
+    Note:
+        Because the logic for parsing Fallout 3 form ids is the same as
+        Fallout: New Vegas form ids, this class is simply a subclass of
+        :class:`~.plugin.fnv.FNVFormID`.
+
+    **Credit:**
+        - `FopDoc <https://tes5edit.github.io/fopdoc/FalloutNV/Records.html>`_
     """
 
     pass

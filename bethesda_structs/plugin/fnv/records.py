@@ -1356,7 +1356,8 @@ WEAP_Subrecords = SubrecordCollection(
     ]
 )
 
-
+# NOTE: these records come from https://tes5edit.github.io/fopdoc/FalloutNV/Records.html
+# NOTE: only property handled subrecord parsers should exist in this dictionary...
 RecordMapping = {
     "ACTI": ACTI_Subrecords,
     "AMMO": AMMO_Subrecords,
