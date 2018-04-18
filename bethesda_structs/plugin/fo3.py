@@ -4,8 +4,8 @@
 from .fnv import FNVPlugin, FNVFormID
 
 
-class FO3Plugin(FNVPlugin):
-    """The form id for Fallouto 3.
+class FO3FormID(FNVFormID):
+    """The form id for Fallout 3.
     """
 
     pass
