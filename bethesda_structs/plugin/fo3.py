@@ -1,7 +1,14 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://opensource.org/licenses/MIT>
 
-from .fnv import FNVPlugin
+from .fnv import FNVPlugin, FNVFormID
+
+
+class FO3Plugin(FNVPlugin):
+    """The form id for Fallouto 3.
+    """
+
+    pass
 
 
 class FO3Plugin(FNVPlugin):
