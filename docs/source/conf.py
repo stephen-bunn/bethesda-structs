@@ -117,11 +117,6 @@ html_theme_options = {
     "sidebar_collapse": True,
     "slackin_button": True,
     "slackin_link": "https://bethesda-structs-slackin.herokuapp.com",
-    "extra_nav_links": {
-        "bethesda-structs @ github": "https://github.com/stephen-bunn/bethesda-structs",
-        "bethesda-structs @ slack": "https://bethesda-structs-slackin.herokuapp.com/",
-        "bethesda-structs @ rtfd": "https://bethesda-structs.readthedocs.io/"
-    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
