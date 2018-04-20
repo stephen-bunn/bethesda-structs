@@ -22,7 +22,6 @@ Flask-Sphinx-Themes = "*"
 black = "*"
 sphinx-autodoc-typehints = "*"
 codacy-coverage = "*"
-alabaster = "*"
 
 [requires]
 python_version = "3.6"

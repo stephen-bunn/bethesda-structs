@@ -20,6 +20,7 @@ import sys
 import alabaster
 
 sys.path.insert(0, os.path.abspath("../.."))
+sys.path.insert(0, os.path.join(os.path.abspath('.'), 'themes'))
 
 from bethesda_structs import __version__
 
@@ -38,8 +39,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode",
-    "alabaster",
+    "sphinx.ext.viewcode"
 ]
 
 autodoc_member_order = "bysource"
@@ -94,7 +94,7 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 
-html_theme_path = [alabaster.get_path()]
+html_theme_path = ["themes"]
 html_theme = "alabaster"
 html_favicon = "_static/img/favicon.png"
 html_sidebars = {
@@ -115,10 +115,12 @@ html_theme_options = {
     "page_width": "1000px",
     "sidebar_width": "220px",
     "sidebar_collapse": True,
+    "slackin_button": True,
+    "slackin_link": "https://bethesda-structs-slackin.herokuapp.com",
     "extra_nav_links": {
         "bethesda-structs @ github": "https://github.com/stephen-bunn/bethesda-structs",
         "bethesda-structs @ slack": "https://bethesda-structs-slackin.herokuapp.com/",
-        "bethesda-structs @ rtd": "https://bethesda-structs.readthedocs.io/"
+        "bethesda-structs @ rtfd": "https://bethesda-structs.readthedocs.io/"
     },
 }
 
