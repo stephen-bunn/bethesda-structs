@@ -113,8 +113,13 @@ html_theme_options = {
     "github_type": "star",
     "analytics_id": "UA-110798724-2",
     "page_width": "1000px",
+    "sidebar_width": "220px",
     "sidebar_collapse": True,
-    "extra_nav_links": {"stephen-bunn@web": "http://stephen.bunn.io/"},
+    "extra_nav_links": {
+        "bethesda-structs @ github": "https://github.com/stephen-bunn/bethesda-structs",
+        "bethesda-structs @ slack": "https://bethesda-structs-slackin.herokuapp.com/",
+        "bethesda-structs @ rtd": "https://bethesda-structs.readthedocs.io/"
+    },
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
