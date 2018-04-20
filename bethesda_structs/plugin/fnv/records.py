@@ -247,6 +247,115 @@ AVIF_Subrecords = SubrecordCollection(
 )
 
 
+CELL_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        Subrecord(
+            "DATA",
+            FlagsEnum(
+                Int8ul,
+                is_interior_cell=0x01,
+                has_water=0x02,
+                invert_fast_travel_behavior=0x04,
+                no_lod_water=0x08,
+                _unknown_0=0x10,
+                public_place=0x20,
+                hand_changed=0x40,
+                behave_like_exterior=0x80,
+            )
+            * "Flags"
+        ),
+        Subrecord(
+            "XCLC",
+            Struct(
+                "x" / Int32sl,
+                "y" / Int32sl,
+                "force_hide_land"
+                / FlagsEnum(
+                    Int32ul,
+                    quad_1=0x00000001,
+                    quad_2=0x00000002,
+                    quad_3=0x00000004,
+                    quad_4=0x00000008,
+                ),
+            )
+            * "Grid",
+            optional=True
+        ),
+        Subrecord(
+            "XCLL",
+            Struct(
+                "ambient_color" / RGBAStruct,
+                "directional_color" / RGBAStruct,
+                "fog_color" / RGBAStruct,
+                "fog_near" / Float32l,
+                "fog_far" / Float32l,
+                "directional_rotation_xy" / Int32sl,
+                "directional_rotation_z" / Int32sl,
+                "directional_fade" / Float32l,
+                "fog_clip_distance" / Float32l,
+                "fog_power" / Float32l,
+            )
+            * "Lighting",
+            optional=True
+        ),
+        Subrecord(
+            "IMPF",
+            Struct(
+                "concrete_solid" / Bytes(30),
+                "concrete_broken" / Bytes(30),
+                "metal_solid" / Bytes(30),
+                "metal_hollow" / Bytes(30),
+                "metal_sheet" / Bytes(30),
+                "wood" / Bytes(30),
+                "sand" / Bytes(30),
+                "dirt" / Bytes(30),
+                "grass" / Bytes(30),
+                "water" / Bytes(30),
+            )
+            * "Footstep Material",
+            optional=True
+        ),
+        SubrecordCollection(
+            [
+                Subrecord("LTMP", FNVFormID(["LGTM"]) * "Template"),
+                Subrecord(
+                    "LNAM",
+                    FlagsEnum(
+                        Int32ul,
+                        ambient_color=0x00000001,
+                        directional_color=0x00000002,
+                        fog_color=0x00000004,
+                        fog_near=0x00000008,
+                        fog_far=0x00000010,
+                        directional_rotation=0x00000020,
+                        directional_fade=0x00000040,
+                        fog_clip_distance=0x00000080,
+                        fog_power=0x00000100,
+                    )
+                    * "Inherit"
+                ),
+            ]
+        ),
+        Subrecord("XCLW", Float32l * "Water Height", optional=True),
+        Subrecord("XNAM", CString("utf8") * "Water Noise Texture", optional=True),
+        Subrecord("XCLR", GreedyRange(FNVFormID(["REGN"])) * "Regions", optional=True),
+        Subrecord("XCIM", FNVFormID(["IMGS"]) * "Image Space", optional=True),
+        Subrecord("XCET", Bytes(1) * "Unknown", optional=True),
+        Subrecord("XEZN", FNVFormID(["ECZN"]) * "Encounter Zone", optional=True),
+        Subrecord("XCCM", FNVFormID(["CLMT"]) * "Climate", optional=True),
+        Subrecord("XCWT", FNVFormID(["WATR"]) * "Water", optional=True),
+        Subrecord(
+            "XOWN", FNVFormID(["FACT", "ACHR", "CREA", "NPC_"]) * "Owner", optional=True
+        ),
+        Subrecord("XRNK", Int32sl * "Faction Rank", optional=True),
+        Subrecord("XCAS", FNVFormID(["ASPC"]) * "Acoustic Space", optional=True),
+        Subrecord("XCMT", Bytes(1) * "Unknown", optional=True),
+        Subrecord("XCMO", FNVFormID(["MUSC"]) * "Music Type", optional=True),
+    ]
+)
+
 CONT_Subrecords = SubrecordCollection(
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
@@ -1363,6 +1472,7 @@ RecordMapping = {
     "AMMO": AMMO_Subrecords,
     "ARMO": ARMO_Subrecords,
     "AVIF": AVIF_Subrecords,
+    "CELL": CELL_Subrecords,
     "CONT": CONT_Subrecords,
     "DIAL": DIAL_Subrecords,
     "DOOR": DOOR_Subrecords,
