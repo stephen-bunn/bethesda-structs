@@ -7,6 +7,7 @@ from construct import (
     Int8sl,
     Int8ul,
     Struct,
+    Switch,
     CString,
     Int16sl,
     Int16ul,
@@ -551,6 +552,16 @@ FACT_Subrecords = SubrecordCollection(
             multiple=True,
         ),
         Subrecord("WMI1", FNVFormID(["REPU"]) * "Reputation", optional=True),
+    ]
+)
+
+
+# NOTE: FNAM = s -> short, l -> long, f -> float
+GLOB_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FNAM", Int8ul * "Type"),
+        Subrecord("FLTV", Float32l * "Value"),
     ]
 )
 
@@ -1553,6 +1564,7 @@ RecordMapping = {
     "DOOR": DOOR_Subrecords,
     "EYES": EYES_Subrecords,
     "FACT": FACT_Subrecords,
+    "GLOB": GLOB_Subrecords,
     "HAIR": HAIR_Subrecords,
     "KEYM": KEYM_Subrecords,
     "MICN": MICN_Subrecords,
