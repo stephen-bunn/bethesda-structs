@@ -38,12 +38,14 @@ from ._common import (
     Model3Collection,
     Model4Collection,
     ScriptCollection,
+    SkillBoostStruct,
     EquipmentTypeEnum,
     ImpactMaterialEnum,
     ObjectBoundsStruct,
     ReloadAnimationEnum,
     WeaponAnimationEnum,
     AttackAnimationsEnum,
+    DefaultHairColorsEnum,
     DestructionCollection,
 )
 from .._common import Subrecord, SubrecordCollection
@@ -1019,6 +1021,204 @@ NPC__Subrecords = SubrecordCollection(
     ]
 )
 
+
+RACE_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        Subrecord("DESC", CString("utf8") * "Description"),
+        Subrecord(
+            "XNAM",
+            Struct(
+                "faction" / FNVFormID(["FACT", "RACE"]),
+                "modifier" / Int32sl,
+                "group_combat_relation"
+                / Enum(Int32ul, neutral=0, enemy=1, ally=2, friend=3),
+            )
+            * "Relation",
+            optional=True,
+            multiple=True
+        ),
+        Subrecord(
+            "DATA",
+            Struct(
+                "skill_boost_1" / SkillBoostStruct,
+                "skill_boost_2" / SkillBoostStruct,
+                "skill_boost_3" / SkillBoostStruct,
+                "skill_boost_4" / SkillBoostStruct,
+                "skill_boost_5" / SkillBoostStruct,
+                "skill_boost_6" / SkillBoostStruct,
+                "skill_boost_7" / SkillBoostStruct,
+                "_unknown_0" / Bytes(2),
+                "male_height" / Float32l,
+                "female_height" / Float32l,
+                "male_weight" / Float32l,
+                "female_height" / Float32l,
+                "flags"
+                / FlagsEnum(
+                    Int32ul,
+                    playable=0x00000001,
+                    _unknown_0=0x00000002,
+                    child=0x00000004,
+                ),
+            )
+            * "Data"
+        ),
+        Subrecord("ONAM", FNVFormID(["RACE"]) * "Older", optional=True),
+        Subrecord("YNAM", FNVFormID(["RACE"]) * "Younger", optional=True),
+        Subrecord("NAM2", Bytes(0) * "Unknown Marker"),
+        Subrecord(
+            "VTCK",
+            Struct(
+                "male_voice" / FNVFormID(["VTYP"]), "female_voice" / FNVFormID(["VTYP"])
+            )
+            * "Voices"
+        ),
+        Subrecord(
+            "DNAM",
+            Struct(
+                "male_default_hair" / FNVFormID(["HAIR"]),
+                "female_default_hair" / FNVFormID(["HAIR"]),
+            )
+            * "Default Hair Styles"
+        ),
+        Subrecord(
+            "CNAM",
+            Struct(
+                "male_default_hair_color" / DefaultHairColorsEnum,
+                "female_default_hair_color" / DefaultHairColorsEnum,
+            )
+            * "Default Hair Colors"
+        ),
+        Subrecord("PNAM", Float32l * "FaceGen - Main Clamp"),
+        Subrecord("UNAM", Float32l * "FaceGen - Face Clamp"),
+        Subrecord("ATTR", GreedyBytes * "Unknown"),
+        Subrecord("NAM0", Bytes(0) * "Head Data Marker"),
+        Subrecord("MNAM", Bytes(0) * "Male Head Data Marker"),
+        SubrecordCollection(
+            [
+                Subrecord(
+                    "INDX",
+                    Enum(
+                        Int32ul,
+                        head=0,
+                        ears=1,
+                        mouth=2,
+                        teeth_lower=3,
+                        teeth_upper=4,
+                        tongue=5,
+                        left_eye=6,
+                        right_eye=7,
+                    )
+                    * "Index",
+                    optional=True
+                ),
+                ModelCollection,
+                Subrecord(
+                    "ICON", CString("utf8") * "Large Icon Filename", optional=True
+                ),
+                Subrecord(
+                    "MICO", CString("utf8") * "Small Icon Filename", optional=True
+                ),
+            ],
+            multiple=True,
+        ),
+        Subrecord("FNAM", Bytes(0) * "Female Head Data Marker"),
+        SubrecordCollection(
+            [
+                Subrecord(
+                    "INDX",
+                    Enum(
+                        Int32ul,
+                        head=0,
+                        ears=1,
+                        mouth=2,
+                        teeth_lower=3,
+                        teeth_upper=4,
+                        tongue=5,
+                        left_eye=6,
+                        right_eye=7,
+                    )
+                    * "Index",
+                    optional=True
+                ),
+                ModelCollection,
+                Subrecord(
+                    "ICON", CString("utf8") * "Large Icon Filename", optional=True
+                ),
+                Subrecord(
+                    "MICO", CString("utf8") * "Small Icon Filename", optional=True
+                ),
+            ],
+            multiple=True,
+        ),
+        Subrecord("NAM1", Bytes(0) * "Body Data Marker"),
+        Subrecord("MNAM", Bytes(0) * "Male Body Data Marker"),
+        SubrecordCollection(
+            [
+                Subrecord(
+                    "INDX",
+                    Enum(
+                        Int32ul,
+                        upper_body=0,
+                        left_hand=1,
+                        right_hand=2,
+                        upper_body_texture=3,
+                    )
+                    * "Index",
+                    optional=True
+                ),
+                Subrecord(
+                    "ICON", CString("utf8") * "Large Icon Filename", optional=True
+                ),
+                Subrecord(
+                    "MCIO", CString("utf8") * "Small Icon Filename", optional=True
+                ),
+                ModelCollection,
+            ],
+            multiple=True,
+        ),
+        Subrecord("FNAM", Bytes(0) * "Female Body Data Marker"),
+        SubrecordCollection(
+            [
+                Subrecord(
+                    "INDX",
+                    Enum(
+                        Int32ul,
+                        upper_body=0,
+                        left_hand=1,
+                        right_hand=2,
+                        upper_body_texture=3,
+                    )
+                    * "Index",
+                    optional=True
+                ),
+                Subrecord(
+                    "ICON", CString("utf8") * "Large Icon Filename", optional=True
+                ),
+                Subrecord(
+                    "MCIO", CString("utf8") * "Small Icon Filename", optional=True
+                ),
+                ModelCollection,
+            ],
+            multiple=True,
+        ),
+        Subrecord("HNAM", GreedyRange(FNVFormID(["HAIR"])) * "Hairs"),
+        Subrecord("ENAM", GreedyRange(FNVFormID(["EYES"])) * "Eyes"),
+        Subrecord("MNAM", Bytes(0) * "Male FaceGen Data Marker"),
+        Subrecord("FGGS", GreedyBytes * "Male FaceGen Geometry - Symmetric"),
+        Subrecord("FGGA", GreedyBytes * "Male FaceGen Geometry - Asymmetric"),
+        Subrecord("FGTS", GreedyBytes * "Male FaceGen Texture - Symmetric"),
+        Subrecord("SNAM", Bytes(0) * "Unknown"),
+        Subrecord("FNAM", Bytes(0) * "Female FaceGen Data Marker"),
+        Subrecord("FGGS", GreedyBytes * "Female FaceGen Geometry - Symmetric"),
+        Subrecord("FGGA", GreedyBytes * "Female FaceGen Geometry - Asymmetric"),
+        Subrecord("FGTS", GreedyBytes * "Female FaceGen Texture - Symmetric"),
+        Subrecord("SNAM", Bytes(0) * "Unknown"),
+    ]
+)
+
+
 SCPT_Subrecords = SubrecordCollection(
     [Subrecord("EDID", CString("utf8") * "Editor ID"), ScriptCollection]
 )
@@ -1574,6 +1774,7 @@ RecordMapping = {
     "NAVI": NAVI_Subrecords,
     "NOTE": NOTE_Subrecords,
     "NPC_": NPC__Subrecords,
+    "RACE": RACE_Subrecords,
     "SCPT": SCPT_Subrecords,
     "SPEL": SPEL_Subrecords,
     "STAT": STAT_Subrecords,
