@@ -65,6 +65,36 @@ ACTI_Subrecords = SubrecordCollection(
 )
 
 
+ALCH_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
+        Subrecord("FULL", CString("utf8") * "Name"),
+        ModelCollection.be(optional=True),
+        Subrecord("ICON", CString("utf8") * "Large Icon Filename", optional=True),
+        Subrecord("MICO", CString("utf8") * "Small Icon Filename", optional=True),
+        Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
+        DestructionCollection.be(optional=True),
+        Subrecord("YNAM", FNVFormID(["SOUN"]) * "Sound - Pick Up", optional=True),
+        Subrecord("ZNAM", FNVFormID(["SOUN"]) * "Sound - Drop", optional=True),
+        Subrecord("ETYP", EquipmentTypeEnum * "Equipment Type"),
+        Subrecord("DATA", Float32l * "Weight"),
+        Subrecord(
+            "ENIT",
+            Struct(
+                "value" / Int32sl,
+                "flags"
+                / FlagsEnum(Int8ul, no_auto_calc=0x01, food_item=0x02, medicine=0x04),
+                "_unknown_0" / Bytes(3),
+                "withdrawal_effect" / FNVFormID(["SPEL"]),
+                "addiction_chance" / Float32l,
+                "consume_sound" / FNVFormID(["SOUN"]),
+            ),
+        ),
+        EffectCollection.be(multiple=True),
+    ]
+)
+
 AMMO_Subrecords = SubrecordCollection(
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
@@ -1469,6 +1499,7 @@ WEAP_Subrecords = SubrecordCollection(
 # NOTE: only property handled subrecord parsers should exist in this dictionary...
 RecordMapping = {
     "ACTI": ACTI_Subrecords,
+    "ALCH": ALCH_Subrecords,
     "AMMO": AMMO_Subrecords,
     "ARMO": ARMO_Subrecords,
     "AVIF": AVIF_Subrecords,
