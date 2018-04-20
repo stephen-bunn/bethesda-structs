@@ -594,6 +594,14 @@ KEYM_Subrecords = SubrecordCollection(
 )
 
 
+MICN_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("ICON", CString("utf8") * "Large Icon Filename"),
+        Subrecord("MICO", CString("utf8") * "Small Icon Filename"),
+    ]
+)
+
 MISC_Subrecords = KEYM_Subrecords
 
 
@@ -1547,6 +1555,7 @@ RecordMapping = {
     "FACT": FACT_Subrecords,
     "HAIR": HAIR_Subrecords,
     "KEYM": KEYM_Subrecords,
+    "MICN": MICN_Subrecords,
     "MESG": MESG_Subrecords,
     "MGEF": MGEF_Subrecords,
     "MISC": MISC_Subrecords,
