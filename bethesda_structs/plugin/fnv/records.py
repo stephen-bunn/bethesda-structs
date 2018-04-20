@@ -1198,6 +1198,42 @@ TES4_Subrecords = SubrecordCollection(
 )
 
 
+TXST_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
+        Subrecord("TX00", CString("utf8") * "Base Image / Transparency", optional=True),
+        Subrecord("TX01", CString("utf8") * "Normal Map / Specular", optional=True),
+        Subrecord("TX02", CString("utf8") * "Environment Map Mask", optional=True),
+        Subrecord("TX03", CString("utf8") * "Glow Map", optional=True),
+        Subrecord("TX04", CString("utf8") * "Parallax Map", optional=True),
+        Subrecord("TX05", CString("utf8") * "Environment Map", optional=True),
+        Subrecord(
+            "DODT",
+            Struct(
+                "min_width" / Float32l,
+                "max_width" / Float32l,
+                "min_height" / Float32l,
+                "max_height" / Float32l,
+                "depth" / Float32l,
+                "shininess" / Float32l,
+                "parallax_scale" / Float32l,
+                "parallax_passes" / Int8ul,
+                "flags"
+                / FlagsEnum(
+                    Int8ul, parallax=0x01, alpha_blending=0x02, alpha_testing=0x04
+                ),
+                "_unknown_0" / Bytes(2),
+                "color" / RGBAStruct,
+            )
+            * "Decal Data",
+            optional=True
+        ),
+        Subrecord("DNAM", FlagsEnum(Int16ul, no_specular_map=0x0001) * "Flags"),
+    ]
+)
+
+
 WEAP_Subrecords = SubrecordCollection(
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
@@ -1523,5 +1559,6 @@ RecordMapping = {
     "TACT": TACT_Subrecords,
     "TERM": TERM_Subrecords,
     "TES4": TES4_Subrecords,
+    "TXST": TXST_Subrecords,
     "WEAP": WEAP_Subrecords,
 }
