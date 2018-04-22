@@ -9,9 +9,13 @@ Changelog
 **WIP: 1.0.0** (*unreleased*)
 -----------------------------
 
+`0.1.1`_ (*2018-04-21*)
+-----------------------
+- fixed readme display on pypi
+
 
 `0.1.0`_ (*2018-04-21*)
------------------------------
+-----------------------
 - full rewrite using `construct <https://construct.readthedocs.io/en/latest/>`_.
 - added complete support for BTDX archives
 - added complete support for BSA archives (*not including Morrowind*)
@@ -46,3 +50,4 @@ Changelog
 .. _0.0.0: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.0.0
 .. _0.0.1: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.0.1
 .. _0.1.0: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.1.0
+.. _0.1.1: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.1.1

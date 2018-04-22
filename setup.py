@@ -3,6 +3,7 @@
 
 import os
 import sys
+import codecs
 import shutil
 import setuptools
 
@@ -61,11 +62,15 @@ class UploadCommand(setuptools.Command):
 
         sys.exit()
 
+long_description = ''
+with codecs.open("README.rst", encoding="utf-8") as fp:
+    long_description = '\n' + fp.read()
+
 setuptools.setup(
     name=__version__.__name__,
     version=__version__.__version__,
     description=__version__.__description__,
-    long_description=open("README.rst", "r").read(),
+    long_description=long_description,
     url=__version__.__repo__,
     license=__version__.__license__,
     author=__version__.__author__,
