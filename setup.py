@@ -63,7 +63,7 @@ class UploadCommand(setuptools.Command):
         sys.exit()
 
 long_description = ''
-with codecs.open("README.rst", encoding="utf-8") as fp:
+with codecs.open("README-PYPI.rst", encoding="utf-8") as fp:
     long_description = '\n' + fp.read()
 
 setuptools.setup(
