@@ -1,4 +1,4 @@
-.. image:: https://github.com/stephen-bunn/bethesda-structs/raw/feature/construct/docs/source/_static/img/logo.png
+.. image:: https://github.com/stephen-bunn/bethesda-structs/raw/master/docs/source/_static/img/logo.png
    :alt: Bethesda Structs Logo
    :width: 800
    :align: center
