@@ -61,7 +61,6 @@ class UploadCommand(setuptools.Command):
 
         sys.exit()
 
-
 setuptools.setup(
     name=__version__.__name__,
     version=__version__.__version__,
@@ -74,6 +73,8 @@ setuptools.setup(
     install_requires=INSTALL_REQUIRES,
     setup_requires=SETUP_REQUIRES,
     extras_require=EXTRAS_REQUIRE,
+    include_package_data=True,
+    packages=setuptools.find_packages(exclude=["tests.*", "tests"]),
     keywords=["bethesda", "filetype", "structures", "archive", "python36", "construct"],
     python_requires=">=3.6",
     classifiers=[
