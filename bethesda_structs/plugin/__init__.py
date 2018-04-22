@@ -1,28 +1,32 @@
-# Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
+# Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
+# MIT License <https://choosealicense.com/licenses/mit/>
 
-import sys
-import inspect
+from ._common import BasePlugin
+from .fnv import FNVPlugin
+from .fo3 import FO3Plugin
 
-from ._common import (AbstractPlugin,)
-from .tes4 import (TES4Plugin,)
-from .tes5 import (TES5Plugin,)
+AVAILABLE_PLUGINS = (FNVPlugin, FO3Plugin)
 
 
-def get_plugin(filepath: str) -> AbstractPlugin:
-    """ Unreliable method of guessing and initializing a plugin \
-        given a filepath.
+def get_plugin(filepath: str) -> BasePlugin:
+    """Get an instance of the first plugin that can handle a given file.
 
-    :param filepath: A filepath to a Bethesda plugin
-    :type filepath: str
-    :returns: An initialized plugin, hopefully
+    Args:
+        filepath (str): The path of the file to handle
+
+    Returns:
+        BasePlugin: The base plugin
+
+    Examples:
+        This method simply returns the first encountered plugin that can handle a
+        given file.
+
+        >>> FILEPATH = ""  # absolute filepath to some FNV plugin
+        >>> plugin = bethesda_structs.plugin.get_plugin(FILEPATH)
+        >>> plugin
+        FNVPlugin(filepath=PosixPath(...))
     """
 
-    # iterate over all the imported plugins
-    for (class_name, class_ref,) in \
-            inspect.getmembers(sys.modules[__name__], inspect.isclass):
-        # return the first plugin that can handle the file
-        # and isn't an abstract class
-        if class_ref not in (AbstractPlugin,) and \
-                class_ref.can_handle(filepath):
-            return class_ref(filepath)
+    for plug in AVAILABLE_PLUGINS:
+        if plug.can_handle(filepath):
+            return plug.parse_file(filepath)

@@ -1,21 +1,38 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [packages]
-
-
+construct = "*"
+multidict = "*"
+attrs = "*"
+"lz4" = "*"
 
 [dev-packages]
-
 ptpython = "*"
 "flake8" = "*"
-sphinx = "*"
-sphinx-autodoc-typehints = "*"
-sphinx-readable-theme = "*"
+Sphinx = "*"
 pytest = "*"
 pytest-cov = "*"
 "pytest-flake8" = "*"
+pytest-sugar = "*"
+sphinxcontrib-napoleon = "*"
+Flask-Sphinx-Themes = "*"
+black = "*"
+sphinx-autodoc-typehints = "*"
+codacy-coverage = "*"
+twine = "*"
+
+[requires]
+python_version = "3.6"
+
+[pipenv]
+allow_prereleases = true
+
+[scripts]
+test = "pytest"
+test-cov = "pytest --cov"
+make-docs = "make -C ./docs html"
+open-docs = "python -mwebbrowser ./docs/build/html/index.html"
+black = "black ./bethesda_structs"

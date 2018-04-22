@@ -10,15 +10,20 @@ When contributing to this repository, please first discuss the change you wish t
 Style Guide
 -----------
 
-- We stictly follow `PEP8 <https://www.python.org/dev/peps/pep-0008/>`_ and utilize `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ docstrings on **all** classes and functions.
+- We somewhat follow `PEP8 <https://www.python.org/dev/peps/pep-0008/>`_ and utilize `Sphinx <http://www.sphinx-doc.org/en/stable/>`_ docstrings on **all** classes and functions.
 - We employee `flake8 <http://flake8.pycqa.org/en/latest/>`_ as our linter with exceptions to the following rules:
    - D203
    - F401
    - E123
+   - W503
+- Maximum line length is 88 characters.
+- Maxiumum McCabe complexity is 12.
 - Linting and test environments are configured via ``tox.ini``.
+- Imports are sorted using `isort <https://pypi.python.org/pypi/isort>`_ with multi-line output mode ``3``.
 - An ``.editorconfig`` file is included in this repository which dictates whitespace, indentation, and file encoding rules.
 - Although ``requirements.txt`` and ``requirements_dev.txt`` do exist, `Pipenv <https://docs.pipenv.org/>`_ is utilized as the primary virtual environment and package manager for this project.
 - We strictly utilize `Semantic Versioning <https://semver.org/>`_ as our version specification.
+- All Python source files are post-processed using `ambv/black <https://github.com/ambv/black>`_.
 
 Issues
 ------

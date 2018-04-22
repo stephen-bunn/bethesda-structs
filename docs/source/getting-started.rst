@@ -16,9 +16,9 @@ However, you can install Bethesda Structs by cloning the source and installing t
 
 .. code-block:: bash
 
-    $ git clone https://github.com/stephen-bunn/bethesda-structs.git
-    $ cd ./bethesda-structs
-    $ python setup.py install
+   $ git clone https://github.com/stephen-bunn/bethesda-structs.git
+   $ cd ./bethesda-structs
+   $ python setup.py install
 
 
 Example Usage
@@ -37,18 +37,18 @@ This can be done quickly using a snippet like the following:
 
 .. code-block:: python
 
-    import os
-    import bethesda_structs
+   import os
+   from bethesda_structs.archive import BSAArchive
 
-    BSA_ARCHIVE_PATH = 'C:/Users/me/Desktop/Archive.bsa'
-    EXTRACT_TO_DIR   = 'C:/Users/me/Desktop/ArchiveContents/'
+   BSA_ARCHIVE_PATH = 'C:/Users/me/Desktop/Archive.bsa'
+   EXTRACT_TO_DIR   = 'C:/Users/me/Desktop/ArchiveContents/'
 
-    archive = bethesda_structs.archive.BSAArchive(BSA_ARCHIVE_PATH)
+   archive = BSAArchive.parse_file(BSA_ARCHIVE_PATH)
 
-    if not os.path.isdir(EXTRACT_TO_DIR):
-        os.makedirs(EXTRACT_TO_DIR)
+   if not os.path.isdir(EXTRACT_TO_DIR):
+      os.makedirs(EXTRACT_TO_DIR)
 
-    archive.extract(EXTRACT_TO_DIR)
+   archive.extract(EXTRACT_TO_DIR)
 
 Because the archive package is `somewhat` smart, we can make a guess for the correct archive object by using the archive package's :func:`~bethesda_structs.archive.get_archive` method.
 
@@ -56,13 +56,14 @@ This method can be used to replace the line
 
 .. code-block:: python
 
-    archive = bethesda_structs.archive.BSAArchive(BSA_ARCHIVE_PATH)
+   archive = BSAArchive.parse_file(BSA_ARCHIVE_PATH)
 
 with the simplification
 
 .. code-block:: python
 
-    archive = bethesda_structs.archive.get_archive(BSA_ARCHIVE_PATH)
+   from bethesda_structs.archive import get_archive
+   archive = get_archive(BSA_ARCHIVE_PATH)
 
 This automatically handles the instance where ``BSA_ARCHIVE_PATH`` isn't actually pointing to a BSA archive.
 Instead, it will set the local ``archive`` variable to whatever archive it thinks can handle the file.
@@ -99,7 +100,7 @@ Simply give the path to a BA2 archive and decompress and extract the archived co
 
     BA2_ARCHIVE_PATH = 'C:/Users/me/Desktop/Archive.ba2'
 
-    archive = bethesda_structs.archive.get_archive(BA2_ARCHIVE_PATH)
+    archive = get_archive(BA2_ARCHIVE_PATH)
 
     if not os.path.isdir(EXTRACT_TO_DIR):
         os.makedirs(EXTRACT_TO_DIR)
@@ -117,13 +118,13 @@ You can get a list of these names like this:
 .. code-block:: python
 
     import os
-    import bethesda_structs
+    from bethesda_structs.plugin.fnv import FNVPlugin
 
-    TES_PLUGIN_PATH = 'C:/Users/me/Desktop/Archive.esp'
+    FNV_PLUGIN_PATH = 'C:/Users/me/Desktop/Archive.esp'
 
-    plugin = bethesda_structs.plugin.get_plugin(TES_PLUGIN_PATH)
+    plugin = FNVPlugin.parse_file(TES_PLUGIN_PATH)
     print([
-        field.data
-        for field in plugin.header.fields
-        if feild.type == b'MAST'
+        subrecord.data
+        for subrecord in plugin.container.header.subrecords
+        if subrecord.type == 'MAST'
     ])

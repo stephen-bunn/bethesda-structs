@@ -1,0 +1,9 @@
+formats:
+  - epub
+  - pdf
+requirements_file: requirements-docs.txt
+build:
+  image: latest
+python:
+  version: 3.6
+  pip_install: true

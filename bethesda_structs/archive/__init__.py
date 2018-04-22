@@ -1,28 +1,32 @@
-# Copyright (c) 2017 Stephen Bunn (stephen@bunn.io)
-# GPLv3 License <https://choosealicense.com/licenses/gpl-3.0/>
+# Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
+# MIT License <https://choosealicense.com/licenses/mit/>
 
-import sys
-import inspect
+from ._common import BaseArchive
+from .bsa import BSAArchive
+from .btdx import BTDXArchive
 
-from ._common import (AbstractArchive,)
-from .bsa import (BSAArchive,)
-from .ba2 import (BA2Archive,)
+AVAILABLE_ARCHIVES = (BSAArchive, BTDXArchive)
 
 
-def get_archive(filepath: str) -> AbstractArchive:
-    """ Unreliable method of guessing and initializing a archive \
-        given a filepath.
+def get_archive(filepath: str) -> BaseArchive:
+    """Get an instance of the first archive that can handle a given file.
 
-    :param filepath: A filepath to a Bethesda archive
-    :type filepath: str
-    :returns: An initialized archive, hopefully
+    Args:
+        filepath (str): The path of the file to handle
+
+    Returns:
+        BaseArchive: The base archive
+
+    Examples:
+        This method simply returns the first encountered archive that can handle a
+        given file.
+
+        >>> FILEPATH = ""  # absolute filepath to some BSA
+        >>> archive = bethesda_structs.archive.get_archve(FILEPATH)
+        >>> archive
+        BSAArchive(filepath=PosixPath(...))
     """
 
-    # iterate over all the imported archives
-    for (class_name, class_ref,) in \
-            inspect.getmembers(sys.modules[__name__], inspect.isclass):
-        # return the first archive that can handle the file
-        # and isn't an abstract class
-        if class_ref not in (AbstractArchive,) and \
-                class_ref.can_handle(filepath):
-            return class_ref(filepath)
+    for arch in AVAILABLE_ARCHIVES:
+        if arch.can_handle(filepath):
+            return arch.parse_file(filepath)
