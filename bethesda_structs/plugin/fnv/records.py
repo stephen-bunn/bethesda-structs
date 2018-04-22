@@ -7,7 +7,6 @@ from construct import (
     Int8sl,
     Int8ul,
     Struct,
-    Switch,
     CString,
     Int16sl,
     Int16ul,

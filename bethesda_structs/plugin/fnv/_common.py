@@ -302,7 +302,7 @@ DefaultHairColorsEnum = Enum(
     black=12,
     chestnut=13,
     steel=14,
-    champagne=15
+    champagne=15,
 )
 
 
@@ -744,7 +744,8 @@ CTDAStruct = Struct(
 
 
 SkillBoostStruct = Struct(
-    "skill" / Enum(
+    "skill"
+    / Enum(
         Int8sl,
         none=-1,
         aggression=0,
@@ -825,7 +826,7 @@ SkillBoostStruct = Struct(
         sleep_deprivation=75,
         damage=76,
     ),
-    "boost" / Int8sl
+    "boost" / Int8sl,
 )
 
 DestructionCollection = SubrecordCollection(
