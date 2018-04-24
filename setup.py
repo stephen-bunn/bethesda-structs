@@ -17,7 +17,6 @@ EXTRAS_REQUIRE = {
         "flake8",
         "sphinx",
         "sphinx-autodoc-typehints",
-        "sphinx-readable-theme",
         "pytest",
         "pytest-cov",
         "pytest-flake8",
@@ -33,7 +32,7 @@ class UploadCommand(setuptools.Command):
 
     @staticmethod
     def status(status):
-        print(f"... {status}")
+        print("... {0}".format(status))
 
     def initialize_options(self):
         pass
@@ -51,13 +50,13 @@ class UploadCommand(setuptools.Command):
             pass
 
         self.status("building distribution")
-        os.system(f"{sys.executable} setup.py sdist")
+        os.system("{0} setup.py sdist".format(sys.executable))
 
         self.status("uploading distribution")
         os.system("twine upload dist/*")
 
         self.status("pushing git tags")
-        os.system(f"git tag v{__version__.__version__}")
+        os.system("git tag v{0}".format(__version__.__version__))
         os.system("git push --tags")
 
         sys.exit()

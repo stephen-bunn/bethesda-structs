@@ -1,2 +1,2 @@
-include LICENSE README.rst CHANGELOG.rst
+include LICENSE README.rst README-PYPI.rst CHANGELOG.rst
 prune tests*
