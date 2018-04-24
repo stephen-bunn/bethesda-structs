@@ -53,9 +53,8 @@ Using this package, understanding **every little detail** about an archive is si
 
 For more advanced usage and information, `check out the documentation <https://bethesda-structs.readthedocs.io/>`_.
 
-
-.. important:: The supported filetypes are **parsers** not **writers**.
-   We do not currently support the writing of archives or plugins.
+   | The supported filetypes are **parsers** not **writers**.
+   | *We do not currently support the writing of archives or plugins.*
 
 
 Installation
@@ -84,8 +83,8 @@ You can install this package using Git by simply cloning the repo and building t
 
 Usage
 -----
-Using ``bethesda-structs`` is designed to be straight-forward and intuitive.
-Below are some short examples of parsing various filetypes.
+| Using ``bethesda-structs`` is designed to be straight-forward and intuitive.
+| Below are some short examples of parsing various filetypes.
 
 
 .. _ESP Usage:
@@ -97,7 +96,7 @@ ESP
 
 This package aims to provide simple, programmatic access to the in-depth details of a plugin!
 
-.. note:: Because of how long it takes to build complete subrecord parers for a given plugin version, the **only** currently supported plugins are:
+   Because of how long it takes to build complete subrecord parers for a given plugin version, the **only** currently supported plugins are:
 
    - ``FNVPlugin`` - Fallout: New Vegas (*partial*)
    - ``F03Plugin`` - Fallout 3 (*partial and experimental*)
@@ -437,4 +436,3 @@ Container:
 >>> # extract archive to directory
 ...
 >>> archive.extract('/home/USER/Downloads')
-
