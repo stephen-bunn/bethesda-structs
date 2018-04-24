@@ -4,7 +4,7 @@
 __name__ = "bethesda-structs"
 __repo__ = "https://github.com/stephen-bunn/bethesda-structs"
 __description__ = "A parser for Bethesda's file formats"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __author__ = "Stephen Bunn"
 __contact__ = "stephen@bunn.io"
 __license__ = "MIT License"

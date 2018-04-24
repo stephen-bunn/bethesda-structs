@@ -9,7 +9,7 @@ Changelog
 **WIP: 1.0.0** (*unreleased*)
 -----------------------------
 
-`0.1.2`_ (*2018-04-22*)
+`0.1.3`_ (*2018-04-22*)
 -----------------------
 - full rewrite using `construct <https://construct.readthedocs.io/en/latest/>`_.
 - added complete support for BTDX archives
