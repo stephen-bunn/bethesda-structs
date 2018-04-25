@@ -27,6 +27,7 @@ About
 | *Modding Bethesda's games can be a fine-art.*
 | This package intends to provide **clean** and **accessible** methods for parsing and understanding Bethesda's filetypes.
 
+
 *For example:*
 
 There are so many "unarchiver" tools for Bethesda's archives (``.bsa`` and ``.ba2``), but no *good* programmatic way to read these filetypes.
