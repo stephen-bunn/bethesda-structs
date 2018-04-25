@@ -32,10 +32,12 @@ About
 There are so many "unarchiver" tools for Bethesda's archives (``.bsa`` and ``.ba2``), but no *good* programmatic way to read these filetypes.
 Using this package, understanding **every little detail** about an archive is simple and straight-forward (see `BSA Usage`_ and `BA2 Usage`_).
 
-For more advanced usage and information, `check out the documentation <https://bethesda-structs.readthedocs.io/>`_.
+| `All contributions welcome! <./CONTRIBUTORS.md>`_
+| For more advanced usage and information, `check out the documentation <https://bethesda-structs.readthedocs.io/>`_.
 
    | The supported filetypes are **parsers** not **writers**.
    | *We do not currently support the writing of archives or plugins.*
+
 
 
 Installation

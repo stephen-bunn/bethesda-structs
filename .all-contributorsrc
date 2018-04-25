@@ -1,0 +1,26 @@
+{
+  "projectName": "bethesda-structs",
+  "projectOwner": "stephen-bunn",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "files": [
+    "CONTRIBUTORS.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "stephen-bunn",
+      "name": "Stephen Bunn",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/4956855?v=4",
+      "profile": "http://stephen.bunn.io/",
+      "contributions": [
+        "code",
+        "ideas",
+        "example",
+        "doc",
+        "bug"
+      ]
+    }
+  ]
+}
