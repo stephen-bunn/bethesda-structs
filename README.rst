@@ -26,7 +26,7 @@ About
 -----
 | *Modding Bethesda's games can be a fine-art.*
 | This package intends to provide **clean** and **accessible** methods for parsing and understanding Bethesda's filetypes.
-
+|
 
 *For example:*
 
