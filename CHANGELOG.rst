@@ -44,4 +44,4 @@ Changelog
 
 .. _0.0.0: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.0.0
 .. _0.0.1: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.0.1
-.. _0.1.2: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.1.2
+.. _0.1.3: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.1.3
