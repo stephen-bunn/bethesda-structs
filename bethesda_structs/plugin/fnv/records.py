@@ -49,6 +49,89 @@ from ._common import (
 )
 from .._common import Subrecord, SubrecordCollection
 
+ACHR_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("NAME", FNVFormID(["NPC_"]) * "Base"),
+        Subrecord("XEZN", FNVFormID(["ECZN"]) * "Encounter Zone", optional=True),
+        Subrecord("XRGD", GreedyBytes * "Ragdoll Data", optional=True),
+        Subrecord("XRGB", GreedyBytes * "Ragdool Biped Data", optional=True),
+        Subrecord("XPRD", Float32l * "Idle Time"),
+        Subrecord("XPPA", Bytes(0) * "Patrol Script Marker"),
+        Subrecord("INAM", FNVFormID(["IDLE"]) * "Idle"),
+        ScriptCollection,
+        Subrecord("TNAM", FNVFormID(["DIAL"]) * "Topic"),
+        Subrecord("XLCM", Int32sl * "Level Modifier", optional=True),
+        Subrecord("XMRC", FNVFormID(["REFR"]) * "Merchant Container", optional=True),
+        Subrecord("XCNT", Int32sl * "Count", optional=True),
+        Subrecord("XRDS", Float32l * "Radius", optional=True),
+        Subrecord("XHLP", Float32l * "Health", optional=True),
+        Subrecord(
+            "XDCR",
+            Struct("reference" / FNVFormID(["REFR"]), "_unknown_0" / GreedyBytes)
+            * "Decal",
+            optional=True,
+            multiple=True
+        ),
+        Subrecord(
+            "XLKR",
+            FNVFormID(["REFR", "ACRE", "ACHR", "PGRE", "PMIS"]) * "Linked Reference",
+            optional=True
+        ),
+        Subrecord(
+            "XCLP",
+            Struct("link_start_color" / RGBAStruct, "link_end_color" / RGBAStruct)
+            * "Linked Reference Color",
+            optional=True
+        ),
+        Subrecord(
+            "XAPD", FlagsEnum(Int8ul, parent_active_only=0x01) * "Flags", optional=True
+        ),
+        Subrecord(
+            "XAPR",
+            Struct(
+                "reference" / FNVFormID(["REFR", "ACRE", "ACHR", "PGRE", "PMIS"]),
+                "delay" / Float32l,
+            )
+            * "Activate Parent Reference",
+            optional=True,
+            multiple=True
+        ),
+        Subrecord("XATO", CString("utf8") * "Activation Prompt", optional=True),
+        Subrecord(
+            "XESP",
+            Struct(
+                "reference"
+                / FNVFormID(["PLYR", "REFR", "ACRE", "ACHR", "PGRE", "PMIS"]),
+                "flags"
+                / FlagsEnum(
+                    Int8ul, set_enable_state_to_opposite_of_parent=0x01, pop_in=0x02
+                ),
+                "_unknown_0" / Bytes(3),
+            )
+            * "Enable Parent",
+            optional=True
+        ),
+        Subrecord("XEMI", FNVFormID(["LIGH", "REGN"]) * "Emittance", optional=True),
+        Subrecord("XMBR", FNVFormID(["REFR"]) * "MultiBound Reference", optional=True),
+        Subrecord("XIBS", Bytes(0) * "Ignored by Sandbox", optional=True),
+        Subrecord("XSCL", Float32l * "Scale", optional=True),
+        Subrecord(
+            "DATA",
+            Struct(
+                "x_position" / Float32l,
+                "y_position" / Float32l,
+                "z_position" / Float32l,
+                "x_rotation" / Float32l,
+                "y_rotation" / Float32l,
+                "z_rotation" / Float32l,
+            )
+            * "Position / Rotation"
+        ),
+    ]
+)
+
+
 ACTI_Subrecords = SubrecordCollection(
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
@@ -388,6 +471,58 @@ CELL_Subrecords = SubrecordCollection(
     ]
 )
 
+
+CHAL_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        Subrecord("ICON", CString("utf8") * "Large Icon Filename", optional=True),
+        Subrecord("MICO", CString("utf8") * "Small Icon Filename", optional=True),
+        Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
+        Subrecord("DESC", CString("utf8") * "Description", optional=True),
+        Subrecord(
+            "DATA",
+            Struct(
+                "type"
+                / Enum(
+                    Int32ul,
+                    kill_from_a_form_list=0,
+                    kill_a_specific_formid=1,
+                    kill_any_in_a_category=2,
+                    hit_an_enemy=3,
+                    discover_a_map_marker=4,
+                    use_an_item=5,
+                    acquire_an_item=6,
+                    use_a_skill=7,
+                    do_damage=8,
+                    use_an_item_from_a_list=9,
+                    acquire_an_item_from_a_list=10,
+                    miscellaneous_stat=11,
+                    craft_using_an_item=12,
+                    scripted_challenge=13,
+                ),
+                "threshold" / Int32ul,
+                "flags"
+                / FlagsEnum(
+                    Int32ul,
+                    start_disabled=0x00000001,
+                    recurring=0x00000002,
+                    show_zero_progress=0x00000004,
+                ),
+                "interval" / Int32ul,
+                "value_1" / Bytes(2),
+                "value_2" / Bytes(2),
+                "value_3" / Bytes(4),
+            )
+            * "Data",
+            optional=True
+        ),
+        Subrecord("SNAM", FNVFormID([]) * "Value 3", optional=True),
+        Subrecord("XNAM", FNVFormID([]) * "Value 4", optional=True),
+    ]
+)
+
+
 CONT_Subrecords = SubrecordCollection(
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
@@ -553,6 +688,14 @@ FACT_Subrecords = SubrecordCollection(
             multiple=True,
         ),
         Subrecord("WMI1", FNVFormID(["REPU"]) * "Reputation", optional=True),
+    ]
+)
+
+
+FLST_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("LNAM", FNVFormID([]) * "Form ID", optional=True, multiple=True),
     ]
 )
 
@@ -1218,6 +1361,82 @@ RACE_Subrecords = SubrecordCollection(
 )
 
 
+RCPE_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        Subrecord("CTDA", CTDAStruct * "Condition", optional=True, multiple=True),
+        Subrecord(
+            "DATA",
+            Struct(
+                "skill" / Int32sl,
+                "level" / Int32ul,
+                "category" / FNVFormID(["RCCT"]),
+                "sub_category" / FNVFormID(["RCCT"]),
+            )
+            * "Data",
+            optional=True
+        ),
+        SubrecordCollection(  # NOTE: Ingredient is same as output with no marker :(
+            [
+                Subrecord(
+                    "RCIL",
+                    FNVFormID(
+                        [
+                            "ARMO",
+                            "AMMO",
+                            "MISC",
+                            "WEAP",
+                            "BOOK",
+                            "KEYM",
+                            "ALCH",
+                            "NOTE",
+                            "IMOD",
+                            "CMNY",
+                            "CCRD",
+                            "CHIP",
+                            "LIGH",
+                        ]
+                    )
+                    * "Item"
+                ),
+                Subrecord("RCQY", Int32ul * "Quantity"),
+            ],
+            optional=True,
+            multiple=True,
+        ),
+        SubrecordCollection(  # NOTE: Output is same as ingredient with no marker :(
+            [
+                Subrecord(
+                    "RCIL",
+                    FNVFormID(
+                        [
+                            "ARMO",
+                            "AMMO",
+                            "MISC",
+                            "WEAP",
+                            "BOOK",
+                            "KEYM",
+                            "ALCH",
+                            "NOTE",
+                            "IMOD",
+                            "CMNY",
+                            "CCRD",
+                            "CHIP",
+                            "LIGH",
+                        ]
+                    )
+                    * "Item"
+                ),
+                Subrecord("RCQY", Int32ul * "Quantity"),
+            ],
+            optional=True,
+            multiple=True,
+        ),
+    ]
+)
+
+
 SCPT_Subrecords = SubrecordCollection(
     [Subrecord("EDID", CString("utf8") * "Editor ID"), ScriptCollection]
 )
@@ -1752,17 +1971,20 @@ WEAP_Subrecords = SubrecordCollection(
 # NOTE: these records come from https://tes5edit.github.io/fopdoc/FalloutNV/Records.html
 # NOTE: only property handled subrecord parsers should exist in this dictionary...
 RecordMapping = {
+    "ACHR": ACHR_Subrecords,
     "ACTI": ACTI_Subrecords,
     "ALCH": ALCH_Subrecords,
     "AMMO": AMMO_Subrecords,
     "ARMO": ARMO_Subrecords,
     "AVIF": AVIF_Subrecords,
     "CELL": CELL_Subrecords,
+    "CHAL": CHAL_Subrecords,
     "CONT": CONT_Subrecords,
     "DIAL": DIAL_Subrecords,
     "DOOR": DOOR_Subrecords,
     "EYES": EYES_Subrecords,
     "FACT": FACT_Subrecords,
+    "FLST": FLST_Subrecords,
     "GLOB": GLOB_Subrecords,
     "HAIR": HAIR_Subrecords,
     "KEYM": KEYM_Subrecords,
@@ -1774,6 +1996,7 @@ RecordMapping = {
     "NOTE": NOTE_Subrecords,
     "NPC_": NPC__Subrecords,
     "RACE": RACE_Subrecords,
+    "RCPE": RCPE_Subrecords,
     "SCPT": SCPT_Subrecords,
     "SPEL": SPEL_Subrecords,
     "STAT": STAT_Subrecords,
