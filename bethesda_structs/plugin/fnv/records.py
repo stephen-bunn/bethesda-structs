@@ -700,6 +700,19 @@ FLST_Subrecords = SubrecordCollection(
 )
 
 
+FURN_Subrecords = SubrecordCollection(
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
+        Subrecord("FULL", CString("utf8") * "Name", optional=True),
+        ModelCollection,
+        Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
+        DestructionCollection.be(optional=True),
+        Subrecord("MNAM", GreedyBytes * "Marker Flags"),
+    ]
+)
+
+
 # NOTE: FNAM = s -> short, l -> long, f -> float
 GLOB_Subrecords = SubrecordCollection(
     [
@@ -1985,6 +1998,7 @@ RecordMapping = {
     "EYES": EYES_Subrecords,
     "FACT": FACT_Subrecords,
     "FLST": FLST_Subrecords,
+    "FURN": FURN_Subrecords,
     "GLOB": GLOB_Subrecords,
     "HAIR": HAIR_Subrecords,
     "KEYM": KEYM_Subrecords,
