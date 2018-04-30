@@ -99,7 +99,7 @@ html_theme_path = ["themes"]
 html_theme = "alabaster"
 html_favicon = "_static/img/favicon.png"
 html_sidebars = {
-    "**": ["about.html", "navigation.html", "relations.html", "searchbox.html"]
+    "**": ["about.html", "navigation.html", "relations.html", "authorprojects.html", "searchbox.html"]
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme

@@ -11,8 +11,13 @@ Installation and Setup
 
 Installing the package should be super duper simple as we utilize Python's setuptools.
 
-Bethesda Structs is not yet on PyPI as it is still undergoing initial development.
-However, you can install Bethesda Structs by cloning the source and installing the package through the included setup script!
+.. code-block:: bash
+
+   $ pipenv install bethesda-structs
+   $ # or...
+   $ pip install bethesda-structs
+
+Or you can build and install the package from the git repo.
 
 .. code-block:: bash
 

@@ -34,5 +34,6 @@ allow_prereleases = true
 test = "pytest"
 test-cov = "pytest --cov"
 make-docs = "make -C ./docs html"
+clean-docs = "make -C ./docs clean"
 open-docs = "python -mwebbrowser ./docs/build/html/index.html"
 black = "black ./bethesda_structs"

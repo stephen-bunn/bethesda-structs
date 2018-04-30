@@ -1,0 +1,21 @@
+<h3>Author's Projects</h3>
+<ul id="author-repos"></ul>
+<script src="http://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/github-api/dist/GitHub.bundle.min.js"></script>
+<script>
+  $(function () {
+    var gh = new GitHub();
+    gh.getUser('stephen-bunn').listRepos({
+      type: 'owner',
+      sort: 'pushed',
+      direction: 'desc'
+    }).then(function (resp) {
+      $.each(resp.data, function (index, value) {
+        $('#author-repos').append('<li><a href="' + value.html_url + '" target="_blank">' + value.name + '</a></li>');
+        if (index >= 5) {
+          return false;
+        }
+      });
+    });
+  });
+</script>
