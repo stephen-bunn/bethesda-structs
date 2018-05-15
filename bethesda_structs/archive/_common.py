@@ -106,49 +106,6 @@ class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
 
         return cls(content, filepath=filepath)
 
-    @classmethod
-    def parse_stream(
-        cls, stream: io.BufferedReader, filepath: str = None
-    ) -> T_BaseArchive:
-        """Create a :class:`BaseArchive` from a file stream.
-
-        Args:
-            stream (io.BufferedReader): A file stream to read from.
-            filepath (str, optional): Defaults to None.
-                Sets the filepath attribute for user's reference.
-
-        Raises:
-            ValueError: If the given stream is not of ``bytes``
-
-        Returns:
-            :class:`BaseArchive`: An archive instance
-        """
-        if not isinstance(stream.peek(1), bytes):
-            raise ValueError(
-                f"stream {stream!r} is not a stream of bytes, recieved {type(stream)!r}"
-            )
-
-        return cls.parse(stream.read(), filepath=filepath)
-
-    @classmethod
-    def parse_file(cls, filepath: str) -> T_BaseArchive:
-        """Create a :class:`BaseArchive` from a given filepath.
-
-        Args:
-            filepath (str): The filepath to read from
-
-        Raises:
-            FileNotFoundError: If the given filepath does not exist
-
-        Returns:
-            :class:`BaseArchive`: An archive instance
-        """
-        if not os.path.isfile(filepath):
-            raise FileNotFoundError(f"no such file {filepath!r} exists")
-
-        with open(filepath, "rb") as stream:
-            return cls.parse_stream(stream, filepath)
-
     @abc.abstractmethod
     def iter_files(self) -> Generator[ArchiveFile, None, None]:
         """Iterates over the available files in the archive.

@@ -188,7 +188,7 @@ class BasePlugin(BaseFiletype, abc.ABC, Generic[T_BasePlugin]):
         return self._container
 
     @classmethod
-    def parse_bytes(cls, content: bytes, filepath: str = None) -> T_BasePlugin:
+    def parse(cls, content: bytes, filepath: str = None) -> T_BasePlugin:
         """Create a `BasePlugin` from a byte array.
 
         Args:
@@ -208,49 +208,6 @@ class BasePlugin(BaseFiletype, abc.ABC, Generic[T_BasePlugin]):
             )
 
         return cls(content, filepath=filepath)
-
-    @classmethod
-    def parse_stream(
-        cls, stream: io.BufferedReader, filepath: str = None
-    ) -> T_BasePlugin:
-        """Create a `BasePlugin` from a file stream.
-
-        Args:
-            stream (io.BufferedReader): A file stream to read from.
-            filepath (str, optional): Defaults to None. Sets the filepath attribute for
-                user's reference.
-
-        Raises:
-            ValueError: If the given stream is not of ``bytes``
-
-        Returns:
-            T_BasePlugin: A created `BasePlugin`
-        """
-        if not isinstance(stream.peek(1), bytes):
-            raise ValueError(
-                f"stream {stream!r} is not a stream of bytes, recieved {type(stream)!r}"
-            )
-
-        return cls.parse_bytes(stream.read(), filepath=filepath)
-
-    @classmethod
-    def parse_file(cls, filepath: str) -> T_BasePlugin:
-        """Create a `BasePlugin` from a given filepath.
-
-        Args:
-            filepath (str): The filepath to read from
-
-        Raises:
-            FileNotFoundError: If the given filepath does not exist
-
-        Returns:
-            T_BasePlugin: A created `BasePlugin`
-        """
-        if not os.path.isfile(filepath):
-            raise FileNotFoundError(f"no such file '{filepath!r}' exists")
-
-        with open(filepath, "rb") as stream:
-            return cls.parse_stream(stream, filepath)
 
     def iter_records(
         self, record_type: str = None, include_header: bool = False

@@ -1,7 +1,13 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://choosealicense.com/licenses/mit/>
 
+import os
+import io
 import abc
+
+from typing import Generic, TypeVar
+
+T_BaseFiletype = TypeVar("BaseFiletype")
 
 
 class BaseFiletype(abc.ABC):
@@ -19,3 +25,63 @@ class BaseFiletype(abc.ABC):
             NotImplementedError: Subclasses must implement
         """
         raise NotImplementedError
+
+    @abc.abstractclassmethod
+    def parse(cls, content: bytes, filepath: str = None) -> T_BaseFiletype:
+        """Create a :class:`BaseFiletype` from a byte array.
+
+        Args:
+            content (bytes): The byte content
+            filepath (str, optional): Defaults to None.
+                Sets the filepath attribute for user's reference
+
+        Raises:
+            NotImplementedError: Subclasses must implement
+
+        Returns:
+            :class:`BaseFiletype`: A filetype instance
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def parse_stream(
+        cls, stream: io.BufferedReader, filepath: str = None
+    ) -> T_BaseFiletype:
+        """Create a :class:`BaseFiletype` from a file stream.
+
+        Args:
+            stream (io.BufferedReader): A file stream to read from.
+            filepath (str, optional): Defaults to None.
+                Sets the filepath attribute for user's reference.
+
+        Raises:
+            ValueError: If the given stream is not of ``bytes``
+
+        Returns:
+            :class:`BaseFiletype`: A filetype instance
+        """
+        if not isinstance(stream.peek(1), bytes):
+            raise ValueError(
+                f"stream {stream!r} is not a stream of bytes, recieved {type(stream)!r}"
+            )
+
+        return cls.parse(stream.read(), filepath=filepath)
+
+    @classmethod
+    def parse_file(cls, filepath: str) -> T_BaseFiletype:
+        """Create a :class:`BaseFiletype` from a given filepath.
+
+        Args:
+            filepath (str): The filepath to read from
+
+        Raises:
+            FileNotFoundError: If the given filepath does not exist
+
+        Returns:
+            :class:`BaseFiletype`: A filetype instance
+        """
+        if not os.path.isfile(filepath):
+            raise FileNotFoundError(f"no such file {filepath!r} exists")
+
+        with open(filepath, "rb") as stream:
+            return cls.parse_stream(stream, filepath)
