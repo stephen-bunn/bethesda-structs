@@ -5,7 +5,7 @@ import os
 import io
 import abc
 
-from typing import Generic, TypeVar
+from typing import TypeVar
 
 T_BaseFiletype = TypeVar("BaseFiletype")
 

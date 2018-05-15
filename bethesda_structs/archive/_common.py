@@ -1,7 +1,6 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://choosealicense.com/licenses/mit/>
 
-import io
 import os
 import abc
 from typing import Generic, TypeVar, Callable, Generator
