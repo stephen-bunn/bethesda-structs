@@ -3,7 +3,7 @@
 Bethesda Structs Package
 ========================
 The following is the automatically built documentation for the entire :mod:`bethesda_structs` package.
-All objects that are considered to be handlers for a Bethesda file format are subclasses of :class:`bethesda_structs._common.BaseFiletype`.
+All objects that are considered to be handlers for a Bethesda file format are subclasses of :class:`~._common.BaseFiletype`.
 
 ``Plugins`` and ``Archives`` adhere to the following naming conventions.
    - ``{GAME_PREFIX}Plugin`` - :class:`~.plugin.fnv.FNVPlugin`
@@ -26,3 +26,10 @@ But, in this project, repetition is sacrificed for standardization.
    Plugins <bethesda_structs.plugin>
    Archives <bethesda_structs.archive>
    Additional <bethesda_structs.contrib>
+
+-----
+
+.. automodule:: bethesda_structs._common
+   :members:
+   :undoc-members:
+   :show-inheritance:
