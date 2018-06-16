@@ -71,18 +71,18 @@ ACHR_Subrecords = SubrecordCollection(
             Struct("reference" / FNVFormID(["REFR"]), "_unknown_0" / GreedyBytes)
             * "Decal",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord(
             "XLKR",
             FNVFormID(["REFR", "ACRE", "ACHR", "PGRE", "PMIS"]) * "Linked Reference",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "XCLP",
             Struct("link_start_color" / RGBAStruct, "link_end_color" / RGBAStruct)
             * "Linked Reference Color",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "XAPD", FlagsEnum(Int8ul, parent_active_only=0x01) * "Flags", optional=True
@@ -95,7 +95,7 @@ ACHR_Subrecords = SubrecordCollection(
             )
             * "Activate Parent Reference",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord("XATO", CString("utf8") * "Activation Prompt", optional=True),
         Subrecord(
@@ -110,7 +110,7 @@ ACHR_Subrecords = SubrecordCollection(
                 "_unknown_0" / Bytes(3),
             )
             * "Enable Parent",
-            optional=True
+            optional=True,
         ),
         Subrecord("XEMI", FNVFormID(["LIGH", "REGN"]) * "Emittance", optional=True),
         Subrecord("XMBR", FNVFormID(["REFR"]) * "MultiBound Reference", optional=True),
@@ -126,7 +126,7 @@ ACHR_Subrecords = SubrecordCollection(
                 "y_rotation" / Float32l,
                 "z_rotation" / Float32l,
             )
-            * "Position / Rotation"
+            * "Position / Rotation",
         ),
     ]
 )
@@ -273,7 +273,7 @@ ARMO_Subrecords = SubrecordCollection(
                 ),
                 "unused" / GreedyBytes,
             )
-            * "Biped Data"
+            * "Biped Data",
         ),
         ModelCollection,
         Model2Collection,
@@ -302,7 +302,7 @@ ARMO_Subrecords = SubrecordCollection(
         Subrecord(
             "DATA",
             Struct("value" / Int32sl, "max_condition" / Int32sl, "weight" / Float32l)
-            * "Data"
+            * "Data",
         ),
         Subrecord(
             "DNAM",
@@ -315,12 +315,12 @@ ARMO_Subrecords = SubrecordCollection(
                 "dt" / Float32l,
                 "_unknown_0" / Bytes(4),
             )
-            * "Unknown"
+            * "Unknown",
         ),  # FIXME: missing description
         Subrecord(
             "BNAM",
             Enum(Int32ul, no=0, yes=1) * "Overrides Animation Sounds",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "SNAM",
@@ -341,7 +341,7 @@ ARMO_Subrecords = SubrecordCollection(
             )
             * "Animation Sound",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord(
             "TNAM", FNVFormID(["ARMO"]) * "Animation Sound Template", optional=True
@@ -379,7 +379,7 @@ CELL_Subrecords = SubrecordCollection(
                 hand_changed=0x40,
                 behave_like_exterior=0x80,
             )
-            * "Flags"
+            * "Flags",
         ),
         Subrecord(
             "XCLC",
@@ -396,7 +396,7 @@ CELL_Subrecords = SubrecordCollection(
                 ),
             )
             * "Grid",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "XCLL",
@@ -413,7 +413,7 @@ CELL_Subrecords = SubrecordCollection(
                 "fog_power" / Float32l,
             )
             * "Lighting",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "IMPF",
@@ -430,7 +430,7 @@ CELL_Subrecords = SubrecordCollection(
                 "water" / Bytes(30),
             )
             * "Footstep Material",
-            optional=True
+            optional=True,
         ),
         SubrecordCollection(
             [
@@ -449,7 +449,7 @@ CELL_Subrecords = SubrecordCollection(
                         fog_clip_distance=0x00000080,
                         fog_power=0x00000100,
                     )
-                    * "Inherit"
+                    * "Inherit",
                 ),
             ]
         ),
@@ -515,7 +515,7 @@ CHAL_Subrecords = SubrecordCollection(
                 "value_3" / Bytes(4),
             )
             * "Data",
-            optional=True
+            optional=True,
         ),
         Subrecord("SNAM", FNVFormID([]) * "Value 3", optional=True),
         Subrecord("XNAM", FNVFormID([]) * "Value 4", optional=True),
@@ -539,7 +539,7 @@ CONT_Subrecords = SubrecordCollection(
                 "weight" / Float32l,
             )
             * "Data",
-            optional=True
+            optional=True,
         ),
         Subrecord("SNAM", FNVFormID(["SOUN"]) * "Sound - Open", optional=True),
         Subrecord("QNAM", FNVFormID(["SOUN"]) * "Sound - Close", optional=True),
@@ -561,7 +561,7 @@ DIAL_Subrecords = SubrecordCollection(
                         Subrecord(
                             "INFC",
                             FNVFormID(["INFO"]) * "Info Connection",
-                            optional=True
+                            optional=True,
                         ),
                         Subrecord("INFX", Int32sl * "Info Index", optional=True),
                     ],
@@ -603,7 +603,7 @@ DIAL_Subrecords = SubrecordCollection(
                 ),
                 "flags" / FlagsEnum(Int8ul, rumors=0x01, top_level=0x02),
             )
-            * "Data"
+            * "Data",
         ),
     ]
 )
@@ -630,7 +630,7 @@ DOOR_Subrecords = SubrecordCollection(
                 minimal_use=0x08,
                 sliding_door=0x10,
             )
-            * "Flags"
+            * "Flags",
         ),
     ]
 )
@@ -642,7 +642,7 @@ EYES_Subrecords = SubrecordCollection(
         Subrecord("ICON", CString("utf8") * "Texture", optional=True),
         Subrecord(
             "DATA",
-            FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04) * "Flags"
+            FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04) * "Flags",
         ),
     ]
 )
@@ -661,7 +661,7 @@ FACT_Subrecords = SubrecordCollection(
             )
             * "Relation",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord(
             "DATA",
@@ -674,7 +674,7 @@ FACT_Subrecords = SubrecordCollection(
                 "unused" / Bytes(2),
             )
             * "Data",
-            optional=True
+            optional=True,
         ),
         Subrecord("CNAM", Float32l * "Unused", optional=True),
         SubrecordCollection(
@@ -732,7 +732,7 @@ HAIR_Subrecords = SubrecordCollection(
         Subrecord(
             "DATA",
             FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04, fixed=0x08)
-            * "Flags"
+            * "Flags",
         ),
     ]
 )
@@ -753,7 +753,7 @@ KEYM_Subrecords = SubrecordCollection(
         Subrecord(
             "DATA",
             Struct("value" / Int32sl, "weight" / Float32l) * "Data",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "RNAM", FNVFormID(["SOUN"]) * "Sound - Random/Looping", optional=True
@@ -791,7 +791,7 @@ MESG_Subrecords = SubrecordCollection(
         Subrecord(
             "DNAM",
             FlagsEnum(Int32ul, message_box=0x00000001, auto_display=0x00000002)
-            * "Flags"
+            * "Flags",
         ),
         Subrecord("TNAM", Int32ul * "Display Time", optional=True),
         SubrecordCollection(
@@ -852,7 +852,7 @@ MGEF_Subrecords = SubrecordCollection(
                     _unknown_9=0x20000000,
                 )
             )
-            * "Data"
+            * "Data",
         ),
         "base_cost" / Float32l,
         "associated_item" / FNVFormID([]),  # NOTE: unknown form id reference
@@ -932,7 +932,7 @@ NAVI_Subrecords = SubrecordCollection(
             )
             * "Navigation Map Info",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord(
             "NVCI",
@@ -944,7 +944,7 @@ NAVI_Subrecords = SubrecordCollection(
             )
             * "Unknown",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
     ]
 )
@@ -963,7 +963,7 @@ NOTE_Subrecords = SubrecordCollection(
         Subrecord(
             "DATA",
             Enum(Int8ul, sound=0, text=1, image=2, voice=3) * "Type",
-            optional=True
+            optional=True,
         ),
         Subrecord("ONAM", FNVFormID(["QUST"]) * "Quest", optional=True, multiple=True),
         Subrecord("XNAM", CString("utf8") * "Texture", optional=True),
@@ -1043,7 +1043,7 @@ NPC__Subrecords = SubrecordCollection(
                     use_script=0x0200,
                 ),
             )
-            * "Configuration"
+            * "Configuration",
         ),
         Subrecord(
             "SNAM",
@@ -1052,7 +1052,7 @@ NPC__Subrecords = SubrecordCollection(
             )
             * "Faction",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord("INAM", FNVFormID(["LVLI"]) * "Death Item", optional=True),
         Subrecord("VTCK", FNVFormID(["VTCP"]) * "Voice"),
@@ -1102,7 +1102,7 @@ NPC__Subrecords = SubrecordCollection(
                 "aggro_radius" / Int32sl,
             )
             * "AI Data",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "PKID", FNVFormID(["PACK"]) * "Package", optional=True, multiple=True
@@ -1121,7 +1121,7 @@ NPC__Subrecords = SubrecordCollection(
                 "luck" / Int8ul,
                 "unused" / Optional(GreedyBytes),
             )
-            * "Data"
+            * "Data",
         ),
         Subrecord(
             "DNAM",
@@ -1156,7 +1156,7 @@ NPC__Subrecords = SubrecordCollection(
                 "unarmed_offset" / Int8ul,
             )
             * "Skills",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "PNAM", FNVFormID(["HDPT"]) * "Head Part", optional=True, multiple=True
@@ -1192,7 +1192,7 @@ RACE_Subrecords = SubrecordCollection(
             )
             * "Relation",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
         Subrecord(
             "DATA",
@@ -1217,7 +1217,7 @@ RACE_Subrecords = SubrecordCollection(
                     child=0x00000004,
                 ),
             )
-            * "Data"
+            * "Data",
         ),
         Subrecord("ONAM", FNVFormID(["RACE"]) * "Older", optional=True),
         Subrecord("YNAM", FNVFormID(["RACE"]) * "Younger", optional=True),
@@ -1227,7 +1227,7 @@ RACE_Subrecords = SubrecordCollection(
             Struct(
                 "male_voice" / FNVFormID(["VTYP"]), "female_voice" / FNVFormID(["VTYP"])
             )
-            * "Voices"
+            * "Voices",
         ),
         Subrecord(
             "DNAM",
@@ -1235,7 +1235,7 @@ RACE_Subrecords = SubrecordCollection(
                 "male_default_hair" / FNVFormID(["HAIR"]),
                 "female_default_hair" / FNVFormID(["HAIR"]),
             )
-            * "Default Hair Styles"
+            * "Default Hair Styles",
         ),
         Subrecord(
             "CNAM",
@@ -1243,7 +1243,7 @@ RACE_Subrecords = SubrecordCollection(
                 "male_default_hair_color" / DefaultHairColorsEnum,
                 "female_default_hair_color" / DefaultHairColorsEnum,
             )
-            * "Default Hair Colors"
+            * "Default Hair Colors",
         ),
         Subrecord("PNAM", Float32l * "FaceGen - Main Clamp"),
         Subrecord("UNAM", Float32l * "FaceGen - Face Clamp"),
@@ -1266,7 +1266,7 @@ RACE_Subrecords = SubrecordCollection(
                         right_eye=7,
                     )
                     * "Index",
-                    optional=True
+                    optional=True,
                 ),
                 ModelCollection,
                 Subrecord(
@@ -1295,7 +1295,7 @@ RACE_Subrecords = SubrecordCollection(
                         right_eye=7,
                     )
                     * "Index",
-                    optional=True
+                    optional=True,
                 ),
                 ModelCollection,
                 Subrecord(
@@ -1321,7 +1321,7 @@ RACE_Subrecords = SubrecordCollection(
                         upper_body_texture=3,
                     )
                     * "Index",
-                    optional=True
+                    optional=True,
                 ),
                 Subrecord(
                     "ICON", CString("utf8") * "Large Icon Filename", optional=True
@@ -1346,7 +1346,7 @@ RACE_Subrecords = SubrecordCollection(
                         upper_body_texture=3,
                     )
                     * "Index",
-                    optional=True
+                    optional=True,
                 ),
                 Subrecord(
                     "ICON", CString("utf8") * "Large Icon Filename", optional=True
@@ -1388,7 +1388,7 @@ RCPE_Subrecords = SubrecordCollection(
                 "sub_category" / FNVFormID(["RCCT"]),
             )
             * "Data",
-            optional=True
+            optional=True,
         ),
         SubrecordCollection(  # NOTE: Ingredient is same as output with no marker :(
             [
@@ -1411,7 +1411,7 @@ RCPE_Subrecords = SubrecordCollection(
                             "LIGH",
                         ]
                     )
-                    * "Item"
+                    * "Item",
                 ),
                 Subrecord("RCQY", Int32ul * "Quantity"),
             ],
@@ -1439,7 +1439,7 @@ RCPE_Subrecords = SubrecordCollection(
                             "LIGH",
                         ]
                     )
-                    * "Item"
+                    * "Item",
                 ),
                 Subrecord("RCQY", Int32ul * "Quantity"),
             ],
@@ -1493,7 +1493,7 @@ SPEL_Subrecords = SubrecordCollection(
                 ),
                 "_unknown_0" / Bytes(3),
             )
-            * "Effect Configuration"
+            * "Effect Configuration",
         ),
         EffectCollection.be(multiple=True),
     ]
@@ -1522,7 +1522,7 @@ STAT_Subrecords = SubrecordCollection(
                 bush_j=9,
             )
             * "Passthrough Sound",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "RNAM", FNVFormID(["SOUN"]) * "Sound - Random / Looping", optional=True
@@ -1594,7 +1594,7 @@ TERM_Subrecords = SubrecordCollection(
                 ),
                 "_unknown_0" / Bytes(1),
             )
-            * "Data"
+            * "Data",
         ),
         SubrecordCollection(
             [
@@ -1602,7 +1602,7 @@ TERM_Subrecords = SubrecordCollection(
                 Subrecord("RNAM", CString("utf8") * "Result Text"),
                 Subrecord(
                     "ANAM",
-                    FlagsEnum(Int8ul, add_note=0x01, force_redraw=0x02) * "Flags"
+                    FlagsEnum(Int8ul, add_note=0x01, force_redraw=0x02) * "Flags",
                 ),
                 Subrecord("INAM", FNVFormID(["NOTE"]) * "Display Note", optional=True),
                 Subrecord("TNAM", FNVFormID(["TERM"]) * "Sub Menu", optional=True),
@@ -1626,7 +1626,7 @@ TES4_Subrecords = SubrecordCollection(
                 "num_records" / Int32ul,
                 "next_object_id" / Int32ul,
             )
-            * "Header"
+            * "Header",
         ),
         Subrecord("OFST", GreedyBytes * "Unknown", optional=True),
         Subrecord("DELE", GreedyBytes * "Unknown", optional=True),
@@ -1677,7 +1677,7 @@ TXST_Subrecords = SubrecordCollection(
                 "color" / RGBAStruct,
             )
             * "Decal Data",
-            optional=True
+            optional=True,
         ),
         Subrecord("DNAM", FlagsEnum(Int16ul, no_specular_map=0x0001) * "Flags"),
     ]
@@ -1728,7 +1728,7 @@ WEAP_Subrecords = SubrecordCollection(
         Subrecord(
             "WNM3",
             FNVFormID(["STAT"]) * "First Person Model with Mods 1 and 2",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "WNM4", FNVFormID(["STAT"]) * "First Person Model with Mod 3", optional=True
@@ -1736,17 +1736,17 @@ WEAP_Subrecords = SubrecordCollection(
         Subrecord(
             "WNM5",
             FNVFormID(["STAT"]) * "First Person Model with Mods 1 and 3",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "WNM6",
             FNVFormID(["STAT"]) * "First Person Model with Mods 2 and 3",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "WNM7",
             FNVFormID(["STAT"]) * "First Person Model with Mods 1, 2, and 3",
-            optional=True
+            optional=True,
         ),
         Subrecord("WMI1", FNVFormID(["IMOD"]) * "Weapon Mod 1", optional=True),
         Subrecord("WMI1", FNVFormID(["IMOD"]) * "Weapon Mod 2", optional=True),
@@ -1763,12 +1763,12 @@ WEAP_Subrecords = SubrecordCollection(
         Subrecord(
             "NAM7",
             FNVFormID(["SOUN"]) * "Sound - Gun - Shoot 3D Looping",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "TNAM",
             FNVFormID(["SOUN"]) * "Sound - Melee - Swing / Gun - No Ammo",
-            optional=True
+            optional=True,
         ),
         Subrecord("NAM6", FNVFormID(["SOUN"]) * "Sound - Block", optional=True),
         Subrecord("UNAM", FNVFormID(["SOUN"]) * "Sound - Idle", optional=True),
@@ -1792,7 +1792,7 @@ WEAP_Subrecords = SubrecordCollection(
                 "base_damage" / Int16sl,
                 "clip_size" / Int8ul,
             )
-            * "Data"
+            * "Data",
         ),
         Subrecord(
             "DNAM",
@@ -1949,7 +1949,7 @@ WEAP_Subrecords = SubrecordCollection(
                 "impulse_distance" / Float32l,
                 "skill_requirement" / Int32ul,
             )
-            * "Configuration"
+            * "Configuration",
         ),
         Subrecord(
             "CRDT",
@@ -1961,7 +1961,7 @@ WEAP_Subrecords = SubrecordCollection(
                 "_unused_1" / Bytes(3),
                 "effect" / FNVFormID(["SPEL"]),
             )
-            * "Critical Data"
+            * "Critical Data",
         ),
         Subrecord(
             "VATS",
@@ -1975,7 +1975,7 @@ WEAP_Subrecords = SubrecordCollection(
                 "_unused_0" / Bytes(2),
             )
             * "VATS",
-            optional=True
+            optional=True,
         ),
         Subrecord("VNAM", SoundLevelEnum * "Sound Level"),
     ]

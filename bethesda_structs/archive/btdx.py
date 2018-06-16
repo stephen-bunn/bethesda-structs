@@ -28,7 +28,11 @@ from construct import (
 from .. import __version__
 from ._common import ArchiveFile, BaseArchive
 from ..contrib.dds import (
-    DDS_HEADER, MAKEFOURCC, DDS_HEADER_DX10, DXGIFormats, D3D10ResourceDimension
+    DDS_HEADER,
+    MAKEFOURCC,
+    DDS_HEADER_DX10,
+    DXGIFormats,
+    D3D10ResourceDimension,
 )
 
 
@@ -180,7 +184,9 @@ class BTDXArchive(BaseArchive):
             "dwWidth": file_container.header.width,
             "dwMipMapCount": file_container.header.mips_count,
             "dwCaps": {
-                "DDSCAPS_COMPLEX": True, "DDSCAPS_TEXTURE": True, "DDSCAPS_MIPMAP": True
+                "DDSCAPS_COMPLEX": True,
+                "DDSCAPS_TEXTURE": True,
+                "DDSCAPS_MIPMAP": True,
             },
         }
 
@@ -262,7 +268,8 @@ class BTDXArchive(BaseArchive):
                 )
             )
         elif file_container.header.format in (
-            DXGIFormats.DXGI_FORMAT_BC7_UNORM, DXGIFormats.DXGI_FORMAT_BC7_UNORM_SRGB
+            DXGIFormats.DXGI_FORMAT_BC7_UNORM,
+            DXGIFormats.DXGI_FORMAT_BC7_UNORM_SRGB,
         ):
             # FIXME: There may be a header differnce between BC7_UNORM and
             # BC7_UNORM_SRGB, but I haven't noticed any
@@ -352,7 +359,7 @@ class BTDXArchive(BaseArchive):
         filename_offset = 0
         for file_container in self.container.files:
             filepath_content = self.content[
-                (self.container.header.names_offset + filename_offset):
+                (self.container.header.names_offset + filename_offset) :
             ]
             filepath = PascalString(VarInt, "utf8").parse(filepath_content)
             # filename offset increased by length of parsed string accounting for
@@ -360,7 +367,7 @@ class BTDXArchive(BaseArchive):
             filename_offset += len(filepath) + 2
 
             file_data = self.content[
-                file_container.offset:(
+                file_container.offset : (
                     file_container.offset + file_container.unpacked_size
                 )
             ]
@@ -383,7 +390,7 @@ class BTDXArchive(BaseArchive):
         for file_container in self.container.files:
 
             filepath_content = self.content[
-                (self.container.header.names_offset + filename_offset):
+                (self.container.header.names_offset + filename_offset) :
             ]
             filepath = PascalString(Int16ul, "utf8").parse(filepath_content)
             filename_offset += len(filepath) + 2
@@ -400,14 +407,14 @@ class BTDXArchive(BaseArchive):
                     if tex_chunk.packed_size > 0:
                         dds_content += Compressed(GreedyBytes, "zlib").parse(
                             self.content[
-                                tex_chunk.offset:(
+                                tex_chunk.offset : (
                                     tex_chunk.offset + tex_chunk.packed_size
                                 )
                             ]
                         )
                     else:
                         dds_content += self.content[
-                            tex_chunk.offset:(
+                            tex_chunk.offset : (
                                 tex_chunk.offset + tex_chunk.unpacked_size
                             )
                         ]

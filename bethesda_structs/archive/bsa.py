@@ -244,18 +244,15 @@ class BSAArchive(BaseArchive):
             directory_path = PureWindowsPath(directory_block.name[:-1])
             for file_record in directory_block.file_records:
                 # choose the compressed file structure if compressed mask is set
-                if (
-                    file_record.size > 0
-                    and (
-                        self.container.header.archive_flags.files_compressed
-                        != bool(file_record.size & self.COMPRESSED_MASK)
-                    )
+                if file_record.size > 0 and (
+                    self.container.header.archive_flags.files_compressed
+                    != bool(file_record.size & self.COMPRESSED_MASK)
                 ):
                     file_struct = self.compressed_file_struct
 
                 file_container = file_struct.parse(
                     self.content[
-                        file_record.offset:(
+                        file_record.offset : (
                             file_record.offset + (file_record.size & self.SIZE_MASK)
                         )
                     ]

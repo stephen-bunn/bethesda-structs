@@ -1,9 +1,9 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://choosealicense.com/licenses/mit/>
 
-from ._common import BaseArchive
 from .bsa import BSAArchive
 from .btdx import BTDXArchive
+from ._common import BaseArchive
 
 AVAILABLE_ARCHIVES = (BSAArchive, BTDXArchive)
 

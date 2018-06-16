@@ -16,6 +16,7 @@ Style Guide
    - F401
    - E123
    - W503
+   - E203
 - Maximum line length is 88 characters.
 - Maxiumum McCabe complexity is 12.
 - Linting and test environments are configured via ``tox.ini``.

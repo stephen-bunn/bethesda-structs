@@ -1,9 +1,9 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://choosealicense.com/licenses/mit/>
 
-from ._common import BasePlugin
 from .fnv import FNVPlugin
 from .fo3 import FO3Plugin
+from ._common import BasePlugin
 
 AVAILABLE_PLUGINS = (FNVPlugin, FO3Plugin)
 

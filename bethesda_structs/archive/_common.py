@@ -51,6 +51,7 @@ class ArchiveFile(object):
 class BaseArchive(BaseFiletype, abc.ABC, Generic[T_BaseArchive]):
     """The base class all Archives should subclass.
     """
+
     content = attr.ib(type=bytes, repr=False)
     filepath = attr.ib(type=str, default=None)
     container = attr.ib(type=Container, default=None, repr=False, init=False)

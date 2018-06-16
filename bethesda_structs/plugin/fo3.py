@@ -1,7 +1,7 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://opensource.org/licenses/MIT>
 
-from .fnv import FNVPlugin, FNVFormID
+from .fnv import FNVFormID, FNVPlugin
 
 
 class FO3FormID(FNVFormID):

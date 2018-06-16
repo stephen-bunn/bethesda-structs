@@ -23,6 +23,7 @@ black = "*"
 sphinx-autodoc-typehints = "*"
 codacy-coverage = "*"
 twine = "*"
+isort = "*"
 
 [requires]
 python_version = "3.6"
@@ -37,3 +38,4 @@ make-docs = "make -C ./docs html"
 clean-docs = "make -C ./docs clean"
 open-docs = "python -mwebbrowser ./docs/build/html/index.html"
 black = "black ./bethesda_structs"
+isort = "isort -rc ./bethesda_structs"

@@ -839,7 +839,7 @@ DestructionCollection = SubrecordCollection(
                 "flags" / FlagsEnum(Int8ul, vats_targetable=0x01),
                 "_unknown_0" / Bytes(2),
             )
-            * "Header"
+            * "Header",
         ),
         SubrecordCollection(
             [
@@ -858,7 +858,7 @@ DestructionCollection = SubrecordCollection(
                         "debris" / FNVFormID(["DEBR"]),
                         "debris_count" / Int32sl,
                     )
-                    * "Stage Data"
+                    * "Stage Data",
                 ),
                 Subrecord(
                     "DMDL", CString("utf8") * "Stage Model Filename", optional=True
@@ -866,7 +866,7 @@ DestructionCollection = SubrecordCollection(
                 Subrecord(
                     "DMDT",
                     GreedyBytes * "Stage Model Texture File Hashes",
-                    optional=True
+                    optional=True,
                 ),
                 Subrecord("DSTF", Bytes(0) * "Stage End Marker", optional=True),
             ],
@@ -895,13 +895,13 @@ ModelCollection = SubrecordCollection(
                 ),
             )
             * "Alternate Textures",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "MODD",
             FlagsEnum(Int8ul, head=0x01, torso=0x02, right_hand=0x04, left_hand=0x08)
             * "Facegen Model Flags",
-            optional=True
+            optional=True,
         ),
     ]
 )
@@ -924,7 +924,7 @@ Model2Collection = SubrecordCollection(
                 ),
             )
             * "Alternate Textures",
-            optional=True
+            optional=True,
         ),
     ]
 )
@@ -947,13 +947,13 @@ Model3Collection = SubrecordCollection(
                 ),
             )
             * "Alternate Textures",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "MOSD",
             FlagsEnum(Int8ul, head=0x01, torso=0x02, right_hand=0x04, left_hand=0x08)
             * "Facegen Model Flags",
-            optional=True
+            optional=True,
         ),
     ]
 )
@@ -976,7 +976,7 @@ Model4Collection = SubrecordCollection(
                 ),
             )
             * "Alternate Textures",
-            optional=True
+            optional=True,
         ),
     ]
 )
@@ -1071,7 +1071,7 @@ EffectCollection = SubrecordCollection(
                     ignore_negative_effects=72,
                 ),
             )
-            * "Effect Data"
+            * "Effect Data",
         ),
         Subrecord("CTDA", CTDAStruct * "Condition", optional=True),
     ]
@@ -1107,7 +1107,7 @@ ItemCollection = SubrecordCollection(
                 "count" / Int32sl,
             )
             * "Item",
-            optional=True
+            optional=True,
         ),
         Subrecord(
             "COED",
@@ -1117,7 +1117,7 @@ ItemCollection = SubrecordCollection(
                 "item_condition" / Float32l,
             )
             * "Extra Data",
-            optional=True
+            optional=True,
         ),
     ]
 )
@@ -1135,7 +1135,7 @@ ScriptCollection = SubrecordCollection(
                 "type" / FlagsEnum(Int16ul, object=0x000, quest=0x001, effect=0x100),
                 "flags" / FlagsEnum(Int16ul, enabled=0x0001),
             )
-            * "Basic Script Data"
+            * "Basic Script Data",
         ),
         Subrecord("SCDA", GreedyBytes * "Commpiled Script Source"),
         Subrecord("SCTX", GreedyString("utf8") * "Script Source"),
@@ -1149,7 +1149,7 @@ ScriptCollection = SubrecordCollection(
                         "flags" / FlagsEnum(Int8ul, is_long_or_short=0x01),
                         "_unknown_1" / Bytes(7),
                     )
-                    * "Local Variable Data"
+                    * "Local Variable Data",
                 ),
                 Subrecord("SCVR", CString("utf8") * "Local Variable Name"),
             ],
@@ -1234,7 +1234,7 @@ ScriptCollection = SubrecordCollection(
             )
             * "Reference",
             optional=True,
-            multiple=True
+            multiple=True,
         ),
     ]
 )

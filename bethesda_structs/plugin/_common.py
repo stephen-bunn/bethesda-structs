@@ -38,11 +38,8 @@ class FormID(object):
             ValueError: If all entries in `value` are not uppercase strings
         """
 
-        if (
-            not isinstance(value, list)
-            or not all(
-                isinstance(entry, str) and entry.upper() == entry for entry in value
-            )
+        if not isinstance(value, list) or not all(
+            isinstance(entry, str) and entry.upper() == entry for entry in value
         ):
             raise ValueError(
                 f"forms must be a list of uppercase strings, recieved {value!r} "

@@ -178,9 +178,7 @@ class FNVPlugin(BasePlugin):
                     "cell_visible_distant_children": FNVFormID(["CELL"]),
                 },
                 default=GreedyBytes,
-            ).parse(
-                this._label
-            )
+            ).parse(this._label)
         ),
         "stamp" / Int16ul,
         "_unknown_0" / Bytes(6),
@@ -191,9 +189,7 @@ class FNVPlugin(BasePlugin):
             Computed(
                 lambda this: GreedyRange(
                     LazyBound(lambda: FNVPlugin.group_struct)
-                ).parse(
-                    this.data
-                )
+                ).parse(this.data)
             ),
         ),
         "records"
