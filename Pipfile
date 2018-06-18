@@ -24,6 +24,8 @@ sphinx-autodoc-typehints = "*"
 codacy-coverage = "*"
 twine = "*"
 isort = "*"
+sphinxcontrib-mermaid = "*"
+pytest-xdist = "*"
 
 [requires]
 python_version = "3.6"

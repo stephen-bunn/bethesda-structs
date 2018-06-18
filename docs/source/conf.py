@@ -39,7 +39,8 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx_autodoc_typehints",
     "sphinx.ext.intersphinx",
-    "sphinx.ext.viewcode"
+    "sphinx.ext.viewcode",
+    "sphinxcontrib.mermaid"
 ]
 
 autodoc_member_order = "bysource"
