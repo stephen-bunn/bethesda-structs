@@ -873,7 +873,7 @@ DestructionCollection = SubrecordCollection(
             optional=True,
             multiple=True,
         ),
-    ]
+    ],
 )
 
 
