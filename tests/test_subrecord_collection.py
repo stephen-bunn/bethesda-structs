@@ -41,7 +41,7 @@ def _flatten_subrecords(collection: SubrecordCollection) -> List[str]:
 
 
 @given(
-    text(min_size=4, max_size=4), subrecord_collection_items(), booleans(), booleans()
+    text(min_size=1), subrecord_collection_items(), booleans(), booleans()
 )
 def test_init(name, items, optional, multiple):
     subc = SubrecordCollection(name, items, optional=optional, multiple=multiple)
@@ -53,22 +53,19 @@ def test_init(name, items, optional, multiple):
 
 
 @given(
-    one_of(text().filter(lambda text: len(text) != 4), random_base_type(ignore=[str])),
+    random_base_type(ignore=[str]),
     subrecord_collection_items(),
     booleans(),
     booleans(),
 )
 def test_invalid_name(name, items, optional, multiple):
-    if isinstance(name, str):
-        with pytest.raises(ValueError):
-            SubrecordCollection(name, items, optional, multiple)
-    else:
+    if not isinstance(name, str):
         with pytest.raises(TypeError):
             SubrecordCollection(name, items, optional, multiple)
 
 
 @given(
-    text(min_size=4, max_size=4),
+    text(min_size=1),
     one_of(random_base_type(ignore=[list]), lists(none())),
     booleans(),
     booleans(),
@@ -83,7 +80,7 @@ def test_invalid_items(name, items, optional, multiple):
 
 
 @given(
-    text(min_size=4, max_size=4),
+    text(min_size=1),
     subrecord_collection_items(),
     random_base_type([bool]),
     booleans(),
@@ -94,7 +91,7 @@ def test_invalid_optional(name, items, optional, multiple):
 
 
 @given(
-    text(min_size=4, max_size=4),
+    text(min_size=1),
     subrecord_collection_items(),
     booleans(),
     random_base_type([bool]),
@@ -108,7 +105,7 @@ def test_invalid_multiple(name, items, optional, multiple):
 def test_from_definition(definition):
     subc = SubrecordCollection.from_definition(*definition)
     assert isinstance(subc, SubrecordCollection)
-    assert subc.name == definition[0][:4]
+    assert definition[0].startswith(subc.name)
     assert [item.to_definition() for item in subc.items] == definition[-1]
     if definition[0][-1] in ("*", "+", "?"):
         (optional, multiple) = SubrecordCollection.parse_flag(definition[0][-1])

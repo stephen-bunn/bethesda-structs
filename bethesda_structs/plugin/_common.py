@@ -195,27 +195,7 @@ class SubrecordCollection(object):
     )
     optional = attr.ib(type=bool, default=False, validator=instance_of(bool))
     multiple = attr.ib(type=bool, default=False, validator=instance_of(bool))
-    _definition_regex = re.compile(r"\A(?P<name>\w{4})(?P<flag>[*+?]?)\Z")
-
-    @name.validator
-    def name_validator(self, attribute: str, value: str):
-        """Ensures that the name attribute is valid.
-
-        Args:
-            attribute (str): The attribute name
-            value (str): The attribute value
-
-        Raises:
-            ValueError:
-                - When the name is not of length 4
-        """
-        if len(value) != 4:
-            raise ValueError(
-                (
-                    f"name must be of length 4, recieved {value!r} with length "
-                    f"{len(value)!r}"
-                )
-            )
+    _definition_regex = re.compile(r"\A(?P<name>\w+)(?P<flag>[*+?]?)\Z")
 
     @items.validator
     def items_validator(self, attribute: str, value: list):
