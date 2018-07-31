@@ -3,7 +3,7 @@
 
 import pytest
 from construct import Struct
-from hypothesis import given
+from hypothesis import given, settings, HealthCheck
 from hypothesis.strategies import none, text, one_of, booleans, from_type, sampled_from
 
 from . import subrecord, subrecord_dict, random_base_type, subrecord_definition
@@ -11,6 +11,7 @@ from bethesda_structs.plugin._common import Subrecord
 
 
 @given(text(min_size=4, max_size=4), from_type(Struct), booleans(), booleans())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_init(name, struct, optional, multiple):
     subr = Subrecord(name, struct, optional=optional, multiple=multiple)
     assert isinstance(subr, Subrecord)
@@ -26,6 +27,7 @@ def test_init(name, struct, optional, multiple):
     booleans(),
     booleans(),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_name(name, struct, optional, multiple):
     if isinstance(name, str):
         with pytest.raises(ValueError):
@@ -36,6 +38,7 @@ def test_invalid_name(name, struct, optional, multiple):
 
 
 @given(text(min_size=4, max_size=4), random_base_type(), booleans(), booleans())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_struct(name, struct, optional, multiple):
     with pytest.raises(TypeError):
         Subrecord(name, struct, optional, multiple)
@@ -47,6 +50,7 @@ def test_invalid_struct(name, struct, optional, multiple):
     random_base_type([bool]),
     booleans(),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_optional(name, struct, optional, multiple):
     with pytest.raises(TypeError):
         Subrecord(name, struct, optional, multiple)
@@ -58,12 +62,14 @@ def test_invalid_optional(name, struct, optional, multiple):
     booleans(),
     random_base_type([bool]),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_multiple(name, struct, optional, multiple):
     with pytest.raises(TypeError):
         Subrecord(name, struct, optional, multiple)
 
 
 @given(subrecord_definition())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_from_definition(definition):
     subr = Subrecord.from_definition(*definition)
     assert isinstance(subr, Subrecord)
@@ -79,6 +85,7 @@ def test_from_definition(definition):
 
 
 @given(subrecord_dict())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_from_dict(dictionary):
     subr = Subrecord.from_dict(dictionary)
     assert isinstance(subr, Subrecord)
@@ -89,6 +96,7 @@ def test_from_dict(dictionary):
 
 
 @given(subrecord_definition())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_to_definition(definition):
     subr = Subrecord.from_definition(*definition)
     assert isinstance(subr, Subrecord)
@@ -96,6 +104,7 @@ def test_to_definition(definition):
 
 
 @given(subrecord_dict())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_to_dict(dictionary):
     subr = Subrecord.from_dict(dictionary)
     assert isinstance(subr, Subrecord)
@@ -103,6 +112,7 @@ def test_to_dict(dictionary):
 
 
 @given(subrecord())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_build_flag(subr):
     flag = subr._build_flag()
     assert flag in ("+", "?", "*", "")
@@ -119,6 +129,7 @@ def test_build_flag(subr):
 
 
 @given(subrecord(), sampled_from(["+", "?", "*", ""]))
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_be(subrecord_, flag):
     (optional, multiple) = Subrecord.parse_flag(flag)
     subr = subrecord_.be(flag)

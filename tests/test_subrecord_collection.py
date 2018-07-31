@@ -6,7 +6,7 @@ from typing import List
 
 import pytest
 from construct import Struct
-from hypothesis import given
+from hypothesis import given, settings, HealthCheck
 from hypothesis.strategies import (
     none,
     nothing,
@@ -43,6 +43,7 @@ def _flatten_subrecords(collection: SubrecordCollection) -> List[str]:
 @given(
     text(min_size=1), subrecord_collection_items(), booleans(), booleans()
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_init(name, items, optional, multiple):
     subc = SubrecordCollection(name, items, optional=optional, multiple=multiple)
     assert isinstance(subc, SubrecordCollection)
@@ -58,6 +59,7 @@ def test_init(name, items, optional, multiple):
     booleans(),
     booleans(),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_name(name, items, optional, multiple):
     if not isinstance(name, str):
         with pytest.raises(TypeError):
@@ -70,6 +72,7 @@ def test_invalid_name(name, items, optional, multiple):
     booleans(),
     booleans(),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_items(name, items, optional, multiple):
     if isinstance(items, list) and len(items) <= 0:
         with pytest.raises(ValueError):
@@ -85,6 +88,7 @@ def test_invalid_items(name, items, optional, multiple):
     random_base_type([bool]),
     booleans(),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_optional(name, items, optional, multiple):
     with pytest.raises(TypeError):
         SubrecordCollection(name, items, optional, multiple)
@@ -96,12 +100,14 @@ def test_invalid_optional(name, items, optional, multiple):
     booleans(),
     random_base_type([bool]),
 )
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_invalid_multiple(name, items, optional, multiple):
     with pytest.raises(TypeError):
         SubrecordCollection(name, items, optional, multiple)
 
 
 @given(subrecord_collection_definition())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_from_definition(definition):
     subc = SubrecordCollection.from_definition(*definition)
     assert isinstance(subc, SubrecordCollection)
@@ -117,6 +123,7 @@ def test_from_definition(definition):
 
 
 @given(subrecord_collection_dict())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_from_dict(dictionary):
     subc = SubrecordCollection.from_dict(dictionary)
     assert isinstance(subc, SubrecordCollection)
@@ -132,6 +139,7 @@ def test_from_dict(dictionary):
 
 
 @given(subrecord_collection_definition())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_to_definition(definition):
     subc = SubrecordCollection.from_definition(*definition)
     assert isinstance(subc, SubrecordCollection)
@@ -139,6 +147,7 @@ def test_to_definition(definition):
 
 
 @given(subrecord_collection_dict())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_to_dict(dictionary):
     subc = SubrecordCollection.from_dict(dictionary)
     assert isinstance(subc, SubrecordCollection)
@@ -146,6 +155,7 @@ def test_to_dict(dictionary):
 
 
 @given(subrecord_collection())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_build_flag(collection):
     flag = collection._build_flag()
     assert flag in ("+", "?", "*", "")
@@ -162,6 +172,7 @@ def test_build_flag(collection):
 
 
 @given(subrecord_collection(), sampled_from(["+", "?", "*", ""]))
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_be(collection, flag):
     (optional, multiple) = SubrecordCollection.parse_flag(flag)
     subc = collection.be(flag)
@@ -173,6 +184,7 @@ def test_be(collection, flag):
 
 
 @given(subrecord_collection())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_lookahead(collection):
     flat_subr = _flatten_subrecords(collection)
     target_idx = random.randint(0, len(flat_subr) - 1)
@@ -184,6 +196,7 @@ def test_lookahead(collection):
 
 
 @given(subrecord_collection())
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_parse(collection):
     flat_subr = _flatten_subrecords(collection)
     target_idx = random.randint(0, len(flat_subr) - 1)
@@ -197,6 +210,7 @@ def test_parse(collection):
 
 
 @given(subrecord_collection(min_count=2))
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_discover(collection):
     flat_subr = _flatten_subrecords(collection)
     target_idx = random.randint(0, len(flat_subr) - 2)
@@ -238,6 +252,7 @@ def test_discover_optional():
 
 
 @given(integers(min_value=1, max_value=100))
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_discover_multiple(multiple_scale):
     definition = ("TEST", [("AAAA+", Struct()), ("BBBB", Struct())])
     collection = SubrecordCollection.from_definition(*definition)
@@ -309,6 +324,7 @@ def test_discover_nested_optional():
 
 
 @given(integers(min_value=1, max_value=100))
+@settings(suppress_health_check=[HealthCheck.too_slow])
 def test_discover_nested_multiple(multiple_scale):
     definition = (
         "TEST",
