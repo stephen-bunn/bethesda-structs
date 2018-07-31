@@ -440,7 +440,7 @@ CELL_Subrecords = SubrecordCollection(
             optional=True,
         ),
         SubrecordCollection(
-            "_",
+            "CellTemplate",
             [
                 Subrecord("LTMP", FNVFormID(["LGTM"]) * "Template"),
                 Subrecord(
@@ -565,11 +565,11 @@ DIAL_Subrecords = SubrecordCollection(
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         SubrecordCollection(
-            "_",
+            "DialogQuest",
             [
                 Subrecord("QSTI", FNVFormID(["QUST"]) * "Quest", optional=True),
                 SubrecordCollection(
-                    "_",
+                    "DialogQuestInfo",
                     [
                         Subrecord(
                             "INFC",
@@ -695,7 +695,7 @@ FACT_Subrecords = SubrecordCollection(
         ),
         Subrecord("CNAM", Float32l * "Unused", optional=True),
         SubrecordCollection(
-            "_",
+            "FactionRanks",
             [
                 Subrecord("RNAM", Int32sl * "Rank Number", optional=True),
                 Subrecord("MNAM", CString("utf8") * "Male", optional=True),
@@ -820,7 +820,7 @@ MESG_Subrecords = SubrecordCollection(
         ),
         Subrecord("TNAM", Int32ul * "Display Time", optional=True),
         SubrecordCollection(
-            "_",
+            "MessageConfig",
             [
                 Subrecord("ITXT", CString("utf8") * "Button Text", optional=True),
                 Subrecord(
@@ -1282,7 +1282,7 @@ RACE_Subrecords = SubrecordCollection(
         Subrecord("NAM0", Bytes(0) * "Head Data Marker"),
         Subrecord("MNAM", Bytes(0) * "Male Head Data Marker"),
         SubrecordCollection(
-            "_",
+            "RaceMaleFaceData",
             [
                 Subrecord(
                     "INDX",
@@ -1312,7 +1312,7 @@ RACE_Subrecords = SubrecordCollection(
         ),
         Subrecord("FNAM", Bytes(0) * "Female Head Data Marker"),
         SubrecordCollection(
-            "_",
+            "RaceFemaleFaceData",
             [
                 Subrecord(
                     "INDX",
@@ -1343,7 +1343,7 @@ RACE_Subrecords = SubrecordCollection(
         Subrecord("NAM1", Bytes(0) * "Body Data Marker"),
         Subrecord("MNAM", Bytes(0) * "Male Body Data Marker"),
         SubrecordCollection(
-            "_",
+            "RaceMaleBodyData",
             [
                 Subrecord(
                     "INDX",
@@ -1369,7 +1369,7 @@ RACE_Subrecords = SubrecordCollection(
         ),
         Subrecord("FNAM", Bytes(0) * "Female Body Data Marker"),
         SubrecordCollection(
-            "_",
+            "RaceFemaleBodyData",
             [
                 Subrecord(
                     "INDX",
@@ -1427,7 +1427,7 @@ RCPE_Subrecords = SubrecordCollection(
             optional=True,
         ),
         SubrecordCollection(  # NOTE: Ingredient is same as output with no marker :(
-            "_",
+            "RecipeIngredients",
             [
                 Subrecord(
                     "RCIL",
@@ -1456,7 +1456,7 @@ RCPE_Subrecords = SubrecordCollection(
             multiple=True,
         ),
         SubrecordCollection(  # NOTE: Output is same as ingredient with no marker :(
-            "_",
+            "RecipieIngredients",
             [
                 Subrecord(
                     "RCIL",
@@ -1639,7 +1639,7 @@ TERM_Subrecords = SubrecordCollection(
             * "Data",
         ),
         SubrecordCollection(
-            "_",
+            "TerminalContent",
             [
                 Subrecord("ITXT", CString("utf8") * "Item Text", optional=True),
                 Subrecord("RNAM", CString("utf8") * "Result Text"),
@@ -1677,7 +1677,7 @@ TES4_Subrecords = SubrecordCollection(
         Subrecord("CNAM", CString("utf8") * "Author"),
         Subrecord("SNAM", CString("utf8") * "Description", optional=True),
         SubrecordCollection(
-            "_",
+            "TES4Masters",
             [
                 Subrecord("MAST", CString("utf8") * "Master Plugin"),
                 Subrecord("DATA", Int64ul * "File Size"),

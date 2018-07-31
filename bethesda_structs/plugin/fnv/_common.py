@@ -843,7 +843,7 @@ DestructionCollection = SubrecordCollection(
             * "Header",
         ),
         SubrecordCollection(
-            "_",
+            "DestructionConfig",
             [
                 Subrecord(
                     "DSTD",
@@ -1149,7 +1149,7 @@ ScriptCollection = SubrecordCollection(
         Subrecord("SCDA", GreedyBytes * "Commpiled Script Source"),
         Subrecord("SCTX", GreedyString("utf8") * "Script Source"),
         SubrecordCollection(
-            "_",
+            "ScriptVariables",
             [
                 Subrecord(
                     "SLSD",
