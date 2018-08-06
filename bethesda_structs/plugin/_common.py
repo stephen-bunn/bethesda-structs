@@ -479,6 +479,46 @@ class SubrecordCollection(object):
             handle_strict(rest, target)
         return self._lookahead(rest, target)
 
+    def handle_working(
+        self,
+        subrecord_name: str,
+        subrecord_data: bytes,
+        working_record: list,
+        strict: bool = True,
+    ) -> Tuple[Container, List[str]]:
+        """Handles discovering and parsing a given subrecord using a list of already
+            handled subrecord names.
+
+        Note:
+            Subrecords that cannot be correctly discovered by the collection's discovery
+            process utilize a default ``GreedyBytes * "Not Handled`` struct.
+            So any subrecord that cannot be discovered correctly or isn't handled
+            correctly with simply be a Container with a ``value`` that matches the
+            subrecord's data and a ``description`` of ``Not Handled``.
+
+        Args:
+            subrecord_name (str): The name of the subrecord to discover and parse
+            subrecord_data (bytes): The data of the subrecord to discover and parse
+            working_record (list): The list of names that have already been handled in
+                the working record
+            strict (bool): Defaults to True, If True, enforce strict discovery
+
+        Returns:
+            Tuple[Container, List[str]]: A tuple of
+                (parsed container, new handled names to extend the working record with)
+        """
+
+        subrecord_name = subrecord_name.upper()
+        discovered = self.discover(working_record, subrecord_name, strict=strict)
+        subrecord_struct = GreedyBytes * "Not Handled"
+        if isinstance(discovered, Subrecord):
+            subrecord_struct = discovered.struct
+        parsed = Container(
+            value=subrecord_struct.parse(subrecord_data),
+            description=subrecord_struct.docs,
+        )
+        return (parsed, [subrecord_name])
+
 
 @attr.s
 class BasePlugin(BaseFiletype, abc.ABC, Generic[T_BasePlugin]):

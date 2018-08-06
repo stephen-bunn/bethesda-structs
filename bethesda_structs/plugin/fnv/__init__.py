@@ -238,6 +238,11 @@ class FNVPlugin(BasePlugin):
             raise FileNotFoundError(f"file {filepath!r} does not exist")
 
         header = cls.record_struct.parse_file(filepath)
+
+        # NOTE: must clear class working record after every "full" file parse
+        # otherwise, subsequent parses will have fragmented data when trying to discover
+        # and parse subrecords
+        cls.__working_record = {}
         return header.type == "TES4" and header.version == 15
 
     @classmethod
@@ -247,6 +252,7 @@ class FNVPlugin(BasePlugin):
         record_type: str,
         subrecord_type: str,
         subrecord_data: bytes,
+        strict: bool = True,
     ) -> Container:
         """Parses a subrecord's data.
 
@@ -254,6 +260,7 @@ class FNVPlugin(BasePlugin):
             record_type (str): The parent record type
             subrecord_type (str): The subrecord type
             subrecord_data (bytes): The subrecord data to parse
+            strict (bool): Defaults to True, If True, enforce strict subrecord discovery
 
         Returns:
             Container: The resulting parsed container
@@ -263,13 +270,15 @@ class FNVPlugin(BasePlugin):
 
         # handle reset of working record state
         if record_id not in cls.__working_record:
-            cls.__working_record = {}
-            cls.__working_record[record_id] = {}
+            cls.__working_record[record_id] = []
 
         record_subrecords = RecordMapping.get(record_type)
         if record_subrecords:
-            (parsed, working_record) = record_subrecords.handle_subrecord(
-                subrecord_type, subrecord_data, cls.__working_record[record_id]
+            (parsed, working_record) = record_subrecords.handle_working(
+                subrecord_type,
+                subrecord_data,
+                cls.__working_record[record_id],
+                strict=strict,
             )
-            cls.__working_record[record_id] = working_record
+            cls.__working_record[record_id].extend(working_record)
             return parsed
