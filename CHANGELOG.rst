@@ -6,7 +6,7 @@ Changelog
 | The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 |
 
-**WIP: 1.0.0** (*unreleased*)
+**WIP: 0.1.4** (*unreleased*)
 -----------------------------
 - proper plugin parsing logic 👍
 
