@@ -10,4 +10,4 @@
 
 ---
 
-💔 Thank you!
+❤️ Thank you!
