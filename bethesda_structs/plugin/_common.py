@@ -1,16 +1,20 @@
 # Copyright (c) 2018 Stephen Bunn <stephen@bunn.io>
 # MIT License <https://choosealicense.com/licenses/mit/>
 
+import re
 import abc
 from typing import Any, Dict, List, Tuple, Union, Generic, TypeVar, Generator
 
 import attr
+from attr.validators import instance_of
 from construct import Construct, Container, GreedyBytes
 from multidict import CIMultiDict
 
+from .. import exceptions
 from .._common import BaseFiletype
 
 T_BasePlugin = TypeVar("BasePlugin")
+T_Subrecord = TypeVar("Subrecord")
 T_SubrecordCollection = TypeVar("SubrecordCollection")
 
 
@@ -49,113 +53,471 @@ class FormID(object):
 
 @attr.s
 class Subrecord(object):
-    """Defines a the structure of a subrecord.
+    """Defines a subrecord that can be further parsed using the supplied struct.
     """
 
-    name = attr.ib(type=str, converter=str.upper)
-    structure = attr.ib(
-        type=Construct, validator=attr.validators.instance_of(Construct)
-    )
-    optional = attr.ib(type=bool, default=False)
-    multiple = attr.ib(type=bool, default=False)
+    name = attr.ib(type=str, validator=instance_of(str))
+    struct = attr.ib(type=Construct, repr=False, validator=instance_of(Construct))
+    optional = attr.ib(type=bool, default=False, validator=instance_of(bool))
+    multiple = attr.ib(type=bool, default=False, validator=instance_of(bool))
+    _definition_regex = re.compile(r"\A(?P<name>\w{4})(?P<flag>[*+?]?)\Z")
+
+    @name.validator
+    def name_validator(self, attribute: str, value: str):
+        """Ensures that the name attribute is valid.
+
+        Args:
+            attribute (str): The attribute name
+            value (str): The attribute value
+
+        Raises:
+            ValueError:
+                - When the name is not of length 4
+        """
+
+        if len(value) != 4:
+            raise ValueError(
+                (
+                    f"name must be of length 4, recieved {value!r} with length "
+                    f"{len(value)!r}"
+                )
+            )
+
+    @classmethod
+    def parse_flag(cls, flag: str) -> Tuple[bool, bool]:
+        """Parses a given flag into a tuple for optional and multiple.
+
+        Args:
+            flag (str): The flag to parse
+
+        Returns:
+            Tuple[bool, bool]: A tuple containing the new (optional, multiple) booleans
+        """
+
+        assert flag in ("?", "*", "+", "")
+        if flag != "":
+            return ((flag in ("?", "*")), (flag in ("+", "*")))
+        return (False, False)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> T_Subrecord:
+        """Builds a subrecord from a given dictionary.
+
+        Args:
+            data (dict): The dictionary to use
+
+        Returns:
+            T_Subrecord: A new instance of a subrecord
+        """
+
+        return cls(**data)
+
+    @classmethod
+    def from_definition(cls, definition: str, struct: Construct) -> T_Subrecord:
+        """Builds a subrecord from a given definition.
+
+        Args:
+            definition (str): The definition to build from
+            struct (Construct): The structure of the subrecord
+
+        Returns:
+            T_Subrecord: A new instance of a subrecord
+        """
+
+        config = cls._definition_regex.match(definition).groupdict()
+        (is_optional, is_multiple) = cls.parse_flag(config["flag"])
+        return Subrecord(
+            config["name"], struct, optional=is_optional, multiple=is_multiple
+        )
+
+    def _build_flag(self) -> str:
+        """Builds the definition flag for the current subrecord.
+
+        Returns:
+            str: The definition flag
+        """
+
+        flag = ""
+        if self.optional:
+            if self.multiple:
+                flag = "*"
+            else:
+                flag = "?"
+        else:
+            if self.multiple:
+                flag = "+"
+        return flag
+
+    def to_dict(self) -> dict:
+        """Serializes the current subrecord as a dictionary.
+
+        .. note:: Currently not JSON serializable due to structs requiring the use of
+            lambda functions and self refrences.
+
+        Returns:
+            dict: The resulting dictionary.
+        """
+
+        # XXX: cannot serialize Struct instances (typically includes lambda expressions)
+        return attr.asdict(self)
+
+    def to_definition(self) -> Tuple[str, Construct]:
+        """Returns the definition of the subrecord.
+
+        Returns:
+            Tuple[str, Construct]: The definition, a tuple of (definition, struct)
+        """
+
+        return (f"{self.name}{self._build_flag()}", self.struct)
+
+    def be(self, flag: str) -> T_Subrecord:
+        """Set the optional and multiple arguments.
+
+        Args:
+            flag (str): The flag to set for the current collection
+
+        Returns:
+            T_Subrecord: The current subrecord
+        """
+
+        (self.optional, self.multiple) = self.parse_flag(flag)
+        return self
 
 
 @attr.s
-class SubrecordCollection(Generic[T_SubrecordCollection]):
-    """Defines a collection of subrecord structures.
+class SubrecordCollection(object):
+    """Defines a collection of subrecords.
     """
 
-    subrecords = attr.ib(
-        type=List[Union[Subrecord, T_SubrecordCollection]], default=attr.Factory(list)
+    name = attr.ib(type=str, validator=instance_of(str))
+    items = attr.ib(
+        type=list, default=attr.Factory(list), repr=False, validator=instance_of(list)
     )
-    optional = attr.ib(type=bool, default=False)
-    multiple = attr.ib(type=bool, default=False)
+    optional = attr.ib(type=bool, default=False, validator=instance_of(bool))
+    multiple = attr.ib(type=bool, default=False, validator=instance_of(bool))
+    _definition_regex = re.compile(r"\A(?P<name>\w+)(?P<flag>[*+?]?)\Z")
 
-    def _flatten_collection(self, collection: T_SubrecordCollection) -> CIMultiDict:
-        """Flattens the collection to a case insensitive multidict.
-
-        Args:
-            collection (T_SubrecordCollection): The collection to flatten
-
-        Returns:
-            CIMultiDict: The resulting multidict
-        """
-
-        flat = CIMultiDict()
-        for entry in collection.subrecords:
-            if isinstance(entry, Subrecord):
-                flat.add(entry.name, entry)
-            elif isinstance(entry, SubrecordCollection):
-                flat.extend(self._flatten_collection(entry))
-        return flat
-
-    def be(self, optional: bool = None, multiple: bool = None) -> T_SubrecordCollection:
-        """Modifies the operation of a collection in place.
+    @items.validator
+    def items_validator(self, attribute: str, value: list):
+        """Ensures that the items attribute is valid.
 
         Args:
-            optional (bool, optional): Defaults to None. Modifies the
-                optional field
-            multiple (bool, optional): Defaults to None. Updates the
-                multiple field
+            attribute (str): The attribute name
+            value (list): The attribute value
 
-        Returns:
-            T_SubrecordCollection: The collection the updates were applied to
+        Raises:
+            ValueError:
+                - When the length of the items is not greater than 0
+            TypeError:
+                - When not all of the items within the list are not of instance
+                    Subrecord or SubrecordCollection
         """
 
-        if isinstance(optional, bool):
-            self.optional = optional
-        if isinstance(multiple, bool):
-            self.multiple = multiple
+        if len(value) <= 0:
+            raise ValueError(
+                (
+                    f"items must contain at least one subrecord, "
+                    f"recieved {value!r} with length {len(value)!r}"
+                )
+            )
+        if not all(isinstance(item, (Subrecord, self.__class__)) for item in value):
+            raise TypeError(
+                (
+                    f"items can only be instances of {Subrecord!r} or "
+                    f"{SubrecordCollection!r}"
+                )
+            )
+
+    @classmethod
+    def parse_flag(cls, flag: str) -> Tuple[bool, bool]:
+        """Parses a given flag into a tuple for optional and multiple.
+
+        Args:
+            flag (str): The flag to parse
+
+        Returns:
+            Tuple[bool, bool]: A tuple containing the new (optional, multiple) booleans
+        """
+
+        assert flag in ("?", "*", "+", "")
+        if flag != "":
+            return ((flag in ("?", "*")), (flag in ("+", "*")))
+        return (False, False)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> T_SubrecordCollection:
+        """Builds a subrecord collection from a given dictionary.
+
+        Args:
+            data (dict): The dictionary to use
+
+        Returns:
+            T_SubrecordCollection: A new instance of a collection
+        """
+        # NOTE: PEP-448 dictionary unpacking emulates deepcopy
+        data = {**data}
+        data["items"] = [
+            SubrecordCollection.from_dict(item)
+            if "items" in item
+            else Subrecord.from_dict(item)
+            for item in data.get("items", [])
+        ]
+        return cls(**data)
+
+    @classmethod
+    def from_definition(cls, definition: str, data: list) -> T_SubrecordCollection:
+        """Builds a subrecord collection from a given definition.
+
+        Args:
+            definition (str): The definition to build from
+            data (list): The data of the definition
+
+        Returns:
+            T_SubrecordCollection: A new instance of a SubrecordCollection
+        """
+        config = cls._definition_regex.match(definition).groupdict()
+        items = []
+        for (sub_definition, value) in data:
+            if isinstance(value, Construct):
+                items.append(Subrecord.from_definition(sub_definition, value))
+            elif isinstance(value, list):
+                items.append(cls.from_definition(sub_definition, value))
+        (is_optional, is_multiple) = cls.parse_flag(config["flag"])
+        return cls(config["name"], items, optional=is_optional, multiple=is_multiple)
+
+    def _build_flag(self) -> str:
+        """Builds the definition flag for the current collection.
+
+        Returns:
+            str: The definition flag
+        """
+        flag = ""
+        if self.optional:
+            if self.multiple:
+                flag = "*"
+            else:
+                flag = "?"
+        else:
+            if self.multiple:
+                flag = "+"
+        return flag
+
+    def _lookahead(self, items: list, target: str) -> Subrecord:
+        """Returns the first subrecord in a list of items that matches the given target.
+
+        Args:
+            items (list): The list of items to use
+            target (str): The target to serach for
+
+        Returns:
+            Subrecord: The first matching subrecord, or None
+        """
+        for item in items:
+            if isinstance(item, Subrecord):
+                if item.name == target:
+                    return item
+            elif isinstance(item, self.__class__):
+                result = self._lookahead(item.items, target)
+                if result:
+                    return result
+
+    def _parse(  # noqa: C901
+        self, names: list, strict: bool = True, level: int = 0
+    ) -> Tuple[list, int]:
+        """Parses a given list of names to determine what subrecords to expect next.
+
+        Args:
+            names (list): A list of names to parse
+            strict (bool, optional): Defaults to True. Enables strict parsing
+            level (int, optional): Defaults to 0. The recursion level
+                (for nested collections)
+
+        Raises:
+            exceptions.UnexpectedSubrecord:
+                - When item is required but names does not exist
+                - When name is unexpected
+                - When name repeats but item does not expect multiple occurances
+
+        Returns:
+            Tuple[list, int]: A tuple of subrecords and collections to expect and
+                name index reached
+        """
+        (item_idx, name_idx) = (0, 0)
+        results = []
+
+        while True:
+            try:
+                item = self.items[item_idx]
+                name = names[name_idx]
+            except IndexError:
+                return (results + self.items[item_idx:], name_idx)
+
+            if isinstance(item, Subrecord):
+                if item.name == name:
+                    if not item.multiple:
+                        item_idx += 1
+                    name_idx += 1
+                else:
+                    if strict:
+                        # raise errors on incorrect ordering
+                        previous_name_idx = (abs(name_idx - 1) + (name_idx - 1)) // 2
+                        previous_item_idx = (abs(item_idx - 1) + (item_idx - 1)) // 2
+                        previous_name = names[previous_name_idx]
+                        previous_item = self.items[previous_item_idx]
+                        # TODO: rethink some of this error detection logic
+                        if name == previous_item.name and not previous_item.multiple:
+                            raise exceptions.UnexpectedSubrecord(
+                                f"{previous_item!r} cannot repeat for {self!r}"
+                            )
+                        elif not item.optional and not (
+                            item.multiple and previous_name == item.name
+                        ):
+                            raise exceptions.UnexpectedSubrecord(
+                                f"{item!r} is required for {self!r}"
+                            )
+                        else:
+                            if not self._lookahead(self.items[item_idx:], name):
+                                raise exceptions.UnexpectedSubrecord(
+                                    f"{name!r} is not expected for {self!r}"
+                                )
+                    item_idx += 1
+            elif isinstance(item, self.__class__):
+                if item._lookahead(item.items, name):
+                    (nested, idx) = item._parse(
+                        names[name_idx:], strict=strict, level=(level + 1)
+                    )
+                    results.extend(nested)
+                    if item.multiple:
+                        results.append(item)
+                    name_idx += idx
+                item_idx += 1
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes the current collection as a dictionary.
+
+        .. note:: Not JSON serializable due to structs requiring lambda functions
+            and self references.
+
+        Returns:
+            Dict[str, Any]: The resulting dictionary
+        """
+
+        result = attr.asdict(self)
+        result["items"] = [item.to_dict() for item in self.items]
+        return result
+
+    def to_definition(self) -> Tuple[str, list]:
+        """Returns the definition of the collection.
+
+        Returns:
+            Tuple[str, list]: The definition instance
+        """
+
+        return (
+            f"{self.name}{self._build_flag()}",
+            [_.to_definition() for _ in self.items],
+        )
+
+    def be(self, flag: str) -> T_SubrecordCollection:
+        """Set the optional and multiple arguments.
+
+        Args:
+            flag (str): Teh flag to set for the current collection
+
+        Returns:
+            T_SubrecordCollection: The current subrecord collection
+        """
+
+        (self.optional, self.multiple) = self.parse_flag(flag)
         return self
 
-    def handle_subrecord(
+    def discover(self, names: list, target: str, strict: bool = True) -> Subrecord:
+        """Discovers the next expected subrecord given a target.
+
+        Args:
+            names (list): The previously discovered subrecord names
+            target (str): The target to discover next
+            strict (bool, optional): Defaults to True. Enforce that required subrecords
+                should appear before the target
+
+        Raises:
+            exceptions.UnexpectedSubrecord:
+                - When nothing is expected next but target requested
+                - When requested target does not match next expected subrecord
+
+        Returns:
+            Subrecord: The resulting discovered subrecord, or None
+        """
+
+        def handle_strict(items: list, target: str):
+            if len(items) <= 0:
+                raise exceptions.UnexpectedSubrecord(
+                    f"nothing is expected next, asked for {target!r}"
+                )
+            for item in items:
+                if isinstance(item, Subrecord):
+                    if item.name != target:
+                        if not item.optional:
+                            if item.multiple and (
+                                len(names) > 0 and names[-1] == item.name
+                            ):
+                                continue
+                            raise exceptions.UnexpectedSubrecord(
+                                f"{item!r} is expected next, asked for {target!r}"
+                            )
+                    else:
+                        return item
+                elif isinstance(item, self.__class__):
+                    if not item.optional or self._lookahead(item.items, target):
+                        result = handle_strict(item.items, target)
+                        if result:
+                            return result
+
+        (rest, _) = self._parse(names, strict=strict)
+        if strict:
+            # apply post-parsing ordering enforcement
+            handle_strict(rest, target)
+        return self._lookahead(rest, target)
+
+    def handle_working(
         self,
         subrecord_name: str,
         subrecord_data: bytes,
-        working_record: Dict[str, int] = None,
-    ) -> Tuple[Dict[str, int], Container]:
-        """Handles the desconstruction of a given subrecord.
+        working_record: list,
+        strict: bool = True,
+    ) -> Tuple[Container, List[str]]:
+        """Handles discovering and parsing a given subrecord using a list of already
+            handled subrecord names.
+
+        Note:
+            Subrecords that cannot be correctly discovered by the collection's discovery
+            process utilize a default ``GreedyBytes * "Not Handled`` struct.
+            So any subrecord that cannot be discovered correctly or isn't handled
+            correctly with simply be a Container with a ``value`` that matches the
+            subrecord's data and a ``description`` of ``Not Handled``.
 
         Args:
-            subrecord_name (str): The type of the subrecord
-            subrecord_data (bytes): The data of the subrecord
-            working_record (Dict[str, int], optional): Defaults to None. The
-                working record dictionary (used for better determination of
-                what structure to use)
+            subrecord_name (str): The name of the subrecord to discover and parse
+            subrecord_data (bytes): The data of the subrecord to discover and parse
+            working_record (list): The list of names that have already been handled in
+                the working record
+            strict (bool): Defaults to True, If True, enforce strict discovery
 
         Returns:
-            Tuple[Dict[str, int], Container]: A tuple of the updated
-                `working_record` context and the deconstructed ``Collection``
+            Tuple[Container, List[str]]: A tuple of
+                (parsed container, new handled names to extend the working record with)
         """
 
         subrecord_name = subrecord_name.upper()
-        if working_record is None:
-            working_record = {}
-
-        # FIXME: currently this is a VERY naive way of determining which
-        # subrecord structure to use. This should be updated to also take
-        # advantage of the `optional` and `multiple` fields given to the
-        # Subrecord and SubrecordCollection instances
-        flat_collection = self._flatten_collection(self).getall(subrecord_name)
-        value_structure = GreedyBytes * "Not Handled"
-        try:
-            subrecord_structure = flat_collection[
-                (working_record.get(subrecord_name, 0) % len(flat_collection))
-            ]
-            if subrecord_name not in working_record:
-                working_record[subrecord_name] = 0
-            working_record[subrecord_name] += 1
-
-            value_structure = subrecord_structure.structure
-        except IndexError:
-            pass
-
-        parsed_container = Container(
-            value=value_structure.parse(subrecord_data),
-            description=value_structure.docs,
+        discovered = self.discover(working_record, subrecord_name, strict=strict)
+        subrecord_struct = GreedyBytes * "Not Handled"
+        if isinstance(discovered, Subrecord):
+            subrecord_struct = discovered.struct
+        parsed = Container(
+            value=subrecord_struct.parse(subrecord_data),
+            description=subrecord_struct.docs,
         )
-
-        return (parsed_container, working_record)
+        return (parsed, [subrecord_name])
 
 
 @attr.s

@@ -50,6 +50,7 @@ from ._common import (
 from .._common import Subrecord, SubrecordCollection
 
 ACHR_Subrecords = SubrecordCollection(
+    "ACHR",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("NAME", FNVFormID(["NPC_"]) * "Base"),
@@ -128,38 +129,40 @@ ACHR_Subrecords = SubrecordCollection(
             )
             * "Position / Rotation",
         ),
-    ]
+    ],
 )
 
 
 ACTI_Subrecords = SubrecordCollection(
+    "ACTI",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("SNAM", FNVFormID(["SOUN"]) * "Sound - Looping", optional=True),
         Subrecord("VNAM", FNVFormID(["SOUN"]) * "Sound - Activation", optional=True),
         Subrecord("INAM", FNVFormID(["SOUN"]) * "Radio Template", optional=True),
         Subrecord("RNAM", FNVFormID(["TACT"]) * "Radio Station", optional=True),
         Subrecord("WNAM", FNVFormID(["WATR"]) * "Water Type", optional=True),
         Subrecord("XATO", CString("utf8") * "Activation Prompt", optional=True),
-    ]
+    ],
 )
 
 
 ALCH_Subrecords = SubrecordCollection(
+    "ALCH",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name"),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord("ICON", CString("utf8") * "Large Icon Filename", optional=True),
         Subrecord("MICO", CString("utf8") * "Small Icon Filename", optional=True),
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("YNAM", FNVFormID(["SOUN"]) * "Sound - Pick Up", optional=True),
         Subrecord("ZNAM", FNVFormID(["SOUN"]) * "Sound - Drop", optional=True),
         Subrecord("ETYP", EquipmentTypeEnum * "Equipment Type"),
@@ -176,20 +179,21 @@ ALCH_Subrecords = SubrecordCollection(
                 "consume_sound" / FNVFormID(["SOUN"]),
             ),
         ),
-        EffectCollection.be(multiple=True),
-    ]
+        EffectCollection.be("+"),
+    ],
 )
 
 AMMO_Subrecords = SubrecordCollection(
+    "AMMO",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name"),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord("ICON", CString("utf8") * "Large Icon Filename", optional=True),
         Subrecord("MICO", CString("utf8") * "Small Icon Filename", optional=True),
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("YNAM", FNVFormID(["SOUN"]) * "Sound - Pick Up", optional=True),
         Subrecord("ZNAM", FNVFormID(["SOUN"]) * "Sound - Drop", optional=True),
         Subrecord(
@@ -221,11 +225,12 @@ AMMO_Subrecords = SubrecordCollection(
         Subrecord(
             "RCIL", FNVFormID(["AMEF"]) * "Ammo Effect", optional=True, multiple=True
         ),
-    ]
+    ],
 )
 
 
 ARMO_Subrecords = SubrecordCollection(
+    "ARMO",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
@@ -346,11 +351,12 @@ ARMO_Subrecords = SubrecordCollection(
         Subrecord(
             "TNAM", FNVFormID(["ARMO"]) * "Animation Sound Template", optional=True
         ),
-    ]
+    ],
 )
 
 
 AVIF_Subrecords = SubrecordCollection(
+    "AVIF",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -358,11 +364,12 @@ AVIF_Subrecords = SubrecordCollection(
         Subrecord("ICON", CString("utf8") * "Large Icon Filename", optional=True),
         Subrecord("MICO", CString("utf8") * "Small Icon Filename", optional=True),
         Subrecord("ANAM", CString("utf8") * "Short Name", optional=True),
-    ]
+    ],
 )
 
 
 CELL_Subrecords = SubrecordCollection(
+    "CELL",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -433,6 +440,7 @@ CELL_Subrecords = SubrecordCollection(
             optional=True,
         ),
         SubrecordCollection(
+            "CellTemplate",
             [
                 Subrecord("LTMP", FNVFormID(["LGTM"]) * "Template"),
                 Subrecord(
@@ -451,7 +459,7 @@ CELL_Subrecords = SubrecordCollection(
                     )
                     * "Inherit",
                 ),
-            ]
+            ],
         ),
         Subrecord("XCLW", Float32l * "Water Height", optional=True),
         Subrecord("XNAM", CString("utf8") * "Water Noise Texture", optional=True),
@@ -468,11 +476,12 @@ CELL_Subrecords = SubrecordCollection(
         Subrecord("XCAS", FNVFormID(["ASPC"]) * "Acoustic Space", optional=True),
         Subrecord("XCMT", Bytes(1) * "Unknown", optional=True),
         Subrecord("XCMO", FNVFormID(["MUSC"]) * "Music Type", optional=True),
-    ]
+    ],
 )
 
 
 CHAL_Subrecords = SubrecordCollection(
+    "CHAL",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -519,19 +528,20 @@ CHAL_Subrecords = SubrecordCollection(
         ),
         Subrecord("SNAM", FNVFormID([]) * "Value 3", optional=True),
         Subrecord("XNAM", FNVFormID([]) * "Value 4", optional=True),
-    ]
+    ],
 )
 
 
 CONT_Subrecords = SubrecordCollection(
+    "CONT",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
         ModelCollection,
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        ItemCollection.be(optional=True, multiple=True),
-        DestructionCollection.be(optional=True),
+        ItemCollection.be("*"),
+        DestructionCollection.be("?"),
         Subrecord(
             "DATA",
             Struct(
@@ -546,17 +556,20 @@ CONT_Subrecords = SubrecordCollection(
         Subrecord(
             "RNAM", FNVFormID(["SOUN"]) * "Sound - Random / Looping", optional=True
         ),
-    ]
+    ],
 )
 
 
 DIAL_Subrecords = SubrecordCollection(
+    "DIAL",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         SubrecordCollection(
+            "DialogQuest",
             [
                 Subrecord("QSTI", FNVFormID(["QUST"]) * "Quest", optional=True),
                 SubrecordCollection(
+                    "DialogQuestInfo",
                     [
                         Subrecord(
                             "INFC",
@@ -576,6 +589,7 @@ DIAL_Subrecords = SubrecordCollection(
             "QSTR", FNVFormID(["QUST"]) * "Removed Quest", optional=True, multiple=True
         ),
         SubrecordCollection(
+            "_",
             [
                 Subrecord("INFC", GreedyBytes * "Unused", optional=True),
                 Subrecord("INFX", GreedyBytes * "Unused", optional=True),
@@ -605,18 +619,19 @@ DIAL_Subrecords = SubrecordCollection(
             )
             * "Data",
         ),
-    ]
+    ],
 )
 
 
 DOOR_Subrecords = SubrecordCollection(
+    "DOOR",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
         ModelCollection,
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("SNAM", FNVFormID(["SOUN"]) * "Sound - Open", optional=True),
         Subrecord("ANAM", FNVFormID(["SOUN"]) * "Sound - Close", optional=True),
         Subrecord("BNAM", FNVFormID(["SOUN"]) * "Sound - Looping", optional=True),
@@ -632,10 +647,11 @@ DOOR_Subrecords = SubrecordCollection(
             )
             * "Flags",
         ),
-    ]
+    ],
 )
 
 EYES_Subrecords = SubrecordCollection(
+    "EYES",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name"),
@@ -644,10 +660,11 @@ EYES_Subrecords = SubrecordCollection(
             "DATA",
             FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04) * "Flags",
         ),
-    ]
+    ],
 )
 
 FACT_Subrecords = SubrecordCollection(
+    "FACT",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -678,6 +695,7 @@ FACT_Subrecords = SubrecordCollection(
         ),
         Subrecord("CNAM", Float32l * "Unused", optional=True),
         SubrecordCollection(
+            "FactionRanks",
             [
                 Subrecord("RNAM", Int32sl * "Rank Number", optional=True),
                 Subrecord("MNAM", CString("utf8") * "Male", optional=True),
@@ -688,42 +706,46 @@ FACT_Subrecords = SubrecordCollection(
             multiple=True,
         ),
         Subrecord("WMI1", FNVFormID(["REPU"]) * "Reputation", optional=True),
-    ]
+    ],
 )
 
 
 FLST_Subrecords = SubrecordCollection(
+    "FLST",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("LNAM", FNVFormID([]) * "Form ID", optional=True, multiple=True),
-    ]
+    ],
 )
 
 
 FURN_Subrecords = SubrecordCollection(
+    "FURN",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
         ModelCollection,
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("MNAM", GreedyBytes * "Marker Flags"),
-    ]
+    ],
 )
 
 
 # NOTE: FNAM = s -> short, l -> long, f -> float
 GLOB_Subrecords = SubrecordCollection(
+    "GLOB",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FNAM", Int8ul * "Type"),
         Subrecord("FLTV", Float32l * "Value"),
-    ]
+    ],
 )
 
 
 HAIR_Subrecords = SubrecordCollection(
+    "HAIR",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name"),
@@ -734,20 +756,21 @@ HAIR_Subrecords = SubrecordCollection(
             FlagsEnum(Int8ul, playable=0x01, not_male=0x02, not_female=0x04, fixed=0x08)
             * "Flags",
         ),
-    ]
+    ],
 )
 
 
 KEYM_Subrecords = SubrecordCollection(
+    "KEYM",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name"),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord("ICON", CString("utf8") * "Large Icon Filename"),
         Subrecord("MICO", CString("utf8") * "Small Icon Filename"),
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("YNAM", FNVFormID(["SOUN"]) * "Sound - Pick Up", optional=True),
         Subrecord("ZNAM", FNVFormID(["SOUN"]) * "Sound - Drop", optional=True),
         Subrecord(
@@ -758,22 +781,24 @@ KEYM_Subrecords = SubrecordCollection(
         Subrecord(
             "RNAM", FNVFormID(["SOUN"]) * "Sound - Random/Looping", optional=True
         ),
-    ]
+    ],
 )
 
 
 MICN_Subrecords = SubrecordCollection(
+    "MICN",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("ICON", CString("utf8") * "Large Icon Filename"),
         Subrecord("MICO", CString("utf8") * "Small Icon Filename"),
-    ]
+    ],
 )
 
 MISC_Subrecords = KEYM_Subrecords
 
 
 MESG_Subrecords = SubrecordCollection(
+    "MESG",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("DESC", CString("utf8") * "Description"),
@@ -795,25 +820,27 @@ MESG_Subrecords = SubrecordCollection(
         ),
         Subrecord("TNAM", Int32ul * "Display Time", optional=True),
         SubrecordCollection(
+            "MessageConfig",
             [
                 Subrecord("ITXT", CString("utf8") * "Button Text", optional=True),
                 Subrecord(
                     "CTDA", CTDAStruct * "Condition", optional=True, multiple=True
                 ),
-            ]
+            ],
         ),
-    ]
+    ],
 )
 
 
 MGEF_Subrecords = SubrecordCollection(
+    "MGEF",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
         Subrecord("DESC", CString("utf8") * "Description"),
         Subrecord("ICON", CString("utf8") * "Large Icon Filename"),
         Subrecord("MICO", CString("utf8") * "Samll Icon Filename"),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord(
             "DATA",
             Struct(
@@ -850,73 +877,74 @@ MGEF_Subrecords = SubrecordCollection(
                     no_hit_effect=0x08000000,
                     no_death_dispel=0x10000000,
                     _unknown_9=0x20000000,
-                )
+                ),
+                "base_cost" / Float32l,
+                "associated_item" / FNVFormID([]),  # NOTE: unknown form id reference
+                "magic_school" / Int32sl,
+                "resistance_type" / ActorValuesEnum,
+                "_unknown_0" / Int16ul,
+                "_unknown_1" / Bytes(2),
+                "light" / FNVFormID(["LIGH"]),
+                "projectile_speed" / Float32l,
+                "effect_shader" / FNVFormID(["EFSH"]),
+                "object_display_shader" / FNVFormID(["EFSH"]),
+                "effect_sound" / FNVFormID(["SOUN"]),
+                "bold_sound" / FNVFormID(["SOUN"]),
+                "hit_sound" / FNVFormID(["SOUN"]),
+                "area_sound" / FNVFormID(["SOUN"]),
+                "constant_effect_enchantment_factor" / Float32l,
+                "constant_effect_barter_factor" / Float32l,
+                "archtype"
+                / Enum(
+                    Int32ul,
+                    value_modifier=0,
+                    script=1,
+                    dispel=2,
+                    cure_disease=3,
+                    _unknown_0=4,
+                    _unknown_1=5,
+                    _unknown_2=6,
+                    _unknown_3=7,
+                    _unknown_4=8,
+                    _unknown_5=9,
+                    _unknown_6=10,
+                    invisibility=11,
+                    chameleon=12,
+                    light=13,
+                    _unknown_7=14,
+                    _unknown_8=15,
+                    lock=16,
+                    open=17,
+                    bound_item=18,
+                    summon_creature=19,
+                    _unknown_9=20,
+                    _unknown_10=21,
+                    _unknown_11=22,
+                    _unknown_12=23,
+                    paralysis=24,
+                    _unknown_13=25,
+                    _unknown_14=26,
+                    _unknown_15=27,
+                    _unknown_16=28,
+                    _unknown_17=29,
+                    cure_paralysis=30,
+                    cure_addiction=31,
+                    cure_poison=32,
+                    concussion=33,
+                    value=34,
+                    limb_condition=35,
+                    turbo=36,
+                ),
+                "actor_value" / ActorValuesEnum,
             )
             * "Data",
         ),
-        "base_cost" / Float32l,
-        "associated_item" / FNVFormID([]),  # NOTE: unknown form id reference
-        "magic_school" / Int32sl,
-        "resistance_type" / ActorValuesEnum,
-        "_unknown_0" / Int16ul,
-        "_unknown_1" / Bytes(2),
-        "light" / FNVFormID(["LIGH"]),
-        "projectile_speed" / Float32l,
-        "effect_shader" / FNVFormID(["EFSH"]),
-        "object_display_shader" / FNVFormID(["EFSH"]),
-        "effect_sound" / FNVFormID(["SOUN"]),
-        "bold_sound" / FNVFormID(["SOUN"]),
-        "hit_sound" / FNVFormID(["SOUN"]),
-        "area_sound" / FNVFormID(["SOUN"]),
-        "constant_effect_enchantment_factor" / Float32l,
-        "constant_effect_barter_factor" / Float32l,
-        "archtype"
-        / Enum(
-            Int32ul,
-            value_modifier=0,
-            script=1,
-            dispel=2,
-            cure_disease=3,
-            _unknown_0=4,
-            _unknown_1=5,
-            _unknown_2=6,
-            _unknown_3=7,
-            _unknown_4=8,
-            _unknown_5=9,
-            _unknown_6=10,
-            invisibility=11,
-            chameleon=12,
-            light=13,
-            _unknown_7=14,
-            _unknown_8=15,
-            lock=16,
-            open=17,
-            bound_item=18,
-            summon_creature=19,
-            _unknown_9=20,
-            _unknown_10=21,
-            _unknown_11=22,
-            _unknown_12=23,
-            paralysis=24,
-            _unknown_13=25,
-            _unknown_14=26,
-            _unknown_15=27,
-            _unknown_16=28,
-            _unknown_17=29,
-            cure_paralysis=30,
-            cure_addiction=31,
-            cure_poison=32,
-            concussion=33,
-            value=34,
-            limb_condition=35,
-            turbo=36,
-        ),
-        "actor_value" / ActorValuesEnum,
-    ]
+    ],
 )
 
 
 NAVI_Subrecords = SubrecordCollection(
+    "NAVI",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID", optional=True),
         Subrecord("NVER", Int32ul * "Version", optional=True),
@@ -946,16 +974,17 @@ NAVI_Subrecords = SubrecordCollection(
             optional=True,
             multiple=True,
         ),
-    ]
+    ],
 )
 
 
 NOTE_Subrecords = SubrecordCollection(
+    "NOTE",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name"),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord("ICON", CString("utf8") * "Large Icon Filename", optional=True),
         Subrecord("MICO", CString("utf8") * "Small Icon Filename", optional=True),
         Subrecord("YNAM", FNVFormID(["SOUN"]) * "Sound - Pick Up", optional=True),
@@ -971,16 +1000,17 @@ NOTE_Subrecords = SubrecordCollection(
         Subrecord(
             "SNAM", FNVFormID(["SOUN", "NPC_", "CREA"]) * "Sound / Actor", optional=True
         ),
-    ]
+    ],
 )
 
 
 NPC__Subrecords = SubrecordCollection(
+    "NPC_",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord(
             "ACBS",
             Struct(
@@ -1065,9 +1095,9 @@ NPC__Subrecords = SubrecordCollection(
             "EITM", FNVFormID(["ENCH", "SPEL"]) * "Unarmed Attack Effect", optional=True
         ),
         Subrecord("EAMT", AttackAnimationsEnum * "Unarmed Attack Animation"),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        ItemCollection.be(optional=True, multiple=True),
+        ItemCollection.be("*"),
         Subrecord(
             "AIDT",
             Struct(
@@ -1173,11 +1203,12 @@ NPC__Subrecords = SubrecordCollection(
         Subrecord("NAM5", Int16ul * "Unknown"),
         Subrecord("NAM6", Float32l * "Height"),
         Subrecord("NAM7", Float32l * "Weight"),
-    ]
+    ],
 )
 
 
 RACE_Subrecords = SubrecordCollection(
+    "RACE",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -1251,6 +1282,7 @@ RACE_Subrecords = SubrecordCollection(
         Subrecord("NAM0", Bytes(0) * "Head Data Marker"),
         Subrecord("MNAM", Bytes(0) * "Male Head Data Marker"),
         SubrecordCollection(
+            "RaceMaleFaceData",
             [
                 Subrecord(
                     "INDX",
@@ -1280,6 +1312,7 @@ RACE_Subrecords = SubrecordCollection(
         ),
         Subrecord("FNAM", Bytes(0) * "Female Head Data Marker"),
         SubrecordCollection(
+            "RaceFemaleFaceData",
             [
                 Subrecord(
                     "INDX",
@@ -1310,6 +1343,7 @@ RACE_Subrecords = SubrecordCollection(
         Subrecord("NAM1", Bytes(0) * "Body Data Marker"),
         Subrecord("MNAM", Bytes(0) * "Male Body Data Marker"),
         SubrecordCollection(
+            "RaceMaleBodyData",
             [
                 Subrecord(
                     "INDX",
@@ -1335,6 +1369,7 @@ RACE_Subrecords = SubrecordCollection(
         ),
         Subrecord("FNAM", Bytes(0) * "Female Body Data Marker"),
         SubrecordCollection(
+            "RaceFemaleBodyData",
             [
                 Subrecord(
                     "INDX",
@@ -1370,11 +1405,12 @@ RACE_Subrecords = SubrecordCollection(
         Subrecord("FGGA", GreedyBytes * "Female FaceGen Geometry - Asymmetric"),
         Subrecord("FGTS", GreedyBytes * "Female FaceGen Texture - Symmetric"),
         Subrecord("SNAM", Bytes(0) * "Unknown"),
-    ]
+    ],
 )
 
 
 RCPE_Subrecords = SubrecordCollection(
+    "RCPE",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -1391,6 +1427,7 @@ RCPE_Subrecords = SubrecordCollection(
             optional=True,
         ),
         SubrecordCollection(  # NOTE: Ingredient is same as output with no marker :(
+            "RecipeIngredients",
             [
                 Subrecord(
                     "RCIL",
@@ -1419,6 +1456,7 @@ RCPE_Subrecords = SubrecordCollection(
             multiple=True,
         ),
         SubrecordCollection(  # NOTE: Output is same as ingredient with no marker :(
+            "RecipieIngredients",
             [
                 Subrecord(
                     "RCIL",
@@ -1446,16 +1484,17 @@ RCPE_Subrecords = SubrecordCollection(
             optional=True,
             multiple=True,
         ),
-    ]
+    ],
 )
 
 
 SCPT_Subrecords = SubrecordCollection(
-    [Subrecord("EDID", CString("utf8") * "Editor ID"), ScriptCollection]
+    "SCPT", [Subrecord("EDID", CString("utf8") * "Editor ID"), ScriptCollection]
 )
 
 
 SPEL_Subrecords = SubrecordCollection(
+    "SPEL",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
@@ -1495,16 +1534,17 @@ SPEL_Subrecords = SubrecordCollection(
             )
             * "Effect Configuration",
         ),
-        EffectCollection.be(multiple=True),
-    ]
+        EffectCollection.be("+"),
+    ],
 )
 
 
 STAT_Subrecords = SubrecordCollection(
+    "STAT",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord(
             "BRUS",
             Enum(
@@ -1527,33 +1567,35 @@ STAT_Subrecords = SubrecordCollection(
         Subrecord(
             "RNAM", FNVFormID(["SOUN"]) * "Sound - Random / Looping", optional=True
         ),
-    ]
+    ],
 )
 
 
 TACT_Subrecords = SubrecordCollection(
+    "TACT",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
         ModelCollection,
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("SNAM", FNVFormID(["SOUN"]) * "Looping Sound", optional=True),
         Subrecord("VNAM", FNVFormID(["VTYP"]) * "Voice Type", optional=True),
         Subrecord("INAM", FNVFormID(["SOUN"]) * "Radio Template", optional=True),
-    ]
+    ],
 )
 
 
 TERM_Subrecords = SubrecordCollection(
+    "TERM",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
         Subrecord("FULL", CString("utf8") * "Name", optional=True),
-        ModelCollection.be(optional=True),
+        ModelCollection.be("?"),
         Subrecord("SCRI", FNVFormID(["SCPT"]) * "Script", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("DESC", CString("utf8") * "Description"),
         Subrecord("SNAM", FNVFormID(["SCPT"]) * "Sound - Looping", optional=True),
         Subrecord("PNAM", FNVFormID(["NOTE"]) * "Password Note", optional=True),
@@ -1597,6 +1639,7 @@ TERM_Subrecords = SubrecordCollection(
             * "Data",
         ),
         SubrecordCollection(
+            "TerminalContent",
             [
                 Subrecord("ITXT", CString("utf8") * "Item Text", optional=True),
                 Subrecord("RNAM", CString("utf8") * "Result Text"),
@@ -1614,10 +1657,11 @@ TERM_Subrecords = SubrecordCollection(
             optional=True,
             multiple=True,
         ),
-    ]
+    ],
 )
 
 TES4_Subrecords = SubrecordCollection(
+    "TES4",
     [
         Subrecord(
             "HEDR",
@@ -1633,6 +1677,7 @@ TES4_Subrecords = SubrecordCollection(
         Subrecord("CNAM", CString("utf8") * "Author"),
         Subrecord("SNAM", CString("utf8") * "Description", optional=True),
         SubrecordCollection(
+            "TES4Masters",
             [
                 Subrecord("MAST", CString("utf8") * "Master Plugin"),
                 Subrecord("DATA", Int64ul * "File Size"),
@@ -1644,11 +1689,12 @@ TES4_Subrecords = SubrecordCollection(
             "ONAM", GreedyRange(Int32ul) * "Overridden Records", optional=True
         ),  # FIXME: reedy FNV_FormID([REFR, ACHR, ACRE, PMIS, PBEA, PGRE, LAND, NAVM]),
         Subrecord("SCRN", GreedyBytes * "Screenshot", optional=True),
-    ]
+    ],
 )
 
 
 TXST_Subrecords = SubrecordCollection(
+    "TXST",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
@@ -1680,11 +1726,12 @@ TXST_Subrecords = SubrecordCollection(
             optional=True,
         ),
         Subrecord("DNAM", FlagsEnum(Int16ul, no_specular_map=0x0001) * "Flags"),
-    ]
+    ],
 )
 
 
 WEAP_Subrecords = SubrecordCollection(
+    "WEAP",
     [
         Subrecord("EDID", CString("utf8") * "Editor ID"),
         Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
@@ -1696,16 +1743,16 @@ WEAP_Subrecords = SubrecordCollection(
         Subrecord("EITM", FNVFormID(["ENCH", "SPEL"]) * "Object Effect", optional=True),
         Subrecord("EAMT", Int16sl * "Enchantment Charge Amount", optional=True),
         Subrecord("NAM0", FNVFormID(["AMMO", "FLST"]) * "Ammo", optional=True),
-        DestructionCollection.be(optional=True),
+        DestructionCollection.be("?"),
         Subrecord("REPL", FNVFormID(["FLST"]) * "Repair List", optional=True),
         Subrecord("ETYP", EquipmentTypeEnum * "Equipment Type"),
         Subrecord("BIPL", FNVFormID(["FLST"]) * "Biped Model List", optional=True),
         Subrecord("YNAM", FNVFormID(["SOUN"]) * "Sound - Pick Up", optional=True),
         Subrecord("ZNAM", FNVFormID(["SOUN"]) * "Sound - Drop", optional=True),
-        Model2Collection.be(optional=True),
-        Model3Collection.be(optional=True),
+        Model2Collection.be("?"),
+        Model3Collection.be("?"),
         Subrecord("EFSD", FNVFormID(["EFSH"]) * "Scope Effect", optional=True),
-        Model4Collection.be(optional=True),
+        Model4Collection.be("?"),
         Subrecord("MWD1", CString("utf8") * "Model with Mod 1", optional=True),
         Subrecord("MWD2", CString("utf8") * "Model with Mod 2", optional=True),
         Subrecord("MWD3", CString("utf8") * "Model with Mods 1 and 2", optional=True),
@@ -1978,7 +2025,7 @@ WEAP_Subrecords = SubrecordCollection(
             optional=True,
         ),
         Subrecord("VNAM", SoundLevelEnum * "Sound Level"),
-    ]
+    ],
 )
 
 # NOTE: these records come from https://tes5edit.github.io/fopdoc/FalloutNV/Records.html

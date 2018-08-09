@@ -26,6 +26,7 @@ twine = "*"
 isort = "*"
 sphinxcontrib-mermaid = "*"
 pytest-xdist = "*"
+hypothesis = "*"
 
 [requires]
 python_version = "3.6"
@@ -34,10 +35,11 @@ python_version = "3.6"
 allow_prereleases = true
 
 [scripts]
-test = "pytest"
-test-cov = "pytest --cov"
+tests = "pytest -rc ./tests -n 4"
+tests-cov = "pytest -rc ./tests -n 4 --cov"
 make-docs = "make -C ./docs html"
 clean-docs = "make -C ./docs clean"
 open-docs = "python -mwebbrowser ./docs/build/html/index.html"
 black = "black ./bethesda_structs"
 isort = "isort -rc ./bethesda_structs"
+profile = "bash profile.sh"

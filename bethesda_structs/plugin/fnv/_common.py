@@ -830,6 +830,7 @@ SkillBoostStruct = Struct(
 )
 
 DestructionCollection = SubrecordCollection(
+    "Destruction",
     [
         Subrecord(
             "DEST",
@@ -842,6 +843,7 @@ DestructionCollection = SubrecordCollection(
             * "Header",
         ),
         SubrecordCollection(
+            "DestructionConfig",
             [
                 Subrecord(
                     "DSTD",
@@ -873,11 +875,12 @@ DestructionCollection = SubrecordCollection(
             optional=True,
             multiple=True,
         ),
-    ]
+    ],
 )
 
 
 ModelCollection = SubrecordCollection(
+    "Model",
     [
         Subrecord("MODL", CString("utf8") * "Model Filename"),
         Subrecord("MODB", Bytes(4) * "Unknown", optional=True),
@@ -903,11 +906,12 @@ ModelCollection = SubrecordCollection(
             * "Facegen Model Flags",
             optional=True,
         ),
-    ]
+    ],
 )
 
 
 Model2Collection = SubrecordCollection(
+    "Model2",
     [
         Subrecord("MOD2", CString("utf8") * "Model Filename"),
         Subrecord("MO2T", GreedyBytes * "Texture File Hashes", optional=True),
@@ -926,11 +930,12 @@ Model2Collection = SubrecordCollection(
             * "Alternate Textures",
             optional=True,
         ),
-    ]
+    ],
 )
 
 
 Model3Collection = SubrecordCollection(
+    "Model3",
     [
         Subrecord("MOD3", CString("utf8") * "Model Filename"),
         Subrecord("MO3T", GreedyBytes * "Texture File Hashes", optional=True),
@@ -960,6 +965,7 @@ Model3Collection = SubrecordCollection(
 
 
 Model4Collection = SubrecordCollection(
+    "Model4",
     [
         Subrecord("MOD4", CString("utf8") * "Model Filename"),
         Subrecord("MO4T", GreedyBytes * "Texture File Hashes", optional=True),
@@ -978,11 +984,12 @@ Model4Collection = SubrecordCollection(
             * "Alternate Textures",
             optional=True,
         ),
-    ]
+    ],
 )
 
 
 EffectCollection = SubrecordCollection(
+    "Effect",
     [
         Subrecord("EFID", FNVFormID(["MGEF"]) * "Base Effect", optional=True),
         Subrecord(
@@ -1074,11 +1081,12 @@ EffectCollection = SubrecordCollection(
             * "Effect Data",
         ),
         Subrecord("CTDA", CTDAStruct * "Condition", optional=True),
-    ]
+    ],
 )
 
 
 ItemCollection = SubrecordCollection(
+    "Item",
     [
         Subrecord(
             "CNTO",
@@ -1119,11 +1127,12 @@ ItemCollection = SubrecordCollection(
             * "Extra Data",
             optional=True,
         ),
-    ]
+    ],
 )
 
 
 ScriptCollection = SubrecordCollection(
+    "Script",
     [
         Subrecord(
             "SCHR",
@@ -1140,6 +1149,7 @@ ScriptCollection = SubrecordCollection(
         Subrecord("SCDA", GreedyBytes * "Commpiled Script Source"),
         Subrecord("SCTX", GreedyString("utf8") * "Script Source"),
         SubrecordCollection(
+            "ScriptVariables",
             [
                 Subrecord(
                     "SLSD",
@@ -1236,5 +1246,5 @@ ScriptCollection = SubrecordCollection(
             optional=True,
             multiple=True,
         ),
-    ]
+    ],
 )

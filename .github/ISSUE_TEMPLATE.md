@@ -26,4 +26,4 @@
 
 ---
 
-💔 Thank you!
+❤️ Thank you!
