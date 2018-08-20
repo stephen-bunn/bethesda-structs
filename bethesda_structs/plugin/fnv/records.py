@@ -2093,6 +2093,7 @@ RecordMapping = {
     "TACT": TACT_Subrecords,
     "TERM": TERM_Subrecords,
     "TES4": TES4_Subrecords,
+    "TREE": TREE_Subrecords,
     "TXST": TXST_Subrecords,
     "WEAP": WEAP_Subrecords,
 }
