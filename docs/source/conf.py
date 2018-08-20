@@ -117,8 +117,8 @@ html_theme_options = {
     "page_width": "1000px",
     "sidebar_width": "220px",
     "sidebar_collapse": True,
-    "slackin_button": True,
-    "slackin_link": "https://bethesda-structs-slackin.herokuapp.com",
+    # "slackin_button": True,
+    # "slackin_link": "https://bethesda-structs-slackin.herokuapp.com",
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,

@@ -960,7 +960,7 @@ Model3Collection = SubrecordCollection(
             * "Facegen Model Flags",
             optional=True,
         ),
-    ]
+    ],
 )
 
 
