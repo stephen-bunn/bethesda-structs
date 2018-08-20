@@ -27,10 +27,6 @@
    :target: https://www.codacy.com/app/stephen-bunn/bethesda-structs?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=stephen-bunn/bethesda-structs&amp;utm_campaign=Badge_Grade
    :alt: Codacy Grade
 
-.. image:: https://bethesda-structs-slackin.herokuapp.com/badge.svg
-   :target: https://bethesda-structs-slackin.herokuapp.com/
-   :alt: Slack
-
 .. image:: https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg
    :target: https://saythanks.io/to/stephen-bunn
    :alt: Say Thanks!
