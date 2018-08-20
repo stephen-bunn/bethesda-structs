@@ -1660,6 +1660,7 @@ TERM_Subrecords = SubrecordCollection(
     ],
 )
 
+
 TES4_Subrecords = SubrecordCollection(
     "TES4",
     [
@@ -1689,6 +1690,34 @@ TES4_Subrecords = SubrecordCollection(
             "ONAM", GreedyRange(Int32ul) * "Overridden Records", optional=True
         ),  # FIXME: reedy FNV_FormID([REFR, ACHR, ACRE, PMIS, PBEA, PGRE, LAND, NAVM]),
         Subrecord("SCRN", GreedyBytes * "Screenshot", optional=True),
+    ],
+)
+
+
+TREE_Subrecords = SubrecordCollection(
+    "TREE",
+    [
+        Subrecord("EDID", CString("utf8") * "Editor ID"),
+        Subrecord("OBND", ObjectBoundsStruct * "Object Bounds"),
+        ModelCollection,
+        Subrecord("ICON", CString("utf8") * "Large Icon Filename"),
+        Subrecord("MICO", CString("utf8") * "Small Icon Filename"),
+        Subrecord("SNAM", GreedyRange(Int32ul) * "SpeedTree Seeds"),
+        Subrecord(
+            "CNAM",
+            Struct(
+                "leaf_curvature" / Float32l,
+                "minimum_leaf_angle" / Float32l,
+                "maximum_leaf_angle" / Float32l,
+                "branch_dimming_value" / Float32l,
+                "leaf_dimming_value" / Float32l,
+                "shadow_radius" / Int32sl,
+                "rock_speed" / Float32l,
+                "rustle_speed" / Float32l,
+            )
+            * "Tree Data",
+        ),
+        Subrecord("BNAM", Struct("width" / Float32l, "height" / Float32l)),
     ],
 )
 
