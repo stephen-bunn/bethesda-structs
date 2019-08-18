@@ -150,7 +150,7 @@ class DXGIFormats(IntEnum):
     DXGI_FORMAT_P208 = 130
     DXGI_FORMAT_V208 = 131
     DXGI_FORMAT_V408 = 132
-    DXGI_FORMAT_FORCE_UINT = 0xffffffff
+    DXGI_FORMAT_FORCE_UINT = 0xFFFFFFFF
 
 
 class D3D10ResourceDimension(IntEnum):
@@ -205,7 +205,7 @@ DDS_PIXELFORMAT = Struct(
             DDPF_ALPHAPIXELS=0x00000001,
             DDPF_ALPHA=0x00000002,
             DDPF_FOURCC=0x00000004,
-            DDPF_RGB=0x00000040,
+            DDPF_RBG=0x00000040,
             DDPF_YUV=0x00000200,
             DDPF_LUMINANCE=0x00020000,
         ),

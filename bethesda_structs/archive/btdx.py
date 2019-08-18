@@ -303,10 +303,10 @@ class BTDXArchive(BaseArchive):
                 dict(
                     dwFlags=dict(DDPF_ALPHA=True, DDPF_RBG=True),
                     dwRGBBitCount=32,
-                    dwABitMask=0xff000000,
-                    dwRBitMask=0x00ff0000,
-                    dwGBitMask=0x0000ff00,
-                    dwBBitMask=0x000000ff,
+                    dwABitMask=0xFF000000,
+                    dwRBitMask=0x00FF0000,
+                    dwGBitMask=0x0000FF00,
+                    dwBBitMask=0x000000FF,
                 )
             )
             header_data.update(
@@ -319,7 +319,7 @@ class BTDXArchive(BaseArchive):
         elif file_container.header.format == DXGIFormats.DXGI_FORMAT_R8_UNORM:
             pixel_data.update(
                 dict(
-                    dwFlags=dict(DDPF_RGB=True), dwRGBBitCount=8, dwRBitMask=0x000000ff
+                    dwFlags=dict(DDPF_RGB=True), dwRGBBitCount=8, dwRBitMask=0x000000FF
                 )
             )
             header_data.update(
