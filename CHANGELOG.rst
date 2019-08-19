@@ -6,9 +6,13 @@ Changelog
 | The format is based on `Keep a Changelog <http://keepachangelog.com/en/1.0.0/>`_ and this project adheres to `Semantic Versioning <http://semver.org/spec/v2.0.0.html>`_.
 |
 
-**WIP: 0.1.4** (*unreleased*)
+**WIP: 0.1.5** (*unreleased*)
 -----------------------------
 - proper plugin parsing logic 👍
+
+`0.1.4`_ (*2019-08-18*)
+-----------------------
+- fixed ``RBG`` flag naming for DDS pixel format headers in BTDX archives
 
 `0.1.3`_ (*2018-04-22*)
 -----------------------
@@ -46,3 +50,4 @@ Changelog
 .. _0.0.0: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.0.0
 .. _0.0.1: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.0.1
 .. _0.1.3: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.1.3
+.. _0.1.4: https://github.com/stephen-bunn/bethesda-structs/releases/tag/v0.1.4
