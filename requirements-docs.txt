@@ -48,5 +48,5 @@ sphinxcontrib-napoleon==0.6.1
 sphinxcontrib-websupport==1.0.1
 sphinxcontrib-mermaid==0.3.1
 termcolor==1.1.0
-urllib3==1.22
+urllib3==1.24.2
 wcwidth==0.1.7
