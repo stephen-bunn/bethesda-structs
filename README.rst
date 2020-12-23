@@ -20,6 +20,9 @@
       <a href="https://www.python.org/" target="_blank"><img alt="Made with: Python" src="https://forthebadge.com/images/badges/made-with-python.svg"></a>
    </p>
 
+.. raw:: html
+
+   <h1 style="text-align: center; color: #f00">This project is archived as I can no longer maintain it!<br/>Sorry for any inconvenience <3.</h1>
 
 About
 -----
