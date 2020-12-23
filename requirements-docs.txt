@@ -19,7 +19,7 @@ flask-sphinx-themes==1.0.2
 idna==2.6
 imagesize==1.0.0
 jedi==0.11.1
-jinja2==2.10
+jinja2==2.10.1
 markupsafe==1.0
 mccabe==0.6.1
 more-itertools==4.1.0
